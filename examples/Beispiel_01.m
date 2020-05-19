@@ -12,7 +12,7 @@ testfun02;
 % Stochastic (Duffing or ECS)
 % testfun03;
 %% Solve
-[vs,ls,exitflag] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve');%,'arclength','ellipsoid');
+[vs,ls,exitflag] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton');%,'arclength','ellipsoid');
 %% Plot
 figure(1);
 clf;

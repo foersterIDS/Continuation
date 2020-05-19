@@ -26,6 +26,9 @@ function [solver] = continuation_solver(Opt)
             options = optimoptions('lsqnonlin','display','off');
         end
         solver = @(fun,x0) lsqnonlin(fun,x0,[],[],options);
+    elseif Opt.solver.newton
+        %% basic newton solver
+        solver = @(fun,x0) basic_newton_solver(fun,x0);
     else
         %% error
         error('No such solver');

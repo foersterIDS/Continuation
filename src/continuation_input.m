@@ -11,7 +11,8 @@ function [Opt] = continuation_input(varargin_cell,fun)
                           'newton',false);
     Opt_sovler = struct('fsolve',true,... % st.
                         'fmincon',false,...
-                        'lsqnonlin',false);
+                        'lsqnonlin',false,...
+                        'newton',false);
     Opt_arclength = struct('sphere',true,... % st.
                            'linear',false,...
                            'ellipsoid',false);
