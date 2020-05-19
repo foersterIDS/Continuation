@@ -8,7 +8,7 @@
 %   lams <= l <= lame
 %   ds0: initial stepsize
 %
-function [vars,ls,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     exitflag = -1;
@@ -24,16 +24,16 @@ function [vars,ls,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,vararg
     %% find initial solution
     %
     R = @(v) fun(v,l_start);
-    [vars,~,initial_exitflag] = solver(R,var0);
+    [var_all,~,initial_exitflag] = solver(R,var0);
     if initial_exitflag>0
-        ls = l_start;
+        l_all = l_start;
         do_continuation = true;
         if Opt.display
             fprintf('Initial solution at l = %.2e\n',l_start);
         end
     else
-        vars = [];
-        ls = [];
+        var_all = [];
+        l_all = [];
         bif = [];
         exitflag = -2; % no initial solution found
         do_continuation = false;
@@ -51,52 +51,52 @@ function [vars,ls,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,vararg
         %
         %% residual and predictor
         %
-        R = @(x) [fun(x(1:end-1),x(end));res_arle(x,[vars;ls],ds)];
+        R = @(x) [fun(x(1:end-1),x(end));res_arle(x,[var_all;l_all],ds)];
         if do_deflate
             try
-                R = @(x) deflation(R,xdef,x);
+                R = @(x) deflation(R,x_deflation,x);
             catch
                 error('Error occured during deflation.');
             end
         end
-        [vp,lp] = predictor(vars,ls,ds,Opt);
-        xp = [vp;lp];
+        [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+        x_predictor = [v_predictor;l_predictor];
         %
         %% solve
         %
         if do_homotopy
             try
-                xi = [vars(:,end);ls(end)];
-                [x_sol,solver_exitflag] = homotopy(R,xi,Opt);
+                x_last_step = [var_all(:,end);l_all(end)];
+                [x_solution,solver_exitflag] = homotopy(R,x_last_step,Opt);
             catch
-                x_sol = NaN(size(xp));
+                x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
             end
         else
             try
-                [x_sol,~,solver_exitflag] = solver(R,xp);
+                [x_solution,~,solver_exitflag] = solver(R,x_predictor);
             catch
-                x_sol = NaN(size(xp));
+                x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
             end
         end
         %
         %% check result
         %
-        val = validate_result(x_sol,vars,ls,solver_exitflag);
+        val = validate_result(x_solution,var_all,l_all,solver_exitflag);
         if val
             %% valid result
-            vars = [vars,x_sol(1:end-1)];
-            ls = [ls,x_sol(end)];
+            var_all = [var_all,x_solution(1:end-1)];
+            l_all = [l_all,x_solution(end)];
             do_deflate = false;
             do_homotopy = false;
             error_counter = 0;
         else
             %% invalid result
             error_counter = error_counter+1;
-            if Opt.deflation && ~isnan(sum(x_sol(:,end)))
+            if Opt.deflation && ~isnan(sum(x_solution(:,end)))
                 do_deflate = true;
-                xdef = x_sol;
+                x_deflation = x_solution;
             else
                 do_deflate = false;
                 warning('Hier muss etwas gemacht werden!');
@@ -121,18 +121,18 @@ function [vars,ls,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,vararg
         %
         if Opt.display
             if val
-                fprintf('-----> continued at l = %.2e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\n',ls(end),ds,loop_counter);
+                fprintf('-----> continued at l = %.2e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\n',l_all(end),ds,loop_counter);
             else
                 fprintf('-----> invalid point\t\t\t\t\t\t\t\t\t\t\t\t\t|\tloop counter = %d\n',loop_counter);
             end
         end
         % exit with success:
-        if ls(end)>l_end
+        if l_all(end)>l_end
             do_continuation = false;
             exitflag = 1;
         end
         % exit with l<l_start:
-        if ls(end)<l_start
+        if l_all(end)<l_start
             do_continuation = false;
             exitflag = 0;
         end
