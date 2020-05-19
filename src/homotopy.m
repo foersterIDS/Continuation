@@ -14,16 +14,16 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     %% Homotopy-function
     %
     if Opt.homotopy.fix
-        G = @(x) x-x0;
+        G = @(x) homotopy_fix(x,x0);
     elseif Opt.homotopy.newton
-        G = @(x) R(x)-R(x0);
+        G = @(x) homotopy_newton(R,x,x0);
     else
         error('unknown homotopy-type');
     end
     %
     %% Residual
     %
-    fH = @(x,l) (1-l)*G(x)+l*R(x);
+    fH = @(x,l) homotpy_merge(G,R,x,l);
     %
     %% Path continuation
     %

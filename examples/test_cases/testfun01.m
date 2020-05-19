@@ -1,4 +1,5 @@
-fun = @(v,l) v.^2+5-exp((1/l)*v);
+addpath('test_cases\testfun01_aux');
+fun = @(v,l) residual_fun01(v,l);
 lams = 0.1;
 lame = 1;
 v0 = 4;

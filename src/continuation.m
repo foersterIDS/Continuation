@@ -23,8 +23,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% find initial solution
     %
-    R = @(v) fun(v,l_start);
-    [var_all,~,initial_exitflag] = solver(R,var0);
+    [var_all,~,initial_exitflag] = solver(@(v) fun(v,l_start),var0);
     if initial_exitflag>0
         l_all = l_start;
         do_continuation = true;
@@ -51,7 +50,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% residual and predictor
         %
-        R = @(x) [fun(x(1:end-1),x(end));res_arle(x,[var_all;l_all],ds)];
+        R = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds);
         if do_deflate
             try
                 R = @(x) deflation(R,x_deflation,x);
