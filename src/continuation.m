@@ -12,7 +12,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %% initialize
     %
     exitflag = -1;
-    Opt = continuation_input(varargin,fun);
+    Opt = continuation_input(varargin,fun,var0,l_start);
     solver = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
     ds = ds0;
@@ -20,10 +20,15 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     do_homotopy = false;
     error_counter = 0;
     loop_counter = 0;
+    if Opt.display
+        fprintf('Starting path continuation...\n');
+        t_display = tic;
+    end
     %
     %% find initial solution
     %
-    [var_all,~,initial_exitflag] = solver(@(v) fun(v,l_start),var0);
+    residual_initial = @(v) residual_fixed_value(fun,v,l_start,Opt);
+    [var_all,~,initial_exitflag] = solver(residual_initial,var0);
     if initial_exitflag>0
         l_all = l_start;
         do_continuation = true;
@@ -50,10 +55,10 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% residual and predictor
         %
-        R = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds);
+        residual = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds,Opt);
         if do_deflate
             try
-                R = @(x) deflation(R,x_deflation,x);
+                residual = @(x) deflation(residual,x_deflation,x,Opt);
             catch
                 error('Error occured during deflation.');
             end
@@ -66,14 +71,14 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         if do_homotopy
             try
                 x_last_step = [var_all(:,end);l_all(end)];
-                [x_solution,solver_exitflag] = homotopy(R,x_last_step,Opt);
+                [x_solution,solver_exitflag] = homotopy(residual,x_last_step,Opt);
             catch
                 x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
             end
         else
             try
-                [x_solution,~,solver_exitflag] = solver(R,x_predictor);
+                [x_solution,~,solver_exitflag] = solver(residual,x_predictor);
             catch
                 x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
@@ -142,6 +147,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             do_continuation = false;
         end
         %
+    end
+    %
+    %% final disp
+    %
+    if Opt.display
+        fprintf('Time Elapsed: %.3f s\n',toc(t_display));
     end
     %
 end

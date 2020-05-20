@@ -8,9 +8,9 @@ function [solver] = continuation_solver(Opt)
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',1);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true);
         else
-            options = optimoptions('fsolve','display','off');
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false);
         end
         solver = @(fun,x0) fsolve(fun,x0,options);
     elseif Opt.solver.fmincon
@@ -21,14 +21,14 @@ function [solver] = continuation_solver(Opt)
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',1);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true);
         else
-            options = optimoptions('lsqnonlin','display','off');
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false);
         end
         solver = @(fun,x0) lsqnonlin(fun,x0,[],[],options);
     elseif Opt.solver.newton
         %% basic newton solver
-        solver = @(fun,x0) basic_newton_solver(fun,x0);
+        solver = @(fun,x0) basic_newton_solver(fun,x0,Opt);
     else
         %% error
         error('No such solver');

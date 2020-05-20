@@ -4,10 +4,10 @@
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
 %
-function [residual] = residual_arclength_ellipsoid(x,xs,ds)
-    RnR = RnRotation([1;0]);
+function [residual,jacobian] = residual_arclength_ellipsoid(x,xs,ds,RnR)
     f = 0.25;%0.05;
-    r = @(x,ds) ds*[1;f*ones(length(x)-1,1)];
-    residual = sum((RnR.getTR(diff_xs(xs))*(x-xs(:,end))).^2./r(x,ds).^2)-1;
-    % TODO: jacobian
+    r = ds*[1;f*ones(length(x)-1,1)];
+    T = RnR.getTR(diff_xs(xs));
+    residual = sum((T*(x-xs(:,end))).^2./r.^2)-1;
+    jacobian = (2*(T*(x-xs(:,end)))./r.^2)'*T;
 end

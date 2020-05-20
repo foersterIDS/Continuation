@@ -79,7 +79,7 @@ end
 ls = nls.getLinearizedSystem(muz_red,Kzz_red);
 Kzz = ls.getKXX();
 
-Kzz(nls.dim_info==0,nls.dim_info==0)
+% Kzz(nls.dim_info==0,nls.dim_info==0)
 
 %% pathConti
 fun = @(vars,om) residual_filter2(nls.nlsh,fex,vars,om);

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [Opt] = continuation_input(varargin_cell,fun)
+function [Opt] = continuation_input(varargin_cell,fun,var0,l_start)
     %% initialize Opt:
     %
     Opt_homotopy = struct('fix',true,... % st.
@@ -82,12 +82,11 @@ function [Opt] = continuation_input(varargin_cell,fun)
     %% read fun:
     %
     % out:
-    if abs(nargout(fun))==1
-        Opt.jacobian = false;
-    elseif abs(nargout(fun))==2
+    try
+        [R,J] = fun(var0,l_start);
         Opt.jacobian = true;
-    else
-        error('fun may have one or two output arguments. [f,jacobian] = fun(v,l)');
+    catch
+        Opt.jacobian = false;
     end
     % in:
     if abs(nargin(fun))~=2

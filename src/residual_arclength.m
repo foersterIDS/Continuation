@@ -10,9 +10,8 @@ function [residual] = residual_arclength(Opt)
     elseif Opt.arclength.sphere
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.ellipsoid
-        residual = @(x,xs,ds) residual_arclength_ellipsoid(x,xs,ds);
-        Opt.jacobian = false;
-        warning('Jacobian is not used due to ellipsoid');
+        RnR = RnRotation([1;0]);
+        residual = @(x,xs,ds) residual_arclength_ellipsoid(x,xs,ds,RnR);
     else
         error('No such arclength-method');
     end
