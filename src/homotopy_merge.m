@@ -1,4 +1,4 @@
-%% path continuation - homotpy_merge
+%% path continuation - homotopy_merge
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
