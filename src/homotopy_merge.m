@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
 %
-function [varargout] = homotpy_merge(G,R,x,l)
-    if ((abs(nargout(G))==2) && (abs(nargout(R))==2))
+function [varargout] = homotopy_merge(G,R,x,l,Opt)
+    if Opt.jacobian
         [Gx,JGx] = G(x);
         [Rx,JRx] = R(x);
         varargout{1} = (1-l)*Gx+l*Rx;

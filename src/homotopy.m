@@ -23,7 +23,7 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     %
     %% Residual
     %
-    fH = @(x,l) homotpy_merge(G,R,x,l);
+    fH = @(x,l) homotopy_merge(G,R,x,l,Opt);
     %
     %% Path continuation
     %
