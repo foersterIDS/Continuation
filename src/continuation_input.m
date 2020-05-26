@@ -7,6 +7,10 @@
 function [Opt] = continuation_input(varargin_cell,fun,var0,l_start)
     %% initialize Opt:
     %
+    %  sub-structs:
+    %   Sub-structs may only contain true or false values.
+    %   Wheter a true value exists can be checkt via 'ison(Opt_sub_struct)'.
+    %   If a sub-struct contains multiple true values the first one is valid.
     Opt_homotopy = struct('fix',true,... % st.
                           'newton',false);
     Opt_sovler = struct('fsolve',true,... % st.
@@ -16,6 +20,7 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start)
     Opt_arclength = struct('sphere',true,... % st.
                            'linear',false,...
                            'ellipsoid',false);
+	%  main-struct:
     Opt = struct('homotopy',Opt_homotopy,...
                  'deflation',true,...
                  'solver',Opt_sovler,...

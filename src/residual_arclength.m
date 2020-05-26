@@ -6,7 +6,9 @@
 %
 function [residual] = residual_arclength(Opt)
     if Opt.arclength.linear
-        error('Muss noch implementiert werden!');
+        warning('linear: not implemented yet, using sphere instead.');
+        % sphere:
+        residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.sphere
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.ellipsoid

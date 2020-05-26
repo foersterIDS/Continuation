@@ -15,9 +15,18 @@ function [solver] = continuation_solver(Opt)
         solver = @(fun,x0) fsolve(fun,x0,options);
     elseif Opt.solver.fmincon
         %% fmincon
-        error('not implemented yet');
-        options = optimoptions('fmincon','display','off');
-        solver = @(fun,x0) fmincon(fun,x0,[],[],[],[],[],[],[],options);
+        warning('fmincon: not implemented yet using fsolve instead.');
+%         options = optimoptions('fmincon','display','off');
+%         solver = @(fun,x0) fmincon(fun,x0,[],[],[],[],[],[],[],options);
+        %% fsolve
+        Opt.solve.fsolve = true;
+        Opt.solve.fmincon = false;
+        if Opt.jacobian
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true);
+        else
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false);
+        end
+        solver = @(fun,x0) fsolve(fun,x0,options);
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian

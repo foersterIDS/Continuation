@@ -105,7 +105,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 do_deflate = false;
                 warning('Hier muss etwas gemacht werden!');
             end
-            if sum(structfun(@(x) x,Opt.homotopy)) && error_counter>=Opt.homotopy_error_counter
+            if ison(Opt.homotopy) && error_counter>=Opt.homotopy_error_counter
                 do_homotopy = true;
             else
                 do_homotopy = false;

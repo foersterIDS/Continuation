@@ -11,6 +11,9 @@ testfun02;
 %% Testfunktion #03
 % Stochastic (Duffing or ECS)
 % testfun03;
+%% Testfunktion #04
+% Point of intersection of circle and sin(radius)-scaled exponential function with radius as parameter
+% testfun04;
 %% Solve
 [vs,ls,exitflag] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton');%,'arclength','ellipsoid');
 %% Plot
