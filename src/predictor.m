@@ -6,7 +6,7 @@
 %
 function [vp,lp] = predictor(vars,ls,ds,Opt)
     if length(ls)==1
-        xip1 = [vars;ls+ds];
+        xip1 = [vars;ls+sign(Opt.direction)*ds];
     else
         xi = [vars(:,end);ls(end)];
         xim1 = [vars(:,end-1);ls(end-1)];

@@ -12,7 +12,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %% initialize
     %
     exitflag = -1;
-    Opt = continuation_input(varargin,fun,var0,l_start);
+    Opt = continuation_input(varargin,fun,var0,l_start,l_end);
     solver = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
     ds = ds0;
@@ -27,13 +27,13 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% find initial solution
     %
-    residual_initial = @(v) residual_fixed_value(fun,v,l_start,Opt);
+    residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
     [var_all,~,initial_exitflag] = solver(residual_initial,var0);
     if initial_exitflag>0
-        l_all = l_start;
+        l_all = Opt.l_0;
         do_continuation = true;
         if Opt.display
-            fprintf('Initial solution at l = %.2e\n',l_start);
+            fprintf('Initial solution at l = %.2e\n',Opt.l_0);
         end
     else
         var_all = [];
@@ -87,7 +87,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% check result
         %
-        val = validate_result(x_solution,var_all,l_all,solver_exitflag);
+        val = validate_result(x_solution,var_all,l_all,solver_exitflag,Opt);
         if val
             %% valid result
             var_all = [var_all,x_solution(1:end-1)];

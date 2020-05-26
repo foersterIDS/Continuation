@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [Opt] = continuation_input(varargin_cell,fun,var0,l_start)
+function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
     %% initialize Opt:
     %
     %  sub-structs:
@@ -28,7 +28,9 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start)
                  'display',true,...
                  'max_error_counter',10,...
                  'homotopy_error_counter',2,...
-                 'jacobian',false);
+                 'jacobian',false,...
+                 'l_0',l_start,...
+                 'direction',sign(l_end-l_start));
 	%
     %% read varargin_cell:
     %

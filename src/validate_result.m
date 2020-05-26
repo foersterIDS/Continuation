@@ -4,10 +4,10 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val] = validate_result(xs,vars,ls,solver_exitflag)
+function [val] = validate_result(xs,vars,ls,solver_exitflag,Opt)
     if solver_exitflag>0
         try
-            if length(ls)==1 && xs(end)>ls
+            if length(ls)==1 && sign(xs(end)-ls)==sign(Opt.direction)
                 val = true;
             else
                 xi = [vars(:,end);ls(end)];
