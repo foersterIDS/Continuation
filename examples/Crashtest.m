@@ -47,5 +47,12 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','deflation','on');
     fprintf('\n### %d: deflation: off ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','deflation','off');
+    %% bifurcation:
+    fprintf('\n### %d: bifurcation: mark ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','mark');
+    fprintf('\n### %d: bifurcation: determine ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','determine');
+    fprintf('\n### %d: bifurcation: trace ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','trace');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');

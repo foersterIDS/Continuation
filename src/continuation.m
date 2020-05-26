@@ -16,6 +16,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     solver = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
     ds = ds0;
+    nv = length(var0);
     do_deflate = false;
     do_homotopy = false;
     error_counter = 0;
@@ -28,17 +29,20 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %% find initial solution
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [var_all,~,initial_exitflag] = solver(residual_initial,var0);
+    [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0);
+    bif = [];
     if initial_exitflag>0
         l_all = Opt.l_0;
         do_continuation = true;
         if Opt.display
             fprintf('Initial solution at l = %.2e\n',Opt.l_0);
         end
+        if ison(Opt.bifurcation)
+            sign_det_jacobian = sign(det(initial_jacobian));
+        end
     else
         var_all = [];
         l_all = [];
-        bif = [];
         exitflag = -2; % no initial solution found
         do_continuation = false;
         if Opt.display
@@ -52,6 +56,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %% initialize loop
         %
         loop_counter = loop_counter+1;
+        is_currect_jacobian = false;
         %
         %% residual and predictor
         %
@@ -78,7 +83,8 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             end
         else
             try
-                [x_solution,~,solver_exitflag] = solver(residual,x_predictor);
+                [x_solution,~,solver_exitflag,~,solver_jacobian] = solver(residual,x_predictor);
+                is_currect_jacobian = true;
             catch
                 x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
@@ -114,8 +120,15 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% Bifurcations
         %
-        bif = [];
+%         bif = [];
         % TODO: Bifurkationen erkennen und exakten Punkt ermitteln
+        if ison(Opt.bifurcation) && val && ~do_homotopy
+            if ~is_currect_jacobian
+                %% get jacobian if not current
+                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
+            end
+            [var_all,l_all,bif,sign_det_jacobian] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
+        end
         %
         %% adjust arc-length
         %
@@ -147,6 +160,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             do_continuation = false;
         end
         %
+    end
+    %
+    %% bifurcation tracing
+    %
+    if Opt.bifurcation.trace
+        % TODO: start new continuation at bifurcations
     end
     %
     %% final disp
