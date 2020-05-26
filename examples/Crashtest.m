@@ -4,7 +4,10 @@ addpath('..\src');
 addpath('test_cases');
 %% Testfunktion #04
 % Point of intersection of circle and sin(radius)-scaled exponential function with radius as parameter
-testfun04;
+% testfun04;
+%% Testfunktion #05
+% function with bifurcation
+testfun05;
 %% Crashtest:
 for i=1:2
     % i=1: with jacobian, i=2: without jacobian
