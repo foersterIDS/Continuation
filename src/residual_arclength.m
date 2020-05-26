@@ -7,7 +7,9 @@
 function [residual] = residual_arclength(Opt)
     if Opt.arclength.linear
         warning('linear: not implemented yet, using sphere instead.');
-        % sphere:
+        %% sphere:
+        Opt.arclength.sphere = true;
+        Opt.arclength.linear = false;
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.sphere
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
