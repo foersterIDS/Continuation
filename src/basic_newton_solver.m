@@ -19,8 +19,8 @@ function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
         end
         nf = length(fi);
         xip1 = xi-Ji(1:nf,1:nf)\fi;
-        toli = sqrt((xip1-xi)'*(xip1-xi));
-        if toli<tol
+        abs_fi = sqrt(fi'*fi);
+        if abs_fi<tol
             exitflag = 1;
             break;
         end
@@ -44,7 +44,7 @@ function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
         if nargout>3
             output = struct('iterations',n_steps,...
                 'algorithm','basic-newton',...
-                'tolerance',toli);
+                'tolerance',abs_fi);
             if nargout>4
                 if ~Opt.jacobian
                     Ji = numeric_jacobian(fun,xi,fi);
