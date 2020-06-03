@@ -8,7 +8,7 @@
 function [dsn] = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt)
     if ~do_deflate
         if error_counter==0
-            dsn = ds*Opt.N_iter_opt/solver_output.iterations;
+            dsn = ds*Opt.n_iter_opt/solver_output.iterations;
             dsn = max(ds/2,dsn);
             dsn = min(2*ds,dsn);
         else
@@ -17,4 +17,6 @@ function [dsn] = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt)
     else
         dsn = ds;
     end
+    %% Limit to max. step size:
+    dsn = min([Opt.ds_max,dsn]);
 end

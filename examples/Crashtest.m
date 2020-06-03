@@ -55,6 +55,12 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','determine');
     fprintf('\n### %d: bifurcation: trace ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','trace');
+    %% n_iter_opt:
+    fprintf('\n### %d: n_iter_opt: 5 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','n_iter_opt',5);
+    %% ds_max:
+    fprintf('\n### %d: ds_max: 2*ds0 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','ds_max',2*ds0);
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])
