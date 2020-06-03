@@ -56,7 +56,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %% initialize loop
         %
         loop_counter = loop_counter+1;
-        is_currect_jacobian = false;
+        is_current_jacobian = false;
         %
         %% residual and predictor
         %
@@ -84,7 +84,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         else
             try
                 [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
-                is_currect_jacobian = true;
+                is_current_jacobian = true;
             catch
                 x_solution = NaN(size(x_predictor));
                 solver_exitflag = -2;
@@ -123,7 +123,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
 %         bif = [];
         % TODO: Bifurkationen erkennen und exakten Punkt ermitteln
         if ison(Opt.bifurcation) && val && ~do_homotopy
-            if ~is_currect_jacobian
+            if ~is_current_jacobian
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
