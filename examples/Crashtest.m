@@ -1,5 +1,6 @@
 clear all;
 clc;
+tic
 addpath('..\src');
 addpath('test_cases');
 %% Testfunktion #04
@@ -56,3 +57,4 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','trace');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
+disp(['simulation time: ' num2str(toc)])
