@@ -83,7 +83,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             end
         else
             try
-                [x_solution,~,solver_exitflag,output,solver_jacobian] = solver(residual,x_predictor);
+                [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
                 is_currect_jacobian = true;
             catch
                 x_solution = NaN(size(x_predictor));
@@ -131,7 +131,9 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         end
         %
         %% adjust arc-length
-        ds = arclength(ds,ds0,error_counter,output);
+        if ~do_deflate
+            ds = arclength(ds,ds0,error_counter,solver_output);
+        end
         %
         %% end loop
         %
