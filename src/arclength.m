@@ -5,14 +5,16 @@
 %   08.05.2020 - Alwin Förster
 %   03.06.2020 - Niklas Marhenke
 
-function [dsn] = arclength(ds,ds0,error_counter,output)
-    % planned number of iterations
-    Nopt=3;
-    if error_counter==0
-        dsn = ds*Nopt/output.iterations;
-        dsn = max(ds/2,dsn);
-        dsn = min(2*ds,dsn);
+function [dsn] = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt)
+    if ~do_deflate
+        if error_counter==0
+            dsn = ds*Opt.N_iter_opt/solver_output.iterations;
+            dsn = max(ds/2,dsn);
+            dsn = min(2*ds,dsn);
+        else
+            dsn = ds/2;
+        end
     else
-        dsn = ds/2;
+        dsn = ds;
     end
 end

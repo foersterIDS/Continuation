@@ -131,9 +131,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         end
         %
         %% adjust arc-length
-        if ~do_deflate
-            ds = arclength(ds,ds0,error_counter,solver_output);
-        end
+        ds = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt);
         %
         %% end loop
         %
