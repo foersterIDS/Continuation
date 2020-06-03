@@ -4,8 +4,10 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
+%   [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+%
 %   fun = fun(var,l) != 0
-%   lams <= l <= lame
+%   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
 function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,varargin)

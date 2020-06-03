@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+
+<body>
+
+<h1>continuation</h1>
+
+<p>Path continuation, determined by the residual-function
+fun(var,l)</p>
+
+<h2>Syntax</h2>
+
+<ul>
+
+  <li>continuation(fun,var0,l_start,l_end,ds0)</li>
+
+  <li>continuation(___,Name,Value)</li>
+
+  <li>[var_all,l_all,exitflag,bif] = continuation(___)</li>
+
+</ul>
+
+<h2>Description</h2>
+
+<p>TODO</p>
+
+<h2>Examples</h2>
+
+<p>TODO</p>
+
+<h2>Name-Value Pair Arguments</h2>
+
+<p>Specify optional comma-separated pairs of Name,Value
+arguments. Name is the argument name and Value is the corresponding
+value. Name must appear inside quotes. You can specify several name and
+value pair arguments in any order as Name1,Value1,...,NameN,ValueN.
+Example: 'homotopy','off','solver','fsolve'</p>
+
+<h3>'homotopy' &mdash; determine homotopy-type</h3>
+
+<p>'fix' (default) | 'newton' | 'on' | 'off'</p>
+
+<p>TODO: What is homotopy?</p>
+
+<h3>'deflation' &mdash; set deflation on/off</h3>
+
+<p>'on' (default) | 'off'</p>
+
+<p>TODO: What is deflation?</p>
+
+<h3>'solver' &mdash; determine solver-type</h3>
+
+<p>'fsolve' (default) | 'fmincon' | 'lsqnonlin' | 'newton'</p>
+
+<p>TODO: Describe solvers</p>
+
+<h3>'arclength' &mdash; determine arc-length-method</h3>
+
+<p>'sphere' (default) | 'linear' | 'ellipsoid'</p>
+
+<p>TODO: What does this mean?</p>
+
+<h3>'bifurcation' &mdash; bifurcation analysis</h3>
+
+<p>'off' (default) | 'on' | 'mark' | 'determine' | 'trace'</p>
+
+<p>TODO: What is bifurcation?</p>
+
+<h3>'display' &mdash; display progress</h3>
+
+<p>'on' (default) | 'off'</p>
+
+<p>TODO: What is displayed?</p>
+
+<h3>'max_error_counter' &mdash; set maximum number off errors in a row</h3>
+
+<p>10 (default) | Integer</p>
+
+<p>TODO: ...</p>
+
+<h3>'homotopy_error_counter' &mdash; set maximum number off errors in a row using homotopy</h3>
+
+<p>2 (default) | Integer</p>
+
+<p>TODO: ...</p>
+
+<h3>'l_0' &mdash; set start value different from l_start</h3>
+
+<p>l_start (default) | Double</p>
+
+<p>TODO: ...</p>
+
+<h3>'direction' &mdash; set initial direction</h3>
+
+<p>sign(l_end-l_start) (default) | +/- 1</p>
+
+<p>TODO: ...</p>
+
+<h3>'n_iter_opt' &mdash; set optimal number of iterations per step</h3>
+
+<p>3 (default) | Integer &gt; 0</p>
+
+<p>TODO: ...</p>
+
+<h3>'ds_max' &mdash; set maximum radius</h3>
+
+<p>inf (default) | Double &gt; 0</p>
+
+<p>TODO: ...</p>
+
+</body>
+</html>
