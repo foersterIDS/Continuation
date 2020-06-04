@@ -147,12 +147,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             end
         end
         % exit with success:
-        if l_all(end)>l_end
+        if sign(l_end-l_start)*(l_all(end)-l_end)>=0
             do_continuation = false;
             exitflag = 1;
         end
         % exit with l<l_start:
-        if l_all(end)<l_start
+        if sign(l_end-l_start)*(l_all(end)-l_start)<0
             do_continuation = false;
             exitflag = 0;
         end

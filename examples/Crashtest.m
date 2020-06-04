@@ -27,6 +27,8 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','homotopy','fix');
     fprintf('\n### %d: homotopy: newton ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','homotopy','newton');
+    fprintf('\n### %d: homotopy: newton ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','homotopy','f2');
     %% solver:
     fprintf('\n### %d: solver: fsolve ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','solver','fsolve');

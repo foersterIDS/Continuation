@@ -12,7 +12,8 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
     %   Wheter a true value exists can be checkt via 'ison(Opt_sub_struct)'.
     %   If a sub-struct contains multiple true values the first one is valid.
     Opt_homotopy = struct('fix',true,... % st.
-                          'newton',false);
+                          'newton',false,...
+                          'f2',false);
     Opt_sovler = struct('fsolve',true,... % st.
                         'fmincon',false,...
                         'lsqnonlin',false,...
