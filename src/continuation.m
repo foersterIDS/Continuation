@@ -70,27 +70,29 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 error('Error occured during deflation.');
             end
         end
-        [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
-        x_predictor = [v_predictor;l_predictor];
+        try
+            if do_homotopy
+                %% Homotopy
+                x_last_step = [var_all(:,end);l_all(end)];
+                x_predictor = homotopy(residual,x_last_step,Opt);
+            else
+                [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+                x_predictor = [v_predictor;l_predictor];
+            end
+        catch
+            [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+            x_predictor = [v_predictor;l_predictor];
+        end
         %
         %% solve
         %
-        if do_homotopy
-            try
-                x_last_step = [var_all(:,end);l_all(end)];
-                [x_solution,solver_exitflag] = homotopy(residual,x_last_step,Opt);
-            catch
-                x_solution = NaN(size(x_predictor));
-                solver_exitflag = -2;
-            end
-        else
-            try
-                [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
-                is_current_jacobian = true;
-            catch
-                x_solution = NaN(size(x_predictor));
-                solver_exitflag = -2;
-            end
+        try
+            %% Solver
+            [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+            is_current_jacobian = true;
+        catch
+            x_solution = NaN(size(x_predictor));
+            solver_exitflag = -2;
         end
         %
         %% check result
