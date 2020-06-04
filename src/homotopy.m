@@ -27,16 +27,18 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     %
     if Opt.homotopy.fix || Opt.homotopy.newton
         fH = @(x,l) homotopy_merge(G,R,x,l,Opt);
-        ls = 0;
+        l0 = 0;
         le = 1;
         ds0 = 0.1;
     elseif Opt.homotopy.f2
         fH = @(x,l) homotopy_f2(R,x,l);
-        [x0,ls] = homotopy_f2_LM_init(R,x0);
-        if ls>1
+        [x0,l0] = homotopy_f2_LM_init(R,x0);
+        if l0>1
+            ls = inf;
             le = 1;
-            ds0 = abs(le-ls)/10;
+            ds0 = abs(le-l0)/10;
         else
+            ls = l0;
             le = -inf;
             ds0 = 10^-3;
         end
@@ -46,7 +48,7 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     %
     %% Path continuation
     %
-    [xs,ll,exitflag] = continuation(fH,x0,ls,le,ds0,'homotopy','off','display','off');
+    [xs,ll,exitflag] = continuation(fH,x0,ls,le,ds0,'homotopy','off','display','off','l_0',l0);
     ind0 = length(ll)-2;
     [~,ind] = min(ll(ind0:end)-1);
     ind = ind0-1+ind;
