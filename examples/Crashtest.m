@@ -63,6 +63,12 @@ for i=1:2
     %% ds_max:
     fprintf('\n### %d: ds_max: 2*ds0 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','ds_max',2*ds0);
+    %% l_0:
+    fprintf('\n### %d: l_0: (l_end-l_start)/2+l_start ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','l_0',(lame-lams)/2+lams);
+    %% l_target:
+    fprintf('\n### %d: l_target: (l_end-l_start)/2+l_start ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','l_target',(lame-lams)/2+lams);
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])

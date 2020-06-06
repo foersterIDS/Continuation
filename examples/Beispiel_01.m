@@ -18,7 +18,7 @@ testfun02;
 % function with bifurcation
 % testfun05;
 %% Solve
-[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton');
+[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton','bifurcation','mark');
 %% Plot
 figure(1);
 clf;

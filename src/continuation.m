@@ -76,19 +76,26 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 x_last_step = [var_all(:,end);l_all(end)];
                 x_predictor = homotopy(residual,x_last_step,Opt);
             else
-                [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
-                x_predictor = [v_predictor;l_predictor];
+                [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+                x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [v_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
-            x_predictor = [v_predictor;l_predictor];
+            [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+            x_predictor = [var_predictor;l_predictor];
         end
         %
         %% solve
         %
         try
-            %% Solver
-            [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+            if sign(l_all(end)-Opt.l_target)*sign(l_predictor-Opt.l_target)<=0
+                %% try to converge to target
+                residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
+                [var_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor);
+                x_solution = [var_solution;Opt.l_target];
+            else
+                %% regular solver
+                [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+            end
             is_current_jacobian = true;
         catch
             x_solution = NaN(size(x_predictor));

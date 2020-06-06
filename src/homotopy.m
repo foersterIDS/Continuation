@@ -45,10 +45,11 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     else
         error('unknown homotopy-type');
     end
+    lt = 1;
     %
     %% Path continuation
     %
-    [xs,ll,exitflag] = continuation(fH,x0,ls,le,ds0,'homotopy','off','display','off','l_0',l0);
+    [xs,ll,exitflag] = continuation(fH,x0,ls,le,ds0,'homotopy','off','display','off','l_0',l0,'l_target',lt);
     ind0 = length(ll)-2;
     [~,ind] = min(ll(ind0:end)-1);
     ind = ind0-1+ind;
