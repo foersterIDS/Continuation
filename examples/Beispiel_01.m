@@ -9,7 +9,7 @@ addpath('test_cases');
 % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( Om * t )
 testfun02;
 %% Testfunktion #03
-% Stochastic (Duffing or ECS)
+% Stochastic Duffing
 % testfun03;
 %% Testfunktion #04
 % Point of intersection of circle and sin(radius)-scaled exponential function with radius as parameter
@@ -18,7 +18,7 @@ testfun02;
 % function with bifurcation
 % testfun05;
 %% Solve
-[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton','bifurcation','mark');
+[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','newton','bifurcation','mark','ds_max',ds_max);
 %% Plot
 figure(1);
 clf;
