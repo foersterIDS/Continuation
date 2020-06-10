@@ -104,7 +104,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% check result
         %
-        val = validate_result(x_solution,var_all,l_all,solver_exitflag,Opt);
+        [val,is_reverse] = validate_result(x_solution,var_all,l_all,solver_exitflag,Opt);
         if val
             %% valid result
             var_all = [var_all,x_solution(1:end-1)];
@@ -115,12 +115,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         else
             %% invalid result
             error_counter = error_counter+1;
-            if Opt.deflation && ~isnan(sum(x_solution(:,end)))
+            if Opt.deflation && ~do_deflate && ~isnan(sum(x_solution(:,end))) && is_reverse && error_counter>=Opt.deflation_error_counter
                 do_deflate = true;
                 x_deflation = x_solution;
             else
                 do_deflate = false;
-                warning('Hier muss etwas gemacht werden!');
             end
             if ison(Opt.homotopy) && error_counter>=Opt.homotopy_error_counter
                 do_homotopy = true;
@@ -150,7 +149,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             if val
                 fprintf('-----> continued at l = %.2e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\n',l_all(end),ds,loop_counter);
             else
-                fprintf('-----> invalid point\t\t\t\t\t\t\t\t\t\t\t\t\t|\tloop counter = %d\n',loop_counter);
+                fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\n',ds,loop_counter);
             end
         end
         % exit with success:

@@ -44,5 +44,5 @@ vs = [1;0;0;0];
 %% pathConti
 fun = @(vars,om) vs'*lyap(G(vars,om),D(vars,om))*vs-vars;
 ds0 = 0.0001;
-ds_max = 0.0005;
+ds_max = 0.01;
 v0 = 0.05;
