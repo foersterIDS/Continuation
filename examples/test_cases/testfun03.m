@@ -1,87 +1,48 @@
 addpath('test_cases\testfun03_aux');
-%addpath('..\..');
-%addpath('..\..\ELM');
-%addpath('..\..\ANSYS');
-%addpath('..\..\pathConti');
-%addpath('..\..\Fixpunkt');
-
-is = [];
-ts = [];
-iter_max = 10^4;
-duf = 'DUF';
-ecs = 'ECS';
-nle_typ = ecs; % 'DUF' or 'ECS'
 
 %% Settings:
 omu = 0.5;
-omo = 2;%1.6;
+omo = 1.6;
 lams = omu;
 lame = omo;
 
 %% System:
 Ndof = 1;
 nex = Ndof;
-if strcmp(nle_typ,duf)
-    nx = 2*Ndof;
-elseif strcmp(nle_typ,ecs)
-    nx = 2*Ndof+1;
-end
+nx = 2*Ndof;
 nz = nx+2;
 
-m = 1;%1.2;
-c = 0.05;%0.9;
-k = 1;%580.8;
-kt = 2;%230.4;
-l = 0.1;%kt;
-kp = 0;
-mu = 0.3;
-fN = 2;%2;%100;
+m = 1;
+c = 0.05;
+k = 1;
+l = 0.1;
 
 Df = 0.01;
-sf = 0.18/sqrt(2);%15.23;
-ab = [0,1];
-om = omu;%sqrt((k+kp)/m);
+sf = 0.18/sqrt(2);
+om = omu;
 
-M = m*eye(Ndof);
-K = kette(k+kp,Ndof,1);
-C = c/(k+kp)*K;
+Az = [1,0,0,0;
+      0,m,0,0;
+      0,0,1,0;
+      0,0,0,1];
+invAz = [  1,  0,  0,  0;
+           0,1/m,  0,  0;
+           0,  0,  1,  0;
+           0,  0,  0,  1];
+Bz = @(v,w) [      0,     -1,      0,      0;
+             k+3*l*v,      c,      0,      1;
+                   0,      0,      0,     -1;
+                   0,      0,    w^2, 2*Df*w];
+SMz = [0;0;0;1];
+Sff = @(w) 4*Df*w*sf^2;
 
-fi = Filter2(nex,Df,om,sf,ab);
-fex = FilteredProcess(zeros(Ndof,1),fi);
-SM2O = eye(Ndof);
+G = @(v,w) -invAz*Bz(v,w);
+D = @(v,w) conj(invAz*SMz)*Sff(w)*(invAz*SMz).';
 
-[Ax,Bx,SM1Ox,dim_infox] = NonLinearSystem_1O.getAB(M,C,K,SM2O);
-
-fnlx = NonLinearForce(nx);
-if strcmp(nle_typ,duf)
-    nle = NL_Element_DUF(l);
-    fnlx.addElement(nle,Ndof+1,1);
-    nls = NonLinearSystem_1O(Ax,Bx,fnlx,SM1Ox,fex,dim_infox);
-    nls.setMeanFree(false);
-elseif strcmp(nle_typ,ecs)
-    nle = NL_Element_ECS(mu,fN,kt);
-    fnlx.addElement(nle,[Ndof+1,nx],[Ndof+1,nx]);
-    nls = NonLinearSystem_1O(Ax,Bx,fnlx,SM1Ox,fex,dim_infox);
-    nls.setMeanFree(true);
-end
-
-f = @(vars) fixedpointfun_ELM(nls,vars);
-fc = @(vars) constrainFun_ELM(nls,vars);
-x0 = covToVars(nls,eye(nls.nx),0*ones(nls.nx,1));%[5;0.03;0.01;0;0];%
-
-try
-    x = fixedpoint(f,x0,'constraint',fc,'damping','off','tol',10^-8,'itermax',20);
-catch
-    x = x0;
-end
-
-[Kzz_red,muz_red] = varsToCov(nls,x);
-ls = nls.getLinearizedSystem(muz_red,Kzz_red);
-Kzz = ls.getKXX();
-
-% Kzz(nls.dim_info==0,nls.dim_info==0)
+vs = [1;0;0;0];
 
 %% pathConti
-fun = @(vars,om) residual_filter2(nls.nlsh,fex,vars,om);
-ds0 = 0.0051;
-v0 = x;
+fun = @(vars,om) vs'*lyap(G(vars,om),D(vars,om))*vs-vars;
+ds0 = 0.0001;
+ds_max = 0.0005;
+v0 = 0.05;

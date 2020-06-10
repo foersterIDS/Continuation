@@ -11,4 +11,5 @@ lame = 1.6;%4;%1.6; % end frequency
 Q = (-lams^2*mu+1i*lams*zeta+kappa)\P;
 v0 = [0;real(Q);-imag(Q);zeros(2*(H-1),1)];
 ds0 = 0.1;
+ds_max = 1;
 fun = @(x,l) HB_residual_Duffing([x;l],mu,zeta,kappa,gamma,P,H,N);
