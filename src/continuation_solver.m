@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [solver] = continuation_solver(Opt)
+function [solver,default_solver_output] = continuation_solver(Opt)
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
@@ -42,4 +42,7 @@ function [solver] = continuation_solver(Opt)
         %% error
         error('No such solver');
     end
+    default_solver_output = struct('iterations',inf,...
+                                   'algorithm','non',...
+                                   'tolerance',inf);
 end

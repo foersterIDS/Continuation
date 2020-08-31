@@ -17,6 +17,9 @@ testfun02;
 %% Testfunktion #05
 % function with bifurcation
 % testfun05;
+%% Testfunktion #06
+% ########################
+% testfun06;
 %% Solve
 [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max);
 %% Plot

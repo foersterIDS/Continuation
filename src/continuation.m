@@ -15,7 +15,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     exitflag = -1;
     Opt = continuation_input(varargin,fun,var0,l_start,l_end);
-    solver = continuation_solver(Opt);
+    [solver,default_solver_output] = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
     ds = ds0;
     nv = length(var0);
@@ -100,6 +100,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         catch
             x_solution = NaN(size(x_predictor));
             solver_exitflag = -2;
+            solver_output = default_solver_output;
         end
         %
         %% check result
