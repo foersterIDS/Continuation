@@ -4,10 +4,10 @@ addpath('..\src');
 addpath('test_cases');
 %% Testfunktion #01
 % 0=!v.^2+5-exp((1/l)*v)
-% testfun01;
+testfun01;
 %% Testfunktion #02
 % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( Om * t )
-testfun02;
+% testfun02;
 %% Testfunktion #03
 % Stochastic Duffing
 % testfun03;
