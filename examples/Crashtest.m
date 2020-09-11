@@ -45,6 +45,8 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','arclength','linear');
     fprintf('\n### %d: arc-length: ellipsoid ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','arclength','ellipsoid');
+    fprintf('\n### %d: arc-length: ellipsoid2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','arclength','ellipsoid2');
     %% deflation:
     fprintf('\n### %d: deflation: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','deflation','on');
