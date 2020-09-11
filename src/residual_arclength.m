@@ -16,6 +16,8 @@ function [residual] = residual_arclength(Opt)
     elseif Opt.arclength.ellipsoid
         RnR = RnRotation([1;0]);
         residual = @(x,xs,ds) residual_arclength_ellipsoid(x,xs,ds,RnR);
+    elseif Opt.arclength.ellipsoid2
+        residual = @(x,xs,ds) residual_arclength_ellipsoid2(x,xs,ds);
     else
         error('No such arclength-method');
     end

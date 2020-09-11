@@ -1,4 +1,4 @@
-%% path continuation - residual_arclength_sphere
+%% path continuation - residual_arclength_ellipsoid
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
