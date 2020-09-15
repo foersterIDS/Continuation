@@ -9,8 +9,8 @@ function [varargout] = merge_residuals(fun,res_arle,x,x_all,ds,Opt)
         [R1,J1] = fun(x(1:end-1),x(end));
         [R2,J2] = res_arle(x,x_all,ds);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % There should be a better was to do this!
-        if length(J1(:,1))==length(J1(1,:))
+        % There should be a better was to do this! --> with numeric_jacobian
+        if ~diff(size(J1))
             delta = 10^-8;
             R1p = fun(x(1:end-1),x(end)+delta);
             J1l = (R1p-R1)*1/delta;
