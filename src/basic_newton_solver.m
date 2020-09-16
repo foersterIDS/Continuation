@@ -3,6 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
+%   16.09.2020 - Tido Kubatschek 
 %
 function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
     tol = 10^-8;
@@ -15,7 +16,7 @@ function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
             [fi,Ji] = fun(xi);
         else
             fi = fun(xi);
-            Ji = numeric_jacobian(fun,xi,fi);
+            Ji = numeric_jacobian(fun,xi,'fx',fi);
         end
         nf = length(fi);
         xip1 = xi-Ji(1:nf,1:nf)\fi;
@@ -47,7 +48,7 @@ function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
                 'tolerance',abs_fi);
             if nargout>4
                 if ~Opt.jacobian
-                    Ji = numeric_jacobian(fun,xi,fi);
+                    Ji = numeric_jacobian(fun,xi,'fx',fi);
                 end
                 jacobian = Ji;
             end
