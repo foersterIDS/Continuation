@@ -18,7 +18,7 @@ testfun02;
 % function with bifurcation
 % testfun05;
 %% Testfunktion #06
-% ########################
+% tests ellipsoid2
 % testfun06;
 %% Solve
 [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max);
