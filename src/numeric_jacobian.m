@@ -46,9 +46,10 @@ function jac = numeric_jacobian(f, x, varargin)
     end
     
     % Do perturbation
-    for i = is
+    jac = NaN(length(f0),length(is));
+    for i = 1:length(is)
         x_ = x;
-        x_(i) =  x(i) + epsilon;
+        x_(is(i)) =  x(is(i)) + epsilon;
         jac(:, i) = (feval(f, x_) - f0) .* epsilon_inv;
     end
     
