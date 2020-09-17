@@ -27,11 +27,11 @@ function jac = numeric_jacobian(f, x, varargin)
     ii = false;
     
     for ki = 1:vl
-        if strcmp(varargin{ki},'central_value')
+        if strcmp(varargin{ki},'fx')
             f0 = varargin{ki+1};
             fi = 1;
         end
-        if strcmp(varargin{ki}, 'derivative_dimensions')
+        if strcmp(varargin{ki}, 'is')
             is = varargin{ki+1};
             ii = true;
         end
