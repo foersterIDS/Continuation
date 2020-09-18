@@ -7,7 +7,6 @@
 %
 function jac = numeric_jacobian(f, x, varargin)
     % Calculate Jacobian of function f at given x
-    % fx is optional f(x)
     %
     % varargin consists of
     %   'fx' followed by optional f(x)
