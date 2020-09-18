@@ -16,7 +16,14 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     exitflag = -1;
     Opt = continuation_input(varargin,fun,var0,l_start,l_end);
     [solver,default_solver_output] = continuation_solver(Opt);
-    res_arle = residual_arclength(Opt);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % added length(l_start) as further value to residual_arclength
+    if Opt.arclength.linear
+        res_arle = residual_arclength(Opt, length(l_start));
+    else
+        res_arle = residual_arclength(Opt);
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ds = ds0;
     nv = length(var0);
     do_deflate = false;

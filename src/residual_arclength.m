@@ -3,14 +3,11 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
+%   17.09.2020 - Tido Kubatschek
 %
-function [residual] = residual_arclength(Opt)
+function [residual] = residual_arclength(Opt, size_l)
     if Opt.arclength.linear
-        warning('linear: not implemented yet, using sphere instead.');
-        %% sphere:
-        Opt.arclength.sphere = true;
-        Opt.arclength.linear = false;
-        residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
+        residual = @(x,xs,ds) residual_arclength_linear(x,xs,[ds, size_l]);
     elseif Opt.arclength.sphere
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.ellipsoid
