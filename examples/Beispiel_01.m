@@ -22,7 +22,6 @@ testfun02;
 % testfun06;
 %% Solve
 [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max);
-% [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'arclength', 'linear','homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max);
 %% Plot
 figure(1);
 clf;

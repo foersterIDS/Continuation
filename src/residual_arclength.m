@@ -5,9 +5,9 @@
 %   08.05.2020 - Alwin Förster
 %   17.09.2020 - Tido Kubatschek
 %
-function [residual] = residual_arclength(Opt, size_l)
+function [residual] = residual_arclength(Opt)
     if Opt.arclength.linear
-        residual = @(x,xs,ds) residual_arclength_linear(x,xs,[ds, size_l]);
+        residual = @(x,xs,ds) residual_arclength_linear(x,xs,ds,Opt);
     elseif Opt.arclength.sphere
         residual = @(x,xs,ds) residual_arclength_sphere(x,xs,ds);
     elseif Opt.arclength.ellipsoid
