@@ -6,9 +6,7 @@
 %   22.09.2020 - Alwin Förster
 %
 function [residual,jacobian] = residual_arclength_linear(x,xs,ds,Opt)
-    % Wichtig: Bifurkationen werden nicht richtig erkannt!!
-    [b,a] = size(xs);
-    
+    [b,a] = size(xs);    
     % approximate tangent with secant
     if a == 1
         sec = [zeros(b-1,1);1];
