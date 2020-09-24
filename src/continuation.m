@@ -47,6 +47,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         l_all = [];
         exitflag = -2; % no initial solution found
         do_continuation = false;
+        do_loop = false;
         if Opt.display
             fprintf('No initial solution found.\n');
         end
@@ -54,7 +55,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% continuation
     %
-    while do_continuation
+    while do_continuation && ~Opt.unique
         %% initialize loop
         %
         loop_counter = loop_counter+1;
@@ -175,8 +176,68 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% bifurcation tracing
     %
-    if Opt.bifurcation.trace
+    if Opt.bifurcation.trace && ~Opt.unique
         % TODO: start new continuation at bifurcations
+    end
+    %
+    %% unique - Durchlaufen mit festen Werten für l
+    %
+    
+    if Opt.unique && do_loop
+        do_loop = true;
+        l_all = l_start;
+        steps = 100;
+        ds = (l_end - l_start)/steps;
+        l_v = l_start:ds:l_end;
+        %
+        while loop_counter < length(l_v) && do_loop
+            %% initialize loop
+            %
+            loop_counter = loop_counter + 1;
+            l_aktuell = l_v(loop_counter);
+            residual = @(v) residual_fixed_value(fun,v,l_aktuell,Opt);
+            %
+            %% find predictor
+            %
+            if sum(isnan(var_all(:,loop_counter))) > 0 % no last solution found
+                var_aktuell = var0; % try with first solution
+            else
+                var_aktuell = var_all(:,loop_counter); % else try with last solution
+            end
+            %
+            %% get next solution
+            %
+            [var_aktuell,~,exitflag,~,~] = solver(residual,var_aktuell);
+            %
+            %% check exitflag
+            %
+            if exitflag > 0
+                if Opt.display
+                    fprintf('-----> Found solution at l = %.2e\t|\tloop counter = %d\n',l_aktuell, loop_counter);
+                end
+            else
+                var_aktuell = NaN(size(var_aktuell));
+                error_counter = error_counter + 1;
+                if Opt.display
+                    fprintf('-----> No solution found at l = %.2e\t|\tloop counter = %d\n', l_aktuell, loop_counter);
+                end
+            end
+            %
+            %% add solution 
+            %
+            var_all = [var_all, var_aktuell];
+            l_all = [l_all, l_aktuell];
+            %
+            %% check for error counter
+            %
+            if error_counter >= Opt.max_error_counter
+            exitflag = -1;
+            warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
+            do_loop = false;
+            end
+            %
+        end
+        %
     end
     %
     %% final disp
