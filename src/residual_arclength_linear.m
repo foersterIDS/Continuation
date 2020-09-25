@@ -14,6 +14,7 @@ function [residual,jacobian] = residual_arclength_linear(x,xs,ds,Opt)
         xip1 = xs(:,end) + sec;
     else
         sec = xs(:,end) - xs(:,end-1);
+        sec = ds*sec/sqrt(sum(sec.^2));
         xi = xs(:,end);
         xip1 = xi + sec;
     end
