@@ -76,6 +76,9 @@ for i=1:2
     %% l_target:
     fprintf('\n### %d: alpha_reverse: pi/4 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','alpha_reverse',pi/4);
+    %% unique:
+    fprintf('\n### %d: unique: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','unique','on');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])
