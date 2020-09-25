@@ -36,6 +36,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     if initial_exitflag>0
         l_all = Opt.l_0;
         do_continuation = true;
+        do_loop = true;
         if Opt.display
             fprintf('Initial solution at l = %.2e\n',Opt.l_0);
         end
@@ -182,13 +183,10 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% unique - Durchlaufen mit festen Werten für l
     %
-    
     if Opt.unique && do_loop
         do_loop = true;
         l_all = l_start;
-        steps = 100;
-        ds = (l_end - l_start)/steps;
-        l_v = l_start:ds:l_end;
+        l_v = l_start:ds0:l_end;
         %
         while loop_counter < length(l_v) && do_loop
             %% initialize loop
