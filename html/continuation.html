@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB R2020a"><title>Continuation</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.8px; min-height: 0px; white-space: pre-wrap; color: rgb(213, 80, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: 400; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S2 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: 700; text-align: left;  }
+.S3 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S4 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }
+.S5 { margin: 10px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 15px; font-weight: 700; text-align: left;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Continuation</span></h1><div  class = 'S1'><span style=' font-weight: bold;'>Path continuation, determined by the residual-function fun(var,l)</span></div><h2  class = 'S2'><span>Syntax</span></h2><ul  class = 'S3'><li  class = 'S4'><span>  continuation(fun,var0,l_start,l_end,ds0)</span></li><li  class = 'S4'><span>  continuation(___,Name,Value)</span></li><li  class = 'S4'><span>  [var_all,l_all,exitflag,bif] = continuation(___)</span></li></ul><h2  class = 'S2'><span>Description</span></h2><div  class = 'S1'><span>TODO</span></div><h2  class = 'S2'><span>Examples</span></h2><div  class = 'S1'><span>TODO</span></div><h2  class = 'S2'><span>Name-Value Pair Arguments</span></h2><div  class = 'S1'><span>Specify optional comma-separated pairs of Name,Value arguments. Name is the argument name and Value is the corresponding value. Name must appear inside quotes. You can specify several name and value pair arguments in any order as Name1,Value1,...,NameN,ValueN. Example: 'homotopy','off','solver','fsolve'</span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'homotopy' — determine homotopy-type</span></h4><div  class = 'S1'><span>'fix' (default) | 'newton' | 'on' | 'off'</span></div><div  class = 'S1'><span>TODO: What is homotopy?</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'deflation' — set deflation on/off</span></h4><div  class = 'S1'><span>'on' (default) | 'off'</span></div><div  class = 'S1'><span>TODO: What is deflation?</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'solver' — determine solver-type</span></h4><div  class = 'S1'><span>'fsolve' (default) | 'fmincon' | 'lsqnonlin' | 'newton'</span></div><div  class = 'S1'><span>TODO: Describe solvers</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'arclength' — determine arc-length-method</span></h4><div  class = 'S1'><span>'sphere' (default) | 'linear' | 'ellipsoid'</span></div><div  class = 'S1'><span>TODO: What does this mean?</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'bifurcation' — bifurcation analysis</span></h4><div  class = 'S1'><span>'off' (default) | 'on' | 'mark' | 'determine' | 'trace'</span></div><div  class = 'S1'><span>TODO: What is bifurcation?</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'display' — display progress</span></h4><div  class = 'S1'><span>'on' (default) | 'off'</span></div><div  class = 'S1'><span>TODO: What is displayed?</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'max_error_counter' — set maximum number off errors in a row</span></h4><div  class = 'S1'><span>10 (default) | Integer</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'homotopy_error_counter' — set maximum number off errors in a row using homotopy</span></h4><div  class = 'S1'><span>2 (default) | Integer</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'l_0' — set start value different from l_start</span></h4><div  class = 'S1'><span>l_start (default) | Double</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'direction' — set initial direction</span></h4><div  class = 'S1'><span>sign(l_end-l_start) (default) | +/- 1</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'n_iter_opt' — set optimal number of iterations per step</span></h4><div  class = 'S1'><span>3 (default) | Integer &gt; 0</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'ds_max' — set maximum radius</span></h4><div  class = 'S1'><span>inf (default) | Double &gt; 0</span></div><div  class = 'S1'><span>TODO: ...</span></div><div  class = 'S1'><span></span></div><h4  class = 'S5'><span style=' font-weight: bold;'>'l_target' — set target value</span></h4><div  class = 'S1'><span>l_end (default) | Double &gt; 0</span></div><div  class = 'S1'><span>TODO: ...</span></div></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Continuation
+% *Path continuation, determined by the residual-function fun(var,l)*
+%% Syntax
+%% 
+% * continuation(fun,var0,l_start,l_end,ds0)
+% * continuation(___,Name,Value)
+% * [var_all,l_all,exitflag,bif] = continuation(___)
+%% Description
+% TODO
+%% Examples
+% TODO
+%% Name-Value Pair Arguments
+% Specify optional comma-separated pairs of Name,Value arguments. Name is the 
+% argument name and Value is the corresponding value. Name must appear inside 
+% quotes. You can specify several name and value pair arguments in any order as 
+% Name1,Value1,...,NameN,ValueN. Example: 'homotopy','off','solver','fsolve'
+% *'homotopy' — determine homotopy-type*
+% 'fix' (default) | 'newton' | 'on' | 'off'
+% 
+% TODO: What is homotopy?
+% 
+% 
+% *'deflation' — set deflation on/off*
+% 'on' (default) | 'off'
+% 
+% TODO: What is deflation?
+% 
+% 
+% *'solver' — determine solver-type*
+% 'fsolve' (default) | 'fmincon' | 'lsqnonlin' | 'newton'
+% 
+% TODO: Describe solvers
+% 
+% 
+% *'arclength' — determine arc-length-method*
+% 'sphere' (default) | 'linear' | 'ellipsoid'
+% 
+% TODO: What does this mean?
+% 
+% 
+% *'bifurcation' — bifurcation analysis*
+% 'off' (default) | 'on' | 'mark' | 'determine' | 'trace'
+% 
+% TODO: What is bifurcation?
+% 
+% 
+% *'display' — display progress*
+% 'on' (default) | 'off'
+% 
+% TODO: What is displayed?
+% 
+% 
+% *'max_error_counter' — set maximum number off errors in a row*
+% 10 (default) | Integer
+% 
+% TODO: ...
+% 
+% 
+% *'homotopy_error_counter' — set maximum number off errors in a row using homotopy*
+% 2 (default) | Integer
+% 
+% TODO: ...
+% 
+% 
+% *'l_0' — set start value different from l_start*
+% l_start (default) | Double
+% 
+% TODO: ...
+% 
+% 
+% *'direction' — set initial direction*
+% sign(l_end-l_start) (default) | +/- 1
+% 
+% TODO: ...
+% 
+% 
+% *'n_iter_opt' — set optimal number of iterations per step*
+% 3 (default) | Integer > 0
+% 
+% TODO: ...
+% 
+% 
+% *'ds_max' — set maximum radius*
+% inf (default) | Double > 0
+% 
+% TODO: ...
+% 
+% 
+% *'l_target' — set target value*
+% l_end (default) | Double > 0
+% 
+% TODO: ...
+##### SOURCE END #####
+--></body></html>
