@@ -7,7 +7,7 @@
 function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
     if length(l_all) == 1
         close all;
-        figure;
+        figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
         clf;
         pl = plot(l_all,var_all,'.-','LineWidth',2);
         grid on;
@@ -25,8 +25,8 @@ function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
         if ~Opt.unique && ison(Opt.bifurcation) && bif_flag 
            if ~isempty(bif)
                hold on;
-               plot(l_all(bif(1,bif(2,:)==0)),var_all(:,bif(1,bif(2,:)==0)),'bo','LineWidth',2);
-               plot(l_all(bif(1,bif(2,:)==1)),var_all(:,bif(1,bif(2,:)==1)),'rx','LineWidth',2);
+               plot(l_all(bif(1,bif(2,end)==0)),var_all(:,bif(1,bif(2,end)==0)),'bo','LineWidth',2);
+               plot(l_all(bif(1,bif(2,end)==1)),var_all(:,bif(1,bif(2,end)==1)),'rx','LineWidth',2);
                hold off;
            end
         end
