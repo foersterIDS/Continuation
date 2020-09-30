@@ -79,6 +79,9 @@ for i=1:2
     %% unique:
     fprintf('\n### %d: unique: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','unique','on');
+    %% plot:
+    fprintf('\n### %d: unique: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])

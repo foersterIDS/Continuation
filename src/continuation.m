@@ -54,6 +54,13 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         end
     end
     %
+    %% initialize live plot
+    %
+    if Opt.plot
+        
+        pl = live_plot(Opt, nv, l_all, var_all);
+    end
+    %
     %% continuation
     %
     while do_continuation && ~Opt.unique
@@ -140,7 +147,9 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
-            [var_all,l_all,bif,sign_det_jacobian] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
+            [var_all,l_all,bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
+        else
+            bif_flag = 0;
         end
         %
         %% adjust arc-length
@@ -171,6 +180,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             exitflag = -1;
             warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
             do_continuation = false;
+        end
+        %
+        %% live plot
+        %
+        if Opt.plot
+            pl = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif);
         end
         %
     end
@@ -232,6 +247,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             exitflag = -1;
             warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
             do_loop = false;
+            end
+            %
+            %% live plot
+            %
+            if Opt.plot
+                pl = live_plot(Opt, nv, l_all, var_all, pl);
             end
             %
         end
