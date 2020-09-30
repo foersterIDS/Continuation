@@ -6,6 +6,7 @@
 %
 function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
     if length(l_all) == 1
+        close all;
         figure;
         clf;
         pl = plot(l_all,var_all,'.-','LineWidth',2);
