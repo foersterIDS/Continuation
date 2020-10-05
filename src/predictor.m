@@ -8,9 +8,7 @@ function [vp,lp] = predictor(vars,ls,ds,Opt)
     if length(ls)==1
         xip1 = [vars;ls+sign(Opt.direction)*ds];
     else
-        xi = [vars(:,end);ls(end)];
-        xim1 = [vars(:,end-1);ls(end-1)];
-        xip1 = xi+(xi-xim1)*ds/sqrt((xi-xim1)'*(xi-xim1));
+        xip1 = predictor_taylor(vars,ls,Opt.predictor_taylor,ds);
     end
     vp = xip1(1:end-1);
     lp = xip1(end);

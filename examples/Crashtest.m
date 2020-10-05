@@ -82,6 +82,12 @@ for i=1:2
     %% plot:
     fprintf('\n### %d: plot: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on');
+    %% include_reverse:
+    fprintf('\n### %d: include_reverse: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','include_reverse','on');
+    %% predictor_taylor:
+    fprintf('\n### %d: predictor_taylor: 2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_taylor',2);
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])

@@ -130,6 +130,9 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             else
                 do_deflate = false;
             end
+            if Opt.include_reverse && is_reverse && solver_exitflag>0
+                [var_all,l_all] = include_reverse(x_solution,var_all,l_all);
+            end
             if ison(Opt.homotopy) && error_counter>=Opt.homotopy_error_counter
                 do_homotopy = true;
             else
