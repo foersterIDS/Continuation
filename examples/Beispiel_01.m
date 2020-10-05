@@ -21,21 +21,4 @@ testfun02;
 % tests ellipsoid2
 % testfun06;
 %% Solve
-[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max);
-
-%% Could be deleted since plot is now an option in continuation
-%% Plot
-figure(1);
-clf;
-plot(ls,vs,'-','LineWidth',2);
-if ~isempty(bifs)
-    hold on;
-    plot(ls(bifs(1,bifs(2,:)==0)),vs(:,bifs(1,bifs(2,:)==0)),'bo','LineWidth',2);
-    plot(ls(bifs(1,bifs(2,:)==1)),vs(:,bifs(1,bifs(2,:)==1)),'rx','LineWidth',2);
-    hold off;
-end
-grid on;
-xlim([lams,lame]);
-xlabel('$\lambda$','interpreter','latex');
-ylabel('$v_{i}$','interpreter','latex');
-drawnow;
+[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max,'plot','on');
