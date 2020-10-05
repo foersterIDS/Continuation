@@ -15,7 +15,7 @@ function [pl] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag,
         grid on;
         xlabel('$\lambda$','interpreter','latex');
         ylabel('$v_{i}$','interpreter','latex');
-        xlim([max([l_lu(1),min(l_all)*(1-dl)]),min([l_lu(2),max(l_all)*(1+dl)])]);
+        xlim([max([l_lu(1),min(l_all-10^-15)*(1-dl)]),min([l_lu(2),max(l_all+10^-15)*(1+dl)])]);
         drawnow;
     else
         newXData = cell(nv, 1);
@@ -33,7 +33,7 @@ function [pl] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag,
                hold off;
            end
         end
-        xlim([max([l_lu(1),min(l_all)*(1-dl)]),min([l_lu(2),max(l_all)*(1+dl)])]);
+        xlim([max([l_lu(1),min(l_all-10^-15)*(1-dl)]),min([l_lu(2),max(l_all+10^-15)*(1+dl)])]);
         drawnow;
     end
 end
