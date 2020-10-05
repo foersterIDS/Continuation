@@ -57,8 +57,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %% initialize live plot
     %
     if Opt.plot
-        
-        pl = live_plot(Opt, nv, l_all, var_all);
+        pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
     end
     %
     %% continuation
@@ -185,7 +184,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %% live plot
         %
         if Opt.plot
-            pl = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif);
+            pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
         end
         %
     end
@@ -252,7 +251,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             %% live plot
             %
             if Opt.plot
-                pl = live_plot(Opt, nv, l_all, var_all, pl);
+                pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl);
             end
             %
         end

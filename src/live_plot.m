@@ -4,7 +4,9 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
+function [pl] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif)
+    l_lu = [min([l_start,l_end]),max([l_start,l_end])];
+    dl = 0.1;
     if length(l_all) == 1
         close all;
         figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
@@ -13,6 +15,7 @@ function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
         grid on;
         xlabel('$\lambda$','interpreter','latex');
         ylabel('$v_{i}$','interpreter','latex');
+        xlim([max([l_lu(1),min(l_all)*(1-dl)]),min([l_lu(2),max(l_all)*(1+dl)])]);
         drawnow;
     else
         newXData = cell(nv, 1);
@@ -30,6 +33,7 @@ function [pl] = live_plot(Opt, nv, l_all, var_all, pl, bif_flag, bif)
                hold off;
            end
         end
+        xlim([max([l_lu(1),min(l_all)*(1-dl)]),min([l_lu(2),max(l_all)*(1+dl)])]);
         drawnow;
     end
 end
