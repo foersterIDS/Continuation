@@ -28,8 +28,11 @@ function [pl] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag,
         if ~Opt.unique && ison(Opt.bifurcation) && bif_flag 
            if ~isempty(bif)
                hold on;
-               plot(l_all(bif(1,bif(2,end)==0)),var_all(:,bif(1,bif(2,end)==0)),'bo','LineWidth',2);
-               plot(l_all(bif(1,bif(2,end)==1)),var_all(:,bif(1,bif(2,end)==1)),'rx','LineWidth',2);
+               if bif(2,end) == 0
+                   plot(l_all(end),var_all(:,end),'bo','LineWidth',2);
+               elseif bif(2,end) == 1
+                   plot(l_all(end),var_all(:,end),'rx','LineWidth',2);
+               end
                hold off;
            end
         end
