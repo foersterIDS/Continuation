@@ -84,11 +84,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 x_last_step = [var_all(:,end);l_all(end)];
                 x_predictor = homotopy(residual,x_last_step,Opt);
             else
-                [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+                [var_predictor,l_predictor,ch] = predictor(var_all,l_all,ds,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+            [var_predictor,l_predictor,ch] = predictor(var_all,l_all,ds,Opt);
             x_predictor = [var_predictor;l_predictor];
         end
         %
@@ -155,7 +155,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% adjust arc-length
         %
-        ds = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt);
+        ds = arclength(ds,ds0,error_counter,solver_output,do_deflate,Opt,ch);
         %
         %% live plot
         %
