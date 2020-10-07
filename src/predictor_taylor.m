@@ -11,9 +11,11 @@ function [xp,ch] = predictor_taylor(vars,ls,nd,ds)
     s = zeros(nd,1);
     for i=1:nd
         if i==1
-            s(i) = sqrt(sum((xs(:,end)-xs(:,end-1)).^2));
+%             s(i) = sqrt(sum((xs(:,end)-xs(:,end-1)).^2));
+            s(i) = norm(xs(:,end)-xs(:,end-1));
         else
-            s(i) = s(i-1)+sqrt(sum((xs(:,end-i+1)-xs(:,end-i)).^2));
+%             s(i) = s(i-1)+sqrt(sum((xs(:,end-i+1)-xs(:,end-i)).^2));
+            s(i) = s(i-1)+norm(xs(:,end-i+1)-xs(:,end-i));
         end
     end
     
