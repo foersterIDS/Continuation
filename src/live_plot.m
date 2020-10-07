@@ -8,7 +8,6 @@ function [pl] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag,
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
     dl = 0.1;
     if length(l_all) == 1
-        close all;
         figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
         clf;
         pl = plot(l_all,var_all,'.-','LineWidth',2);
