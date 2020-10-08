@@ -17,6 +17,12 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
         xlim([max([l_lu(1),min(l_all-10^-15)*(1-dl)]),min([l_lu(2),max(l_all+10^-15)*(1+dl)])]);
         drawnow;
         pl_info = struct('fig',fig,'pl',pl);
+    elseif bif_flag == -1
+            %% final change in live plot
+        for k = 1:nv
+           row = dataTipTextRow('Step',0:l_start,'%d');
+           pl_info.pl(k).DataTipTemplate.DataTipRows(end+1) = row;
+        end
     else
         set(0, 'currentfigure', pl_info.fig);
         newXData = cell(nv, 1);
