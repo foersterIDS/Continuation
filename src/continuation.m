@@ -122,6 +122,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             do_deflate = false;
             do_homotopy = false;
             error_counter = 0;
+            step_loop = step_loop + 1;
         else
             %% invalid result
             error_counter = error_counter+1;
@@ -168,7 +169,6 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         if Opt.display
             if val
-                step_loop = step_loop + 1;
                 fprintf('-----> continued at l = %.2e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\n',l_all(end),ds,loop_counter,step_loop);
             else
                 fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\n',ds,loop_counter,step_loop);
@@ -228,8 +228,8 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             %% check exitflag
             %
             if exitflag > 0
+                step_loop = step_loop + 1;
                 if Opt.display
-                    step_loop = step_loop + 1;
                     fprintf('-----> Found solution at l = %.2e\t|\tloop counter = %d\t|\tstep = %d\n',l_aktuell, loop_counter, step_loop);
                 end
             else
