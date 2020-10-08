@@ -4,10 +4,11 @@
 %   Leibniz University Hannover
 %   05.10.2020 - Alwin Förster
 %
-function [xp,ch] = predictor_taylor(vars,ls,nd,ds)
+function [xp] = predictor_taylor(vars,ls,nd,ds)
     nd = min([length(ls)-1,nd]);
     xs = [vars;ls];
     nx = length(xs(:,end));
+    %% calc arc-length approximation:
     s = zeros(nd,1);
     for i=1:nd
         if i==1
@@ -18,41 +19,7 @@ function [xp,ch] = predictor_taylor(vars,ls,nd,ds)
             s(i) = s(i-1)+norm(xs(:,end-i+1)-xs(:,end-i));
         end
     end
-    
-    if length(ls) > 2
-        vh = height(vars);
-        theta = 0;
-        
-        % calculate greatest angle
-        for k = 1:vh
-            vr = vars(k,end-2:end);
-            lr = ls(end-2:end);
-            vec = [lr;vr];
-            v1 = vec(:,end) - vec(:,end-1);
-            v2 = vec(:,end-1) - vec(:,end-2);
-            
-            thetn = real(acos(max(min(dot(v1,v2)/(norm(v1)*norm(v2)),1),-1)));
-
-            if thetn > theta
-                theta = thetn;
-            end
-        end
-        
-        % define highest value for angle
-        theta_set = 5 * pi/180;
-        
-        % calculate ratio
-        ch = theta / theta_set;
-        
-        if ch < 1 % if ratio < 1, set ch to 1
-            ch = 1;
-        elseif ch > 1.5 % high ratios are punished stronger
-            ch = 5;
-        end
-    else
-        ch = 1;
-    end
-
+    %% calc taylor-predictor:
     f = kron(ones(nd,1),xs(:,end));
     fdi = zeros(nd*nx,1);
     Mdi = zeros(nd*nx);

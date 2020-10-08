@@ -88,6 +88,9 @@ for i=1:2
     %% predictor_taylor:
     fprintf('\n### %d: predictor_taylor: 2 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_taylor',2);
+    %% step_size_control:
+    fprintf('\n### %d: step_size_control: angle ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','step_size_control','angle');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])
