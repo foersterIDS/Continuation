@@ -6,7 +6,8 @@
 %
 function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info, bif_flag, bif)
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
-    dl = 0.1;
+    l_max = [min(l_all),max(l_all)];
+    dl0 = abs(l_end-l_start)*0.05;
     if length(l_all) == 1
         fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
         clf;
@@ -14,7 +15,7 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
         grid on;
         xlabel('$\lambda$','interpreter','latex');
         ylabel('$v_{i}$','interpreter','latex');
-        xlim([max([l_lu(1),min(l_all-10^-15)*(1-dl)]),min([l_lu(2),max(l_all+10^-15)*(1+dl)])]);
+        xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
         drawnow;
         pl_info = struct('fig',fig,'pl',pl);
     elseif bif_flag == -1
@@ -43,7 +44,7 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
                hold off;
            end
         end
-        xlim([max([l_lu(1),min(l_all-10^-15)*(1-dl)]),min([l_lu(2),max(l_all+10^-15)*(1+dl)])]);
+        xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
         drawnow;
     end
 end
