@@ -44,6 +44,9 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         if ison(Opt.bifurcation)
             sign_det_jacobian = sign(det(initial_jacobian));
         end
+        if Opt.plot
+            pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
+        end
     else
         var_all = [];
         l_all = [];
@@ -53,12 +56,6 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         if Opt.display
             fprintf('No initial solution found.\n');
         end
-    end
-    %
-    %% initialize live plot
-    %
-    if Opt.plot
-        pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
     end
     %
     %% continuation
@@ -265,7 +262,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     %% live plot finalization
     %
-    if Opt.plot
+    if Opt.plot && initial_exitflag>0
         live_plot(Opt, nv, step_loop, l_end, l_all, var_all, pl, -1);
     end
     %
