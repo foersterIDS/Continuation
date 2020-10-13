@@ -21,6 +21,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     nv = length(var0);
     do_deflate = false;
     do_homotopy = false;
+    do_stepback = false;
     error_counter = 0;
     loop_counter = 0;
     step_loop = 0;
@@ -34,6 +35,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
     [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0);
     bif = [];
+    x_plus = [];
     if initial_exitflag>0
         l_all = Opt.l_0;
         do_continuation = true;
@@ -114,10 +116,17 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         [val,is_reverse] = validate_result(x_solution,var_all,l_all,solver_exitflag,Opt);
         if val
             %% valid result
-            var_all = [var_all,x_solution(1:end-1)];
-            l_all = [l_all,x_solution(end)];
+            if isempty(x_plus)
+                var_all = [var_all,x_solution(1:end-1)];
+                l_all = [l_all,x_solution(end)];
+            else
+                var_all = [var_all,x_solution(1:end-1),x_plus(1:end-1)];
+                l_all = [l_all,x_solution(end),x_plus(end)];
+                x_plus = [];
+            end
             do_deflate = false;
             do_homotopy = false;
+            do_stepback = false;
             error_counter = 0;
             step_loop = step_loop + 1;
         else
@@ -128,6 +137,18 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 x_deflation = x_solution;
             else
                 do_deflate = false;
+            end
+            do_stepback = (error_counter==Opt.stepback_error_counter);
+            if error_counter==Opt.stepback_error_counter
+                x_plus = [var_all(:,end);l_all(end)];
+                var_all(:,end) = [];
+                l_all(end) = [];
+            elseif error_counter==Opt.stepback_error_counter+1
+                var_all = [var_all,x_plus(1:end-1)];
+                l_all = [l_all,x_plus(end)];
+                x_plus = [];
+            else
+                x_plus = [];
             end
             if Opt.include_reverse && is_reverse && solver_exitflag>0
                 [var_all,l_all] = include_reverse(x_solution,var_all,l_all);
@@ -154,7 +175,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% adjust arc-length
         %
-        ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,var_all,l_all,Opt);
+        ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,Opt);
         %
         %% live plot
         %
