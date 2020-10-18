@@ -197,6 +197,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             do_continuation = false;
             exitflag = 1;
         end
+        % exit with n_step_max reached:
+        if loop_counter>=Opt.n_step_max
+            do_continuation = false;
+            exitflag = 2;
+        end
         % exit with l<l_start:
         if sign(l_end-l_start)*(l_all(end)-l_start)<0
             do_continuation = false;
