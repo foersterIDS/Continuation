@@ -16,5 +16,5 @@ function dp = polydern(p,nd)
     else
         dP = zeros(nd,1);
     end
-    dp = reshape(dP',[1,nd*no]);
+    dp = reshape(dP',[1,nd*max([1,no])]);
 end
