@@ -1,20 +1,20 @@
-%% path continuation - polyvaln
+%% path continuation - polydern
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
-%   12.10.2020 - Alwin Förster
+%   19.10.2020 - Alwin FÃ¶rster
 %
-function yp = polyvaln(p,x,nd)
-    x = x(:).';
-    nx = length(x);
+function dp = polydern(p,nd)
     try
         no = (length(p)/nd)-1;
         P = reshape(p,[no+1,nd])';
     catch
         error('nd does not match size of p');
     end
-    yp = zeros(nd,nx);
-    for i=0:no
-        yp = yp+P(:,i+1)*x.^i;
+    if no>=1
+        dP = P(:,2:no+1).*kron(ones(nd,1),1:no);
+    else
+        dP = zeros(nd,1);
     end
+    dp = reshape(dP',[1,nd*no]);
 end
