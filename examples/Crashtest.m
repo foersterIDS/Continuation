@@ -91,6 +91,9 @@ for i=1:2
     %% predictor_fit:
     fprintf('\n### %d: predictor_fit: 4 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_fit',4);
+    %% predictor_adaptive:
+    fprintf('\n### %d: predictor_adaptive: nt = 4, nf = 5 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_adaptive','on','predictor_taylor',4,'predictor_fit',5);
     %% step_size_control:
     fprintf('\n### %d: step_size_control: angle ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','step_size_control','angle');

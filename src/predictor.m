@@ -10,9 +10,6 @@ function [vp,lp] = predictor(vars,ls,ds,Opt)
     else
         [nt,nf] = predictor_adaptive(vars,ls,Opt);
         xip1 = predictor_taylor(vars,ls,nt,nf,ds);
-        
-        fprintf('--------> nt = %d\tnf = %d\n',nt,nf);
-        
     end
     vp = xip1(1:end-1);
     lp = xip1(end);
