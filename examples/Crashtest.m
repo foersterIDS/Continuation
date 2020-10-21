@@ -97,6 +97,8 @@ for i=1:2
     %% step_size_control:
     fprintf('\n### %d: step_size_control: angle ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','step_size_control','angle');
+    fprintf('\n### %d: step_size_control: pid ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','step_size_control','pid');
 end
 fprintf('\n########################\n########################\n### ### success! ### ###\n########################\n########################\n');
 disp(['simulation time: ' num2str(toc)])
