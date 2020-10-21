@@ -5,7 +5,6 @@
 %   12.10.2020 - Alwin Förster
 %
 function p = polyfitn(x,y,no)
-    warning('');
     [nd,nx] = size(y);
     if nx<(no+1)
         error('polynomial order to high');
@@ -17,9 +16,9 @@ function p = polyfitn(x,y,no)
     X = kron(eye(nd),XX);
     yT = y.';
     yy = yT(:);
-    p = ((X'*X)\X'*yy).';
-    [warnMsg, warnId] = lastwarn;
-    if ~isempty(warnMsg) && no>1
+    if rcond(X'*X)<10^-15 && no>1
         p = polyfitn(x((end-no+1):end),y(:,(end-no+1):end),no-1);
+    else
+        p = ((X'*X)\X'*yy).';
     end
 end
