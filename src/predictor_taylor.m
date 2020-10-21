@@ -9,11 +9,6 @@ function [xp] = predictor_taylor(var_all,l_all,s_all,no,nf,ds)
     ns = min([length(l_all),no+1+nf]);
     xs = [var_all;l_all];
     nd = length(xs(:,end));
-    %% calc arc-length approximation:
-%     s = zeros(1,ns);
-%     for i=2:ns
-%         s(i) = s(i-1)+norm(xs(:,end-ns+i)-xs(:,end-ns+i-1));
-%     end
     %% calc taylor-predictor:
     p = polyfitn(s_all(end+((-ns+1):0)),xs(:,end+((-ns+1):0)),no);
     xp = polyvaln(p,s_all(end)+ds,nd);

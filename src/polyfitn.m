@@ -15,10 +15,8 @@ function p = polyfitn(x,y,no)
         XX(:,i+1) = x(:).^i;
     end
     X = kron(eye(nd),XX);
-    yy = NaN(nx*nd,1);
-    for i=1:nd
-        yy(nx*(i-1)+(1:nx)) = y(i,:).';
-    end
+    yT = y.';
+    yy = yT(:);
     p = ((X'*X)\X'*yy).';
     [warnMsg, warnId] = lastwarn;
     if ~isempty(warnMsg) && no>1
