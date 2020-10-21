@@ -38,6 +38,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     x_plus = [];
     if initial_exitflag>0
         l_all = Opt.l_0;
+        s_all = 0;
         do_continuation = true;
         do_loop = true;
         if Opt.display
@@ -52,6 +53,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     else
         var_all = [];
         l_all = [];
+        s_all = [];
         exitflag = -2; % no initial solution found
         do_continuation = false;
         do_loop = false;
@@ -84,11 +86,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 x_last_step = [var_all(:,end);l_all(end)];
                 x_predictor = homotopy(residual,x_last_step,Opt);
             else
-                [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor] = predictor(var_all,l_all,ds,Opt);
+            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,Opt);
             x_predictor = [var_predictor;l_predictor];
         end
         %
@@ -119,9 +121,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             if isempty(x_plus)
                 var_all = [var_all,x_solution(1:end-1)];
                 l_all = [l_all,x_solution(end)];
+                s_all = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-1);l_all(end-1)])];
             else
                 var_all = [var_all,x_solution(1:end-1),x_plus(1:end-1)];
                 l_all = [l_all,x_solution(end),x_plus(end)];
+                s_all = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-2);l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
                 x_plus = [];
             end
             do_deflate = false;
@@ -143,9 +147,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 x_plus = [var_all(:,end);l_all(end)];
                 var_all(:,end) = [];
                 l_all(end) = [];
+                s_all(end) = [];
             elseif error_counter==Opt.stepback_error_counter+1
                 var_all = [var_all,x_plus(1:end-1)];
                 l_all = [l_all,x_plus(end)];
+                s_all = [s_all,s_all(end)+norm([var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)])];
                 x_plus = [];
             else
                 x_plus = [];
@@ -170,7 +176,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
-            [var_all,l_all,bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
+            [bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
         end
         %
         %% adjust arc-length
@@ -227,6 +233,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     if Opt.unique && do_loop
         do_loop = true;
         l_all = l_start;
+        s_all = 0;
         l_v = l_start:ds0:l_end;
         %
         while loop_counter < length(l_v) && do_loop
@@ -267,6 +274,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             %
             var_all = [var_all, var_aktuell];
             l_all = [l_all, l_aktuell];
+            s_all = [s_all,s_all(end)+norm([var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)])];
             %
             %% check for error counter
             %

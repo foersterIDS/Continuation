@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp] = predictor(vars,ls,ds,Opt)
-    if length(ls)==1
-        xip1 = [vars;ls+sign(Opt.direction)*ds];
+function [vp,lp] = predictor(var_all,l_all,s_all,ds,Opt)
+    if length(l_all)==1
+        xip1 = [var_all;l_all+sign(Opt.direction)*ds];
     else
-        [nt,nf] = predictor_adaptive(vars,ls,Opt);
-        xip1 = predictor_taylor(vars,ls,nt,nf,ds);
+        [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt);
+        xip1 = predictor_taylor(var_all,l_all,s_all,nt,nf,ds);
     end
     vp = xip1(1:end-1);
     lp = xip1(end);

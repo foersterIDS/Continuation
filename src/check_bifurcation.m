@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   26.05.2020 - Alwin Förster
 %
-function [var_all,l_all,bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,bif,sign_det_jacobian,Opt)
+function [bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,bif,sign_det_jacobian,Opt)
     bif_flag = 0;
     if Opt.bifurcation.mark
         %% mark bifurcations:
