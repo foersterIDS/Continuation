@@ -143,13 +143,13 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             else
                 do_deflate = false;
             end
-            do_stepback = (error_counter==Opt.stepback_error_counter);
-            if error_counter==Opt.stepback_error_counter
+            do_stepback = (error_counter==Opt.stepback_error_counter) && (length(l_all)>1);
+            if (error_counter==Opt.stepback_error_counter) && (length(l_all)>1)
                 x_plus = [var_all(:,end);l_all(end)];
                 var_all(:,end) = [];
                 l_all(end) = [];
                 s_all(end) = [];
-            elseif error_counter==Opt.stepback_error_counter+1
+            elseif (error_counter==Opt.stepback_error_counter+1) && (length(l_all)>1)
                 var_all = [var_all,x_plus(1:end-1)];
                 l_all = [l_all,x_plus(end)];
                 s_all = [s_all,s_all(end)+norm([var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)])];
@@ -277,18 +277,24 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             l_all = [l_all, l_aktuell];
             s_all = [s_all,s_all(end)+norm([var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)])];
             %
+            %% check for bifurcations
+            %
+% TODO:
+            bif_flag = -2;
+            bif = [];
+            %
             %% check for error counter
             %
             if error_counter >= Opt.max_error_counter
-            exitflag = -1;
-            warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
-            do_loop = false;
+                exitflag = -1;
+                warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
+                do_loop = false;
             end
             %
             %% live plot
             %
             if Opt.plot
-                pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl);
+                pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
             end
             %
         end
