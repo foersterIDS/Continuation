@@ -193,7 +193,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         if Opt.display
             if val
-                fprintf('-----> continued at l = %.2e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',l_all(end),ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
+                fprintf('-----> continued at l = %.4e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',l_all(end),ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
             else
                 fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
             end
@@ -260,13 +260,13 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             if exitflag > 0
                 step_loop = step_loop + 1;
                 if Opt.display
-                    fprintf('-----> Found solution at l = %.2e\t|\tloop counter = %d\t|\tstep = %d\n',l_aktuell, loop_counter, step_loop);
+                    fprintf('-----> Found solution at l = %.4e\t|\tloop counter = %d\t|\tstep = %d\n',l_aktuell, loop_counter, step_loop);
                 end
             else
                 var_aktuell = NaN(size(var_aktuell));
                 error_counter = error_counter + 1;
                 if Opt.display
-                    fprintf('-----> No solution found at l = %.2e\t|\tloop counter = %d\t|\tstep = %d\n', l_aktuell, loop_counter, step_loop);
+                    fprintf('-----> No solution found at l = %.4e\t|\tloop counter = %d\t|\tstep = %d\n', l_aktuell, loop_counter, step_loop);
                 end
             end
             %
@@ -297,7 +297,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %% live plot finalization
     %
     if Opt.plot && initial_exitflag>0
-        live_plot(Opt, nv, step_loop, l_end, l_all, var_all, pl, -1);
+        live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, -1);
     end
     %
     %% final disp
