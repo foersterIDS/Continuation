@@ -6,7 +6,6 @@
 %   16.09.2020 - Tido Kubatschek 
 %
 function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
-    tol = 10^-8;
     max_step = 50;
     n_steps = 0;
     exitflag = -1;
@@ -21,7 +20,7 @@ function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
         nf = length(fi);
         xip1 = xi-Ji(1:nf,1:nf)\fi;
         abs_fi = sqrt(fi'*fi);
-        if abs_fi<tol
+        if abs_fi<Opt.solver_tol
             exitflag = 1;
             break;
         end

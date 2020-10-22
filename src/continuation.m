@@ -100,22 +100,23 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             if sign(l_all(end)-Opt.l_target)*sign(l_predictor-Opt.l_target)<=0
                 %% try to converge to target
                 residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
-                [var_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor);
+                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor);
                 x_solution = [var_solution;Opt.l_target];
             else
                 %% regular solver
-                [x_solution,~,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+                [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
             end
             is_current_jacobian = true;
         catch
             x_solution = NaN(size(x_predictor));
+            fun_solution = inf(size(x_predictor));
             solver_exitflag = -2;
             solver_output = default_solver_output;
         end
         %
         %% check result
         %
-        [val,is_reverse] = validate_result(x_solution,var_all,l_all,ds,solver_exitflag,Opt);
+        [val,is_reverse] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,Opt);
         if val
             %% valid result
             if isempty(x_plus)
