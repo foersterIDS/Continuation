@@ -182,7 +182,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% adjust arc-length
         %
-        ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,Opt);
+        ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
         %
         %% live plot
         %

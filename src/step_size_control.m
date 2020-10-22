@@ -6,7 +6,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,vars,ls,Opt)
+function [dsn] = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,vars,ls,s_all,Opt)
     if ~do_stepback
         if ~do_deflate
             if error_counter == 0
@@ -15,7 +15,11 @@ function [dsn] = step_size_control(ds,ds0,error_counter,solver_output,do_deflate
                 elseif Opt.step_size_control.angle
                     dsn = step_size_control_angle(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
                 elseif Opt.step_size_control.curvature
-                    dsn = step_size_control_curvature();
+                    if length(ls) > 3
+                        dsn = step_size_control_curvature(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,s_all,Opt);
+                    else
+                        dsn = step_size_control_standard(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                    end
                 elseif Opt.step_size_control.pid
                     if length(ls) > 4
                         dsn = step_size_control_pid(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);

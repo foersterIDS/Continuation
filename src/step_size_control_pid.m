@@ -10,7 +10,7 @@ function [dsn] = step_size_control_pid(ds,ds0,error_counter,solver_output,do_def
     k_I = 0.175;
     k_D = 0.01;
     
-    e_max = Opt.step_size_emax;
+    e_max = Opt.step_size_e_max;
     
     dvarsdl = @(k) (vars(:,end+k) - vars(:,end+k-1)) / (ls(end+k) - ls(end+k-1));
     
