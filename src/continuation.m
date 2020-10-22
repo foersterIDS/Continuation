@@ -115,7 +115,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% check result
         %
-        [val,is_reverse] = validate_result(x_solution,var_all,l_all,solver_exitflag,Opt);
+        [val,is_reverse] = validate_result(x_solution,var_all,l_all,ds,solver_exitflag,Opt);
         if val
             %% valid result
             if isempty(x_plus)
