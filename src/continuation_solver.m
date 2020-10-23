@@ -30,14 +30,14 @@ function [solver,default_solver_output] = continuation_solver(Opt)
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
         else
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
-        solver = @(fun,x0) lsqnonlin(fun,x0,[],[],options);
+        solver = @(fun,x0) solver_lsqnonlin(fun,x0,options);
     elseif Opt.solver.newton
         %% basic newton solver
-        solver = @(fun,x0) basic_newton_solver(fun,x0,Opt);
+        solver = @(fun,x0) solver_basic_newton(fun,x0,Opt);
     else
         %% error
         error('No such solver');

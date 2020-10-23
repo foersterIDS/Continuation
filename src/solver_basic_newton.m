@@ -5,7 +5,7 @@
 %   19.05.2020 - Alwin Förster
 %   16.09.2020 - Tido Kubatschek 
 %
-function [x,fval,exitflag,output,jacobian] = basic_newton_solver(fun,x0,Opt)
+function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,Opt)
     max_step = 50;
     n_steps = 0;
     exitflag = -1;
