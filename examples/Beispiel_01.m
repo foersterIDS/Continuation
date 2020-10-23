@@ -21,5 +21,8 @@ testfun02;
 %% Testfunktion #06
 % tests ellipsoid2
 % testfun06;
+%% Testfunktion #07
+% Multidimensional (nd = 500)
+% testfun07;
 %% Solve
 [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max,'plot','on');
