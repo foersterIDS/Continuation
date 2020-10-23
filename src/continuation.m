@@ -22,6 +22,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     do_deflate = false;
     do_homotopy = false;
     do_stepback = false;
+    do_convergeToTarget = false;
     error_counter = 0;
     loop_counter = 0;
     step_loop = 0;
@@ -102,9 +103,11 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
                 residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
                 [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor);
                 x_solution = [var_solution;Opt.l_target];
+                do_convergeToTarget = true;
             else
                 %% regular solver
                 [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+                do_convergeToTarget = false;
             end
             is_current_jacobian = true;
         catch
@@ -112,11 +115,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             fun_solution = inf(size(x_predictor));
             solver_exitflag = -2;
             solver_output = default_solver_output;
+            do_convergeToTarget = false;
         end
         %
         %% check result
         %
-        [val,is_reverse] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,Opt);
+        [val,is_reverse] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,do_convergeToTarget,Opt);
         if val
             %% valid result
             if isempty(x_plus)

@@ -8,9 +8,9 @@ function [solver,default_solver_output] = continuation_solver(Opt)
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
         solver = @(fun,x0) fsolve(fun,x0,options);
     elseif Opt.solver.fmincon
@@ -22,9 +22,9 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         Opt.solve.fsolve = true;
         Opt.solve.fmincon = false;
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
         solver = @(fun,x0) fsolve(fun,x0,options);
     elseif Opt.solver.lsqnonlin

@@ -1,4 +1,5 @@
 clear all;
+close all;
 clc;
 addpath('..\src');
 addpath('test_cases');
