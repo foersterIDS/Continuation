@@ -6,7 +6,11 @@
 %
 function [vp,lp] = predictor(var_all,l_all,s_all,ds,Opt)
     if length(l_all)==1
-        xip1 = [var_all;l_all+sign(Opt.direction)*ds];
+        if numel(Opt.direction)==1
+            xip1 = [var_all;l_all+sign(Opt.direction)*ds];
+        else
+            xip1 = [var_all;l_all]+Opt.direction*ds;
+        end
     else
         [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt);
         xip1 = predictor_taylor(var_all,l_all,s_all,nt,nf,ds);
