@@ -112,6 +112,9 @@ for i=1:2
     fprintf('\n### %d: plot: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on');
     probinfo = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on ###\n',i),probinfo);
+    fprintf('\n### %d: plot_vars_index: 1 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on','plot_vars_index',1);
+    probinfo = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot_vars_index: 1 ###\n',i),probinfo);
     %% include_reverse:
     fprintf('\n### %d: include_reverse: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','include_reverse','on');

@@ -11,7 +11,7 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
     if length(l_all) == 1
         fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
         clf;
-        pl = plot(l_all,var_all,'.-','LineWidth',2);
+        pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
         grid on;
         xlabel('$\lambda$','interpreter','latex');
         ylabel('$v_{i}$','interpreter','latex');
@@ -20,17 +20,17 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
         pl_info = struct('fig',fig,'pl',pl);
     elseif bif_flag == -1
         %% final change in live plot
-        for k = 1:nv
+        for k = 1:length(Opt.plot_vars_index)
            row = dataTipTextRow('Step',0:(length(l_all)-1),'%d');
            pl_info.pl(k).DataTipTemplate.DataTipRows(end+1) = row;
         end
     else
         set(0, 'currentfigure', pl_info.fig);
-        newXData = cell(nv, 1);
-        newYData = cell(nv, 1);
-        for k = 1:nv
+        newXData = cell(length(Opt.plot_vars_index), 1);
+        newYData = cell(length(Opt.plot_vars_index), 1);
+        for k = 1:length(Opt.plot_vars_index)
             newXData{k,1} = l_all;
-            newYData{k,1} = var_all(k,:);
+            newYData{k,1} = var_all(Opt.plot_vars_index(k),:);
         end
         set(pl_info.pl, {'XData'}, newXData, {'YData'},  newYData);
         if ~Opt.unique && ison(Opt.bifurcation) && bif_flag 
