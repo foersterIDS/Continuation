@@ -1,4 +1,5 @@
 clear all;
+close all;
 clc;
 tic
 addpath('..\src');
