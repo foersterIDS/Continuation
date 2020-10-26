@@ -37,9 +37,9 @@ function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info,
            if ~isempty(bif)
                hold on;
                if bif(2,end) == 0
-                   plot(l_all(end),var_all(:,end),'bo','LineWidth',2);
+                   plot(l_all(end),var_all(Opt.plot_vars_index,end),'bo','LineWidth',2);
                elseif bif(2,end) == 1
-                   plot(l_all(end),var_all(:,end),'rx','LineWidth',2);
+                   plot(l_all(end),var_all(Opt.plot_vars_index,end),'rx','LineWidth',2);
                end
                hold off;
            end
