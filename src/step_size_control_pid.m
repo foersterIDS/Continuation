@@ -5,10 +5,10 @@
 %   21.10.2020 - Tido Kubatschek
 %
 function [dsn] = step_size_control_pid(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt)
-    % parameters of pid control
-    k_P = 0.075;
-    k_I = 0.175;
-    k_D = 0.01;
+    % parameters of pid control 
+    k_P = 0.1;
+    k_I = 0.01;
+    k_D = 0.5;
     
     e_max = Opt.step_size_e_max;
     
