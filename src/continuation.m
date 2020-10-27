@@ -176,12 +176,12 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
 %         bif = [];
         % TODO: Bifurkationen erkennen und exakten Punkt ermitteln
         bif_flag = 0;
-        if ison(Opt.bifurcation) && val && ~do_homotopy
+        if ison(Opt.bifurcation) && val && ~do_homotopy && numel(l_all)>1
             if ~is_current_jacobian
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
-            [bif,sign_det_jacobian, bif_flag] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,bif,sign_det_jacobian,Opt);
+            [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,Opt);
         end
         %
         %% adjust arc-length
@@ -231,6 +231,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     if Opt.bifurcation.trace && ~Opt.unique
         % TODO: start new continuation at bifurcations
+        warning('Bifurcation tracing is not implemented yet. Using determine instead.');
     end
     %
     %% unique - Durchlaufen mit festen Werten für l
