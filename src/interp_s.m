@@ -5,9 +5,9 @@
 %   27.10.2020 - Tido Kubatschek
 %
 function [var_all_i, l_all_i, s_all_i] = interp_s(s_all, var_all, l_all, Opt)
-    % determine interpolation method from Opt
-    method = Opt.interpolation_method;
-    
+    if length(l_all) < 3
+        warning('for interpolation at least 3 data points are needed. Points are linearly interpolated now')
+    end
     x_all = [var_all; l_all];
     
     % calc new s with finer inc
