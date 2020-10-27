@@ -72,28 +72,31 @@ for i=1:2
     %% deflation:
     fprintf('\n### %d: deflation: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','deflation','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: deflation: on ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: deflation: on ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: deflation: off ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','deflation','off');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: deflation: off ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: deflation: off ###\n',i),probinfo,probcounter);
     %% bifurcation:
     fprintf('\n### %d: bifurcation: mark ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','mark');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: mark ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: mark ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: bifurcation: determine ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','determine');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: determine ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: determine ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: bifurcation: trace ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','bifurcation','trace');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: trace ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: bifurcation: trace ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: stop_on_bifurcation: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','stop_on_bifurcation','on');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: stop_on_bifurcation: on ###\n',i),probinfo,probcounter);
     %% n_iter_opt:
     fprintf('\n### %d: n_iter_opt: 5 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','n_iter_opt',5);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: n_iter_opt: 5 ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: n_iter_opt: 5 ###\n',i),probinfo,probcounter);
     %% ds_max:
     fprintf('\n### %d: ds_max: 2*ds0 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','ds_max',2*ds0);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: ds_max: 2*ds0 ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: ds_max: 2*ds0 ###\n',i),probinfo,probcounter);
     %% l_0:
     fprintf('\n### %d: l_0: (l_end-l_start)/2+l_start ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','l_0',(lame-lams)/2+lams);

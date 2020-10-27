@@ -173,15 +173,19 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% Bifurcations
         %
-%         bif = [];
-        % TODO: Bifurkationen erkennen und exakten Punkt ermitteln
         bif_flag = 0;
-        if ison(Opt.bifurcation) && val && ~do_homotopy && numel(l_all)>1
+        if ison(Opt.bifurcation) && val && ~do_homotopy && numel(l_all)>2
             if ~is_current_jacobian
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
             [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,Opt);
+        elseif ison(Opt.bifurcation) && val && numel(l_all)<=2
+            if ~is_current_jacobian
+                %% get jacobian if not current
+                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
+            end
+            sign_det_jacobian = sign(det(solver_jacobian(1:nv,1:nv)));
         end
         %
         %% adjust arc-length
@@ -190,7 +194,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
         %
         %% live plot
         %
-        if Opt.plot
+        if Opt.plot && val
             pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
         end
         %
@@ -223,6 +227,14 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
             exitflag = -1;
             warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
             do_continuation = false;
+        end
+        % exit with bifurcation:
+        if bif_flag>0 && Opt.stop_on_bifurcation
+            do_continuation = false;
+            exitflag = 3;
+            var_all = var_all(:,1:bif(1,end));
+            l_all = l_all(1:bif(1,end));
+            s_all = s_all(1:bif(1,end));
         end
         %
     end

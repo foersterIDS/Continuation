@@ -6,12 +6,13 @@
 %
 function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,s_all,bif,sign_det_jacobian,Opt)
     bif_flag = 0;
+    solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
         %% mark bifurcations:
         full_rank = length(solver_jacobian_red(:,1));
         rank_tol = 10^-2; % TODO!!!
         sign_det_current_jacobian = sign(det(solver_jacobian_red));
-        if sign_det_current_jacobian*sign_det_jacobian<0
+        if sign_det_current_jacobian*sign_det_jacobian<=0
             bif_type = (rank(solver_jacobian_red,rank_tol)==full_rank); % 1: true bif.; 0: zero point
             bif = [bif,[length(l_all);bif_type]];
             sign_det_jacobian = sign_det_current_jacobian;
@@ -27,7 +28,7 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
         full_rank = length(solver_jacobian_red(:,1));
         rank_tol = 10^-2; % TODO!!!
         sign_det_current_jacobian = sign(det_solver_jacobian_red);
-        if sign_det_current_jacobian*sign_det_jacobian<0
+        if sign_det_current_jacobian*sign_det_jacobian<=0
             %% find exact point:
             nds = 5;
             dss = linspace(s_all(end-1)-s_all(end),0,nds);
