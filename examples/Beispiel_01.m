@@ -24,5 +24,8 @@ testfun02;
 %% Testfunktion #07
 % Multidimensional (nd = 500)
 % testfun07;
+%% Testfunktion #08
+% Pitchfork-Bifurkation
+% testfun08;
 %% Solve
 [vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'homotopy','on','solver','fsolve','bifurcation','mark','ds_max',ds_max,'plot','on');
