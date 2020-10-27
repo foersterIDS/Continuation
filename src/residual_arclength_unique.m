@@ -6,6 +6,6 @@
 %
 function [residual,jacobian] = residual_arclength_unique(x,xs,ds,Opt)
     [a,b] = size(xs);
-    residual = x(end)-(xs(end,b)+ds*Opt.direction);
+    residual = x(end)-(xs(end,b)+ds*sign(Opt.direction(end)));
     jacobian = [zeros(1,a-1),1];
 end

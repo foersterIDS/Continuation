@@ -9,8 +9,12 @@ function [residual,jacobian] = residual_arclength_linear(x,xs,ds,Opt)
     [b,a] = size(xs);    
     % approximate tangent with secant
     if a == 1
-        sec = [zeros(b-1,1);1];
-        sec = Opt.direction * ds * sec;
+        if numel(Opt.direction)==1
+            sec = [zeros(b-1,1);1];
+            sec = Opt.direction * ds * sec;
+        else
+            sec = Opt.direction * ds;
+        end
         xip1 = xs(:,end) + sec;
     else
         sec = xs(:,end) - xs(:,end-1);
