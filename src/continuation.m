@@ -10,7 +10,7 @@
 %   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
-function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     exitflag = -1;
@@ -243,7 +243,7 @@ function [var_all,l_all,exitflag,bif] = continuation(fun,var0,l_start,l_end,ds0,
     %
     if Opt.bifurcation.trace && ~Opt.unique
         % TODO: start new continuation at bifurcations
-        warning('Bifurcation tracing is not implemented yet. Using determine instead.');
+        [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end);
     end
     %
     %% unique - Durchlaufen mit festen Werten für l

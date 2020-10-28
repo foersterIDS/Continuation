@@ -1,6 +1,6 @@
 addpath('test_cases\testfun05_aux');
 lm = 2;
-vm = lm^3;
+vm = lm^2;
 r = lm/2;
 fun = @(v,l) residual_fun05(v,l,true,r,lm,vm);
 lams = 0;
