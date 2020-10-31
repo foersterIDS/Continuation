@@ -4,20 +4,34 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [pl_info] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info, bif_flag, bif)
+function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_info, bif_flag, bif)
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
+    
     if length(l_all) == 1
-        fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
-        clf;
-        pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
-        grid on;
-        xlabel('$\lambda$','interpreter','latex');
-        ylabel('$v_{i}$','interpreter','latex');
-        xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+        if isnan(Opt.live_plot_fig) % test for existing figure to plot in
+            fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]); % create new fig
+            clf;
+        else
+            fig = figure(Opt.live_plot_fig); % use existing fig
+            hold on; % for new plot
+        end
+        
+        pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2, 'Color', [0 0.4470 0.7410]);
+        
+        if isnan(Opt.live_plot_fig) % test for existing figure to plot in, there must to no new labels or grid
+            grid on;
+            xlabel('$\lambda$','interpreter','latex');
+            ylabel('$v_{i}$','interpreter','latex');
+            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+        end
+        
         drawnow;
         pl_info = struct('fig',fig,'pl',pl);
+        
+        Opt.live_plot_fig = 1; % reference to existing fig
+        
     elseif bif_flag == -1
         %% final change in live plot
         set(0, 'currentfigure', pl_info.fig);

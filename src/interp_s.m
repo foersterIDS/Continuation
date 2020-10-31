@@ -11,8 +11,7 @@ function [var_all_i, l_all_i, s_all_i] = interp_s(s_all, var_all, l_all, Opt)
     x_all = [var_all; l_all];
     
     % calc new s with finer inc
-    s_inc = Opt.interp_s_inc;
-    s_all_i = s_all(1):s_inc:s_all(end);
+    s_all_i = linspace(s_all(1), s_all(end), Opt.interp_s_inc);
     
     if Opt.interpolation_method.spline
         % use MATLAB intern function spline

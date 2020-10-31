@@ -49,7 +49,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if Opt.plot
-            pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
         end
     else
         var_all = [];
@@ -195,7 +195,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% live plot
         %
         if Opt.plot && val
-            pl = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
         end
         %
         %% end loop
