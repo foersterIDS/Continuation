@@ -18,7 +18,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
             hold on; % for new plot
         end
         
-        pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2, 'Color', [0 0.4470 0.7410]);
+        if Opt.bifurcation.mark
+            pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+        elseif Opt.bifurcation.trace
+            pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2, 'Color', [0 0.4470 0.7410]);
+        end
         
         if isnan(Opt.live_plot_fig) % test for existing figure to plot in, there must to no new labels or grid
             grid on;
