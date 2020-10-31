@@ -20,7 +20,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
         
         if Opt.bifurcation.mark
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
-        elseif Opt.bifurcation.trace
+        elseif Opt.bifurcation.trace || Opt.bifurcation.determine
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2, 'Color', [0 0.4470 0.7410]);
         end
         
@@ -34,7 +34,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
         drawnow;
         pl_info = struct('fig',fig,'pl',pl);
         
-        Opt.live_plot_fig = 1; % reference to existing fig
+        if isnan(Opt.live_plot_fig)
+            Opt.live_plot_fig = fig.Number; % reference to existing fig
+        end
         
     elseif bif_flag == -1
         %% final change in live plot
@@ -50,6 +52,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
             row = dataTipTextRow('Step',0:(length(l_all)-1),'%d');
             pl_info.pl(k).DataTipTemplate.DataTipRows(end+1) = row;
         end
+        xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+        drawnow;
     else
         set(0, 'currentfigure', pl_info.fig);
         newXData = cell(length(Opt.plot_vars_index), 1);
