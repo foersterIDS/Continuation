@@ -6,11 +6,17 @@
 %
 function [] = rescale_values(Opt)
 %     % Opt needs new entries:
-%     % dynamicDscale
+%     % Es gibt jetzt substruct Opt_scaling --> Opt.scaling mit dem Eintrag
+%     % 'dynamicDscale',false --> auf true setzen wenn das hier
+%     % funktioniert
+%     % ison(Opt.scaling) fragt dann wieder ob überhaupt skaliert werden
+%     % soll
 %     % Dscale, Dsacle0 on of which cannot be filled directly by the user
+%     % --> Kann ruhig beides bei Opt rein. Ich mache mir mal gedanken wie man
+%     % da Einträge sperrt.
 %     
 %     %% RESCALE (dynamically adjust scaling, if requested)
-%     if Opt.dynamicDscale
+%     if Opt.scaling.dynamicDscale
 %        
 %         %% Adjust variable scaling values (diagonal elements of diagonal
 %         % scaling matrix) so that scaled variables have value ~1. But avoid
