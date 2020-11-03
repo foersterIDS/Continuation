@@ -7,9 +7,10 @@
 function [is_closed] = closed_curve(var_all,l_all, ds)
     is_closed = 0;
     %letze Punkt nicht betrachten siehe 2 fache Schrittweite
+    % ggf fragen, ob trotzdem weitergemacht werden soll
     n = 5;
     if length(l_all) > n+2
-        eps_dist = 2*ds; %Should be prop to ds to avoid errors
+        eps_dist = ds; %Should be prop to ds to avoid errors
         eps_ang = 10*(2*pi / 360);
 
         x_all = [var_all; l_all];
@@ -33,9 +34,17 @@ function [is_closed] = closed_curve(var_all,l_all, ds)
 
             %% angle
             angle = vector_angle(vec_f, vec_c);
+            
+            %% normalized scalar prod
+            normprod = dot(vec_f, vec_f) / (norm(vec_f) * norm(vec_c));
 
             %% ceck angle
             if angle <= eps_ang
+                is_closed = 1;
+            end
+            
+            %% check normalized scalar product
+            if abs(1-normprod) <= 1e-6
                 is_closed = 1;
             end
         end
