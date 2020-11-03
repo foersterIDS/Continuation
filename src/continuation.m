@@ -252,6 +252,12 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             l_all = l_all(1:bif(1,end));
             s_all = s_all(1:bif(1,end));
         end
+        % exit on closed curve:
+        if closed_curve(var_all,l_all,ds)
+            do_continuation = false;
+            exitflag = 4;
+            warning('closed loop detected. stopping continuation!');
+        end
         %
     end
     %

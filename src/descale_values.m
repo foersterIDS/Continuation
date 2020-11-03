@@ -1,4 +1,4 @@
-%% path continuation - rescale_values
+%% path continuation - descale_values
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
