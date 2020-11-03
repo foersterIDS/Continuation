@@ -71,6 +71,14 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         loop_counter = loop_counter+1;
         is_current_jacobian = false;
         %
+        %% rescale values
+        %
+        if ison(Opt.scaling)
+            [x_scaled, Opt] = rescale_values(Opt,var_all,l_all);
+            var_all(:,end) = x_scaled(1:end-1);
+            l_all(:,end) = x_scaled(end);
+        end
+        %
         %% residual and predictor
         %
         residual = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds,Opt);
@@ -191,6 +199,14 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% adjust arc-length
         %
         ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
+        %
+        %% descale values
+        %
+        if ison(Opt.scaling)
+            [x_descaled] = descale_values(Opt,var_all,l_all);
+            var_all(:,end) = x_descaled(1:end-1);
+            l_all(:,end) = x_descaled(end);
+        end
         %
         %% live plot
         %
