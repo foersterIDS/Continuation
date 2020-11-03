@@ -71,14 +71,14 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         loop_counter = loop_counter+1;
         is_current_jacobian = false;
         %
-        %% rescale values
-        %
-        if ison(Opt.scaling)
-            [x_scaled, Opt] = rescale_values(Opt,var_all,l_all);
-            var_all(:,end) = x_scaled(1:end-1);
-            l_all(:,end) = x_scaled(end);
-        end
-        %
+% %         %% rescale values
+% %         %
+% %         if ison(Opt.scaling)
+% %             [x_scaled, Opt] = rescale_values(Opt,var_all,l_all);
+% %             var_all(:,end) = x_scaled(1:end-1);
+% %             l_all(:,end) = x_scaled(end);
+% %         end
+% %         %
         %% residual and predictor
         %
         residual = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds,Opt);
@@ -200,14 +200,14 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %
         ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
         %
-        %% descale values
-        %
-        if ison(Opt.scaling)
-            [x_descaled] = descale_values(Opt,var_all,l_all);
-            var_all(:,end) = x_descaled(1:end-1);
-            l_all(:,end) = x_descaled(end);
-        end
-        %
+% %         %% descale values
+% %         %
+% %         if ison(Opt.scaling)
+% %             [x_descaled] = descale_values(Opt,var_all,l_all);
+% %             var_all(:,end) = x_descaled(1:end-1);
+% %             l_all(:,end) = x_descaled(end);
+% %         end
+% %         %
         %% live plot
         %
         if Opt.plot && val
@@ -223,41 +223,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
             end
         end
-        % exit with success:
-        if sign(l_end-l_start)*(l_all(end)-l_end)>=0
-            do_continuation = false;
-            exitflag = 1;
-        end
-        % exit with n_step_max reached:
-        if loop_counter>=Opt.n_step_max
-            do_continuation = false;
-            exitflag = 2;
-        end
-        % exit with l<l_start:
-        if sign(l_end-l_start)*(l_all(end)-l_start)<0
-            do_continuation = false;
-            exitflag = 0;
-        end
-        % exit without complete results:
-        if error_counter>=Opt.max_error_counter
-            exitflag = -1;
-            warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
-            do_continuation = false;
-        end
-        % exit with bifurcation:
-        if bif_flag>0 && Opt.stop_on_bifurcation
-            do_continuation = false;
-            exitflag = 3;
-            var_all = var_all(:,1:bif(1,end));
-            l_all = l_all(1:bif(1,end));
-            s_all = s_all(1:bif(1,end));
-        end
-        % exit on closed curve:
-        if closed_curve(var_all,l_all,ds)
-            do_continuation = false;
-            exitflag = 4;
-            warning('closed loop detected. stopping continuation!');
-        end
+        [do_continuation, exitflag, var_all, l_all, s_all] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds);
         %
     end
     %
