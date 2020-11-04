@@ -12,6 +12,7 @@ function [is_closed] = closed_curve(var_all,l_all, ds)
     if length(l_all) > n+2
         eps_dist = ds; %Should be prop to ds to avoid errors
         eps_ang = 10*(2*pi / 360);
+        eps_dir = 1e-1;
 
         x_all = [var_all; l_all];
 
@@ -37,16 +38,21 @@ function [is_closed] = closed_curve(var_all,l_all, ds)
             
             %% normalized scalar prod
             normprod = dot(vec_f, vec_f) / (norm(vec_f) * norm(vec_c));
-
-            %% ceck angle
-            if angle <= eps_ang
+            
+            %% direction
+            r_f = vec_f / norm(vec_f);
+            r_c = vec_c / norm(vec_c);
+            dir = norm(r_f - r_c);
+            
+            %% ceck
+            if angle <= eps_ang % check angle
+                is_closed = 1;
+            elseif abs(1-normprod) <= 1e-6 % check normalized scalar product
+                is_closed = 1;
+            elseif dir <= eps_dir % check direction
                 is_closed = 1;
             end
             
-            %% check normalized scalar product
-            if abs(1-normprod) <= 1e-6
-                is_closed = 1;
-            end
         end
     end
 end
