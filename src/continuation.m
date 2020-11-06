@@ -71,7 +71,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         loop_counter = loop_counter+1;
         is_current_jacobian = false;
         %
-        %% residual and predictor
+        %% residual
         %
         residual = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds,Opt);
         if do_deflate
@@ -81,6 +81,9 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 error('Error occured during deflation.');
             end
         end
+        %
+        %% predictor
+        %
         try
             if do_homotopy
                 %% Homotopy
