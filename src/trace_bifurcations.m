@@ -22,7 +22,8 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
         for j=1:2
             [var_bif_predictor,l_bif_predictor] = predictor(var_all(:,1:bif(1,i)),l_all(1:bif(1,i)),s_all(1:bif(1,i)),(-1)^j*ds_bif,Opt_sphere);
             x_bif_predictor = [var_bif_predictor;l_bif_predictor];
-            [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor);
+            dscale = get_dscale(Opt,var_bif_predictor,l_bif_predictor);
+            [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor,dscale);
             if solver_bif_exitflag>0
                 xdirs_old = [xdirs_old,x_bif_ij-x0];
                 residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
@@ -39,7 +40,8 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
                 %
                 %
                 x_bif_predictor = x0+ds_bif*dx_bif_predictor/norm(dx_bif_predictor);
-                [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor);
+                dscale = get_dscale(Opt,x_bif_predictor(1:end-1,:),x_bif_predictor(end,:));
+                [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor,dscale);
                 if solver_bif_exitflag>0 && norm(x_bif_ij-x0)>=ds_bif*0.99 && norm(x_bif_ij-x0)<=ds_bif*1.01
                     xdirs_trace = [xdirs_trace,x_bif_ij-x0];
                     residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);

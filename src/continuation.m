@@ -34,7 +34,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% find initial solution
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0);
+    [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
     bif = [];
     x_plus = [];
     if initial_exitflag>0
@@ -101,15 +101,16 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% solve
         %
         try
+            dscale = get_dscale(Opt,var_all,l_all);
             if sign(l_all(end)-Opt.l_target)*sign(l_predictor-Opt.l_target)<=0
                 %% try to converge to target
                 residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
-                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor);
+                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor,dscale(1:end-1));
                 x_solution = [var_solution;Opt.l_target];
                 do_convergeToTarget = true;
             else
                 %% regular solver
-                [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor);
+                [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
                 do_convergeToTarget = false;
             end
             is_current_jacobian = true;
@@ -245,7 +246,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             %
             %% get next solution
             %
-            [var_aktuell,~,exitflag,~,~] = solver(residual,var_aktuell);
+            dscale = get_dscale(Opt,var_all,l_all);
+            [var_aktuell,~,exitflag,~,~] = solver(residual,var_aktuell,dscale(1:end-1));
             %
             %% check exitflag
             %

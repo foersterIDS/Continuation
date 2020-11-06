@@ -12,7 +12,8 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         else
             options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
-        solver = @(fun,x0) fsolve(fun,x0,options);
+        optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
+        solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
     elseif Opt.solver.fmincon
         %% fmincon
         warning('fmincon: not implemented yet using fsolve instead.');
@@ -26,7 +27,8 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         else
             options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
-        solver = @(fun,x0) fsolve(fun,x0,options);
+        optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
+        solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
@@ -34,10 +36,11 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         else
             options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
-        solver = @(fun,x0) solver_lsqnonlin(fun,x0,options);
+        optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
+        solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun);
     elseif Opt.solver.newton
         %% basic newton solver
-        solver = @(fun,x0) solver_basic_newton(fun,x0,Opt);
+        solver = @(fun,x0,dscale) solver_basic_newton(fun,x0,dscale,Opt);
     else
         %% error
         error('No such solver');

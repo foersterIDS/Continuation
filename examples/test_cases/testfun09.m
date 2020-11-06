@@ -2,7 +2,7 @@ addpath('test_cases\testfun09_aux');
 vm = 0;
 lm = 0;
 r = 1;
-v0 = 1.02;
+v0 = 0.001;
 lams = -1;
 lame = 4;
 ds0 = 0.05;
