@@ -7,7 +7,7 @@
 function [x_descaled] = descale_values(Opt, var_all, l_all)
     if ison(Opt.scaling)
         x_all = [var_all; l_all];
-        Descale = diag(Opt.Dscale);
+        Descale = diag(Opt.dscale);
         x_descaled = Descale * x_all(:,end);
     end
 end
