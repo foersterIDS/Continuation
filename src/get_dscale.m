@@ -11,6 +11,6 @@ function [dscale] = get_dscale(Opt,var_all,l_all)
     elseif Opt.scaling.staticdscale
         dscale = Opt.dscale0;
     else
-        dscale = Opt.dscale0;
+        dscale = ones(size(Opt.dscale0));
     end
 end
