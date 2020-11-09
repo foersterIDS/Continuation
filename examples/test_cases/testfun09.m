@@ -9,3 +9,4 @@ ds0 = 0.05;
 ds_max = 0.1;
 
 fun = @(v,l) residual_fun09(v,l,r,vm,lm);
+% benoetigt 'direction',[1;0]
