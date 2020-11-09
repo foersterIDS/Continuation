@@ -37,7 +37,8 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
             for i=1:nds
                 dsp = dss(i);
                 [var_bif_predictor,l_bif_predictor] = predictor(var_all,l_all,s_all,dsp,Opt);
-                [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor]);
+                dscale = get_dscale(Opt,var_bif_predictor,l_bif_predictor);
+                [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
                 if bif_solver_exitflag>0
                     s_all = [s_all(1:end-1),s_all(end-1)+[norm(x_bif-[var_all(:,end-1);l_all(end-1)]),norm(x_bif-[var_all(:,end-1);l_all(end-1)])+norm([var_all(:,end);l_all(end)]-x_bif)]];
                     var_all = [var_all(:,1:end-1),x_bif(1:end-1),var_all(:,end)];

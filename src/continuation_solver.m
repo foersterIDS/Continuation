@@ -37,7 +37,7 @@ function [solver,default_solver_output] = continuation_solver(Opt)
             options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
-        solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun);
+        solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun(dscale));
     elseif Opt.solver.newton
         %% basic newton solver
         solver = @(fun,x0,dscale) solver_basic_newton(fun,x0,dscale,Opt);
