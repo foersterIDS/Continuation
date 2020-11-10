@@ -13,8 +13,13 @@ function [xp] = predictor_taylor(var_all,l_all,s_all,no,nf,ds)
     dsc_min = 10^-15;
     x_basis = x_all(:,end-ns+1);
     s_basis = s_all(end-ns+1);
-    dsc_x = max([mean(abs(x_all(:,end+((-ns+2):0))-x_basis),2),ones(nd,1)*dsc_min]')';
-    dsc_s = max([mean(s_all(end+((-ns+2):0))-s_basis),dsc_min]);
+    if length(l_all)>2
+        dsc_x = max([mean(diff(abs(x_all(:,end+((-ns+1):0))-x_basis),1,2),2),ones(nd,1)*dsc_min]')';
+        dsc_s = max([mean(diff(abs(s_all(end+((-ns+1):0))-s_basis),1,2),2),dsc_min]);
+    else
+        dsc_x = max([abs(x_all(:,2)-x_basis),ones(nd,1)*dsc_min]')';
+        dsc_s = max([abs(s_all(2)-s_basis),dsc_min]);
+    end
     %% calc taylor-predictor:
     p_sc = polyfitn((s_all(end+((-ns+1):0))-s_basis)./dsc_s,(x_all(:,end+((-ns+1):0))-x_basis)./kron(dsc_x,ones(1,ns)),no);
     xp_sc = polyvaln(p_sc,(s_all(end)+ds-s_basis)/dsc_s,nd);

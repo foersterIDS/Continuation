@@ -16,7 +16,15 @@ function [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt)
         ds_old = norm(x_solution-[var_old(:,end);l_old(end)]);
         for kt=1:Opt.predictor_taylor
             for kf=0:Opt.predictor_fit
-                x_predictor_old = predictor_taylor(var_old,l_old,s_old,kt,kf,ds_old);
+                if length(l_old)==1
+                    if numel(Opt.direction)==1
+                        x_predictor_old = [var_old;l_old+sign(Opt.direction)*ds_old];
+                    else
+                        x_predictor_old = [var_old;l_old]+Opt.direction*ds_old;
+                    end
+                else
+                    x_predictor_old = predictor_taylor(var_old,l_old,s_old,kt,kf,ds_old);
+                end
                 err = norm(x_predictor_old-x_solution);
                 if err<errmin
                     errmin = err;
