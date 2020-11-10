@@ -192,7 +192,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             sign_det_jacobian = sign(det(solver_jacobian(1:nv,1:nv)));
         end
         %
-        %% adjust arc-length
+        %% step size control
         %
         ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
         %
