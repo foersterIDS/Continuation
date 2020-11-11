@@ -4,6 +4,8 @@
 %   Leibniz University Hannover
 %   21.10.2020 - Tido Kubatschek
 %
+%   DOI: 
+%
 function [dsn] = step_size_control_pid(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt)
     % parameters of pid control 
     k_P = 0.1;
