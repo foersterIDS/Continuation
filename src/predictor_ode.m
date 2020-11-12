@@ -32,21 +32,4 @@ function [xp] = predictor_ode(var_all,l_all,ds,solver_jacobian,fun)
     a = sqrt(1/(sum(cex.^2)));
     dxds = cex*a;
     xp = xi+dxds*ds;
-    
-    
-    
-%     E = eye(nd);
-%     for k=nd:-1:1
-%         e_k = E(:,k);
-%         M = [jac;e_k.'];
-%         if rank(M)==nd
-%             break;
-%         end
-%     end
-%     e_nd = E(:,nd);
-%     %% calc. gradient:
-%     dx = M\e_nd;
-%     z = dx/norm(dx);
-%     %% calc. predictor:
-%     xp = xi+z*ds;
 end
