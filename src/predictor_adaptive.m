@@ -5,7 +5,7 @@
 %   18.10.2020 - Alwin Förster
 %
 function [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt)
-    if Opt.predictor_adaptive
+    if Opt.predictor_polynomial_adaptive
         var_old = var_all(:,1:end-1);
         l_old = l_all(1:end-1);
         s_old = s_all(1:end-1);
@@ -14,8 +14,8 @@ function [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt)
         x_solution = [var_solution;l_solution];
         errmin = inf;
         ds_old = norm(x_solution-[var_old(:,end);l_old(end)]);
-        for kt=1:Opt.predictor_taylor
-            for kf=0:Opt.predictor_fit
+        for kt=1:Opt.predictor_polynomial_order
+            for kf=0:Opt.predictor_polynomial_fit
                 if length(l_old)==1
                     if numel(Opt.direction)==1
                         x_predictor_old = [var_old;l_old+sign(Opt.direction)*ds_old];
@@ -34,7 +34,7 @@ function [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt)
             end
         end
     else
-        nt = Opt.predictor_taylor;
-        nf = Opt.predictor_fit;
+        nt = Opt.predictor_polynomial_order;
+        nf = Opt.predictor_polynomial_fit;
     end
 end

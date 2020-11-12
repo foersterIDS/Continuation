@@ -20,7 +20,7 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
         residual_bif_sphere = @(x) merge_residuals(fun,residual_arclength(Opt_sphere),x,x0,ds_bif,Opt_sphere);
         %% find directions of known path
         for j=1:2
-            [var_bif_predictor,l_bif_predictor] = predictor(var_all(:,1:bif(1,i)),l_all(1:bif(1,i)),s_all(1:bif(1,i)),(-1)^j*ds_bif,Opt_sphere);
+            [var_bif_predictor,l_bif_predictor] = predictor(var_all(:,1:bif(1,i)),l_all(1:bif(1,i)),s_all(1:bif(1,i)),(-1)^j*ds_bif,[],fun,Opt_sphere);
             x_bif_predictor = [var_bif_predictor;l_bif_predictor];
             dscale = get_dscale(Opt,var_bif_predictor,l_bif_predictor);
             [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor,dscale);

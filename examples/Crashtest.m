@@ -112,30 +112,43 @@ for i=1:2
     %% unique:
     fprintf('\n### %d: unique: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','unique','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: unique: on ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: unique: on ###\n',i),probinfo,probcounter);
     %% plot:
     fprintf('\n### %d: plot: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: plot: on & bifurcation: mark ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on','bifurcation','mark');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on & bifurcation: mark ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: plot: on & bifurcation: determine ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on','bifurcation','determine');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on & bifurcation: determine ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: plot: on & bifurcation: trace ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on','bifurcation','trace');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot: on & bifurcation: trace ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plot_vars_index: 1 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','plot','on','plot_vars_index',1);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot_vars_index: 1 ###\n',i),probinfo,probcounter); 
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: plot_vars_index: 1 ###\n',i),probinfo,probcounter);
     %% include_reverse:
     fprintf('\n### %d: include_reverse: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','include_reverse','on');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: include_reverse: on ###\n',i),probinfo,probcounter); 
-    %% predictor_taylor:
-    fprintf('\n### %d: predictor_taylor: 2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_taylor',2);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_taylor: 2 ###\n',i),probinfo,probcounter); 
-    %% predictor_fit:
-    fprintf('\n### %d: predictor_fit: 4 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_fit',4);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_fit: 4 ###\n',i),probinfo,probcounter); 
-    %% predictor_adaptive:
-    fprintf('\n### %d: predictor_adaptive: nt = 4, nf = 5 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor_adaptive','on','predictor_taylor',4,'predictor_fit',5);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_adaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter); 
+    %% predictor_tangential:
+    fprintf('\n### %d: predictor_tangential ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor','tangential');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_tangential ###\n',i),probinfo,probcounter);
+    %% predictor_polynomial_order:
+    fprintf('\n### %d: predictor_polynomial_order: 2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor','polynomial','predictor_polynomial_order',2);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_polynomial_order: 2 ###\n',i),probinfo,probcounter); 
+    %% predictor_polynomial_fit:
+    fprintf('\n### %d: predictor_polynomial_fit: 4 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor','polynomial','predictor_polynomial_fit',4);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_polynomial_fit: 4 ###\n',i),probinfo,probcounter); 
+    %% predictor_polynomial_adaptive:
+    fprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','predictor','polynomial','predictor_polynomial_adaptive','on','predictor_polynomial_order',4,'predictor_polynomial_fit',5);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter); 
     %% step_size_control:
     fprintf('\n### %d: step_size_control: angle ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'display','off','step_size_control','angle');

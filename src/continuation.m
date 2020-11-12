@@ -35,6 +35,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
     [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
+    solver_jacobian = initial_jacobian;
     bif = [];
     x_plus = [];
     if initial_exitflag>0
@@ -90,11 +91,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 x_last_step = [var_all(:,end);l_all(end)];
                 x_predictor = homotopy(residual,x_last_step,Opt);
             else
-                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,Opt);
+                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,Opt);
+            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
             x_predictor = [var_predictor;l_predictor];
         end
         %

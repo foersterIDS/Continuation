@@ -18,7 +18,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
             hold on; % for new plot
         end
         
-        if Opt.bifurcation.mark
+        if Opt.bifurcation.mark || ~ison(Opt.bifurcation)
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
         elseif Opt.bifurcation.trace || Opt.bifurcation.determine
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2, 'Color', [0 0.4470 0.7410]);
