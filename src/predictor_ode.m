@@ -17,7 +17,7 @@ function [xp] = predictor_ode(var_all,l_all,ds,solver_jacobian,fun)
             jac = [solver_jacobian(1:nd-1,1:nj2),numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivative_dimensions',(nj2+1):nd)];
         end
     else
-        error('wrong jacobian');
+        jac = numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi);
     end
     %% build system of equations:
     [~,m] = max(abs(diff(x_all(:,end+(-1:0)),1,2)));
