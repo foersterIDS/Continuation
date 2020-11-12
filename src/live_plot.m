@@ -63,7 +63,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl_i
             newYData{k,1} = var_all(Opt.plot_vars_index(k),:);
         end
         set(pl_info.pl, {'XData'}, newXData, {'YData'},  newYData);
-        if ~Opt.unique && ison(Opt.bifurcation) && bif_flag 
+        if ison(Opt.bifurcation) && bif_flag 
            if ~isempty(bif)
                hold on;
                if bif(2,end) == 0

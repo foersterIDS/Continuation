@@ -11,7 +11,7 @@ function [val,is_reverse] = validate_result(xs,fun_solution,vars,ls,ds,solver_ex
             if norm(fun_solution)<=Opt.solver_tol*10
                 xi = [vars(:,end);ls(end)];
                 norm_xs_xi = norm(xs-xi);
-                if (norm_xs_xi>=0.9*ds && norm_xs_xi<=1.1*ds) || do_convergeToTarget
+                if ((norm_xs_xi>=0.8*ds && norm_xs_xi<=1.2*ds || numel(ls)==1)) || do_convergeToTarget || Opt.arclength.unique
                     if length(ls)==1
                         if numel(Opt.direction)==1 && sign(xs(end)-ls)==sign(Opt.direction)
                             val = true;

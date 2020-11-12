@@ -8,9 +8,9 @@ function [solver,default_solver_output] = continuation_solver(Opt)
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
@@ -23,18 +23,18 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         Opt.solve.fsolve = true;
         Opt.solve.fmincon = false;
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10);
         else
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/2);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun(dscale));

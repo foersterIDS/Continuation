@@ -5,10 +5,11 @@
 %   23.10.2020 - Alwin Förster
 %
 function [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,info,probinfo,probcounter)
-    if (exitflag<=0) || (abs(ls(end)-lame)>10^-8)
+    [~,ind] = find(isnan(ls));
+    if (exitflag<=0) || (abs(ls(end)-lame)/abs(lame-lams)>10^-3 && abs(ls(end)-lams)/abs(lams-lame)>10^-3)
         probinfo = [probinfo,info];
         probcounter = probcounter+1;
-        if abs(ls(end)-lame)>10^-8
+        if abs(ls(end)-lame)/abs(lame-lams)>10^-3 && abs(ls(end)-lams)/abs(lams-lame)>10^-3
             probinfo = [probinfo,sprintf('--> continuation has not reached the target: %.2f%% complete\n',(ls(end)-lams)/(lame-lams)*100)];
         end
         if exitflag<=0
