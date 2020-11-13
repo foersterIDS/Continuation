@@ -44,9 +44,6 @@ for i=1:2
     fprintf('\n### %d: solver: fsolve ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','fsolve');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: solver: fsolve ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: solver: fmincon ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','fmincon');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: solver: fmincon ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: solver: lsqnonlin ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','solver','lsqnonlin');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: solver: lsqnonlin ###\n',i),probinfo,probcounter);

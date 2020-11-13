@@ -14,21 +14,6 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
-    elseif Opt.solver.fmincon
-        %% fmincon
-        warning('fmincon: not implemented yet using fsolve instead.');
-%         options = optimoptions('fmincon','display','off');
-%         solver = @(fun,x0) fmincon(fun,x0,[],[],[],[],[],[],[],options);
-        %% fsolve
-        Opt.solve.fsolve = true;
-        Opt.solve.fmincon = false;
-        if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10);
-        else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10);
-        end
-        optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
-        solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian

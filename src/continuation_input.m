@@ -31,7 +31,6 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
 	Opt_scaling = struct('dynamicdscale',false,... % st. (wenn funktioniert auf true setzen)
                          'staticdscale',false);
     Opt_solver = struct('fsolve',true,... % st.
-                        'fmincon',false,...
                         'lsqnonlin',false,...
                         'newton',false);
     Opt_stepsize = struct('iterations',true,... % st.
