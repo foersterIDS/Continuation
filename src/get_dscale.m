@@ -6,8 +6,18 @@
 %
 function [dscale] = get_dscale(Opt,var_all,l_all)
     if Opt.scaling.dynamicdscale
-        % TODO
-        dscale = Opt.dscale0;
+        % get latest solution
+        x_latest = [var_all(:,end); l_all(end)];
+        
+        % save latest dscale
+        dscaleold = Opt.dscale;
+        
+        % find new dscale
+        Opt.dscale(1:end-1) = max(abs(x_latest(1:end-1)),...
+            Opt.dscale0(1:end-1));
+        
+        dscale = Opt.dscale;
+        
     elseif Opt.scaling.staticdscale
         dscale = Opt.dscale0;
     else
