@@ -17,7 +17,11 @@ function p = polyfitn(x,y,no)
     yT = y.';
     yy = yT(:);
     if rcond(X'*X)<10^-15 && no>1
-        p = polyfitn(x((end-no+1):end),y(:,(end-no+1):end),no-1);
+        pr = polyfitn(x((end-no+1):end),y(:,(end-no+1):end),no-1);
+        p = zeros(1,nd*(no+1));
+        ind = 1:(nd*(no+1));
+        ind((no+1):(no+1):end) = [];
+        p(ind) = pr;
     else
         p = ((X'*X)\X'*yy).';
     end
