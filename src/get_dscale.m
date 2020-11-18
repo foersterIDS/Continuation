@@ -9,15 +9,14 @@ function [dscale] = get_dscale(Opt,var_all,l_all)
         % get latest solution
         x_latest = [var_all(:,end); l_all(end)];
         
-        % save latest dscale
-        dscaleold = Opt.dscale;
-        
         % find new dscale
-        Opt.dscale(1:end-1) = max(abs(x_latest(1:end-1)),...
-            Opt.dscale0(1:end-1));
+        if numel(Opt.dscale_min) == 1 || numel(Opt.dscale_min) == numel(var_all(:,end))+1
+            minimal = Opt.dscale_min;
+        else
+            error('Size of dscale must either be 1 or equal to size of var0+1!');
+        end
         
-        dscale = Opt.dscale;
-        
+        dscale = max(abs(x_latest), minimal);
     elseif Opt.scaling.staticdscale
         dscale = Opt.dscale0;
     else
