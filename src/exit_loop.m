@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   03.11.2020 - Tido Kubatschek
 %
-function [do_continuation, exitflag, var_all, l_all, s_all] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds)
+function [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds)
     % exit with success:
     if sign(l_end-l_start)*(l_all(end)-l_end)>=0
         do_continuation = false;
@@ -35,10 +35,13 @@ function [do_continuation, exitflag, var_all, l_all, s_all] = exit_loop(do_conti
         s_all = s_all(1:bif(1,end));
     end
     % exit on closed curve:
-    if Opt.closed_curve_detection && closed_curve(Opt,var_all,l_all,s_all, ds)
-        do_continuation = false;
-        exitflag = 4;
-        warning('closed curve detected. stopping continuation!');
+    if Opt.closed_curve_detection
+        [is_closed, Opt] = closed_curve(Opt,var_all,l_all,s_all, ds);
+        if is_closed
+            do_continuation = false;
+            exitflag = 4;
+            warning('closed curve detected. stopping continuation!');
+        end
     end
     %
 end

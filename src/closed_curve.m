@@ -5,15 +5,18 @@
 %   03.11.2020 - Tido Kubatschek
 %   09.11.2020 - Alwin Förster
 %
-function [is_closed] = closed_curve(Opt, var_all,l_all, s_all, ds)
+function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
     is_closed = 0;
-    %letze Punkt nicht betrachten siehe 2 fache Schrittweite
-    % ggf fragen, ob trotzdem weitergemacht werden soll
     n = 5;
     nu = 2;
+    if Opt.step_size_control.iterations
+        warning('Using stepsize method iterations may not be precise enough. Using pid instead.')
+        Opt.step_size_control.iterations = 0;
+        Opt.step_size_control.pid = 1;
+    end
     if length(l_all) > n+nu
         x_all = [var_all; l_all];
-        eps_dist = norm(x_all(:,end)-x_all(:,end-1));
+        eps_dist = max(norm(x_all(:,end)-x_all(:,end-1)), 2*ds);
         eps_ang = 1*(2*pi / 360);
         eps_dir = 1e-1;
 
@@ -64,18 +67,19 @@ function [is_closed] = closed_curve(Opt, var_all,l_all, s_all, ds)
 
                 if abs(abs(comp) - 1) <= 1e-2
                     Opt.closed_counter = Opt.closed_counter - 1;
+                    break;
                 end
 
-%                     %% angle
-%                     angle = vector_angle(vec_f, vec_c);
-%                     %% direction
-%                     r_f = vec_f / norm(vec_f);
-%                     r_c = vec_c / norm(vec_c);
-%                     dir = norm(r_f - r_c);
-%                     %% check
-%                     if angle <= eps_ang && dir <= eps_dir && comp > 0.9 % check angle and direction
-%                         closed_counter = closed_counter + 1;
-%                     end
+                    %% angle
+                    angle = vector_angle(vec_f, vec_c);
+                    %% direction
+                    r_f = vec_f / norm(vec_f);
+                    r_c = vec_c / norm(vec_c);
+                    dir = norm(r_f - r_c);
+                    %% check
+                    if angle <= eps_ang && dir <= eps_dir % check angle and direction
+                        Opt.closed_counter = Opt.closed_counter - 1 ;
+                    end
             end
         end
 
