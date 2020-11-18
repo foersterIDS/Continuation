@@ -28,7 +28,7 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
                                'beziere',false);
     Opt_predictor = struct('polynomial',true,... % st.
                            'tangential',false);
-	Opt_scaling = struct('dynamicdscale',false,... % st. (wenn funktioniert auf true setzen)
+	Opt_scaling = struct('dynamicdscale',true,... % st.
                          'staticdscale',false);
     Opt_solver = struct('fsolve',true,... % st.
                         'lsqnonlin',false,...
