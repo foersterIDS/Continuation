@@ -35,7 +35,7 @@ function [do_continuation, exitflag, var_all, l_all, s_all] = exit_loop(do_conti
         s_all = s_all(1:bif(1,end));
     end
     % exit on closed curve:
-    if Opt.closed_curve_detection && closed_curve(var_all,l_all,ds)
+    if Opt.closed_curve_detection && closed_curve(Opt,var_all,l_all,s_all, ds)
         do_continuation = false;
         exitflag = 4;
         warning('closed curve detected. stopping continuation!');
