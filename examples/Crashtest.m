@@ -94,6 +94,13 @@ for i=1:2
     fprintf('\n### %d: ds_min: ds0/2 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','ds_min',ds0/2);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: ds_min: ds0/2 ###\n',i),probinfo,probcounter);
+    %% descale
+    fprintf('\n### %d: scaling: staticdscale ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','scaling','staticdscale');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: scaling: staticdscale ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: scaling: dynamicdscale ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','scaling','dynamicdscale');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: scaling: dynamicdscale ###\n',i),probinfo,probcounter);
     %% l_0:
     fprintf('\n### %d: l_0: (l_end-l_start)/2+l_start ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','l_0',(lame-lams)/2+lams);
