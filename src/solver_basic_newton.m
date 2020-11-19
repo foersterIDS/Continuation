@@ -21,15 +21,15 @@ function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,O
         Ji_sc = Ji*diag(dscale);
         nf = length(fi);
         xip1_sc = xi_sc-Ji_sc(1:nf,1:nf)\fi;
+        %% end loop
+        xi_sc = xip1_sc;
+        xi = xip1_sc.*dscale;
+        n_steps = n_steps+1;
         abs_fi = sqrt(fi'*fi);
         if abs_fi<Opt.solver_tol
             exitflag = 1;
             break;
         end
-        %% end loop
-        xi_sc = xip1_sc;
-        xi = xip1_sc.*dscale;
-        n_steps = n_steps+1;
     end
     %% make output
     x = xi;
