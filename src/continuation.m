@@ -89,6 +89,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 %% Homotopy
                 x_last_step = [var_all(:,end);l_all(end)];
                 x_predictor = homotopy(residual,x_last_step,Opt);
+                var_predictor = x_predictor(1:end-1);
+                l_predictor = x_predictor(end);
             else
                 [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
                 x_predictor = [var_predictor;l_predictor];
@@ -105,7 +107,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             if sign(l_all(end)-Opt.l_target)*sign(l_predictor-Opt.l_target)<=0
                 %% try to converge to target
                 residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
-                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor,dscale(1:end-1));
+                var_predictor_ctt = (var_predictor - var_all(:,end))*(abs(Opt.l_target-l_all(end))/abs(l_predictor-l_all(end)))+var_all(:,end);
+                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor_ctt,dscale(1:end-1));
                 x_solution = [var_solution;Opt.l_target];
                 do_convergeToTarget = true;
             else
