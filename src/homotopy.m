@@ -28,6 +28,7 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     if Opt.homotopy.fix || Opt.homotopy.newton
         fH = @(x,l) homotopy_merge(G,R,x,l,Opt);
         l0 = 0;
+        ls = l0;
         le = 1;
         ds0 = 0.1;
     elseif Opt.homotopy.f2

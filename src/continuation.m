@@ -98,6 +98,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         catch
             [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
             x_predictor = [var_predictor;l_predictor];
+            warning('predictor: catch!');
         end
         %
         %% solve
@@ -123,6 +124,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             solver_exitflag = -2;
             solver_output = default_solver_output;
             do_convergeToTarget = false;
+            warning('solve: catch!');
         end
         %
         %% check result
