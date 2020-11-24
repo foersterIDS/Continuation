@@ -149,6 +149,10 @@ for i=1:2
     fprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_adaptive','on','predictor_polynomial_order',4,'predictor_polynomial_fit',5);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter);
+    %% predictor_polynomial_adaptive:
+    fprintf('\n### %d: predictor_solver: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor_solver','on');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: predictor_solver: on ###\n',i),probinfo,probcounter);
     %% step_size_control:
     fprintf('\n### %d: step_size_control: angle ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','angle');

@@ -4,7 +4,8 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [solver,default_solver_output] = continuation_solver(Opt)
+function [solver,predictor_solver,default_solver_output] = continuation_solver(Opt)
+    predictor_solver = [];
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
@@ -14,6 +15,10 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
+        if Opt.predictor_solver
+            predictor_options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true);
+            predictor_solver = @(fun_predictor,s0) fsolve(fun_predictor,s0,predictor_options);
+        end
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
@@ -23,9 +28,18 @@ function [solver,default_solver_output] = continuation_solver(Opt)
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun(dscale));
+        if Opt.predictor_solver
+            predictor_options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true);
+            predictor_solver = @(fun_predictor,s0) solver_lsqnonlin(fun_predictor,s0,predictor_options);
+        end
     elseif Opt.solver.newton
         %% basic newton solver
         solver = @(fun,x0,dscale) solver_basic_newton(fun,x0,dscale,Opt);
+        if Opt.predictor_solver
+            predictor_Opt = Opt;
+            predictor_Opt.jacobian = true;
+            predictor_solver = @(fun_predictor,s0) solver_basic_newton(fun_predictor,s0,1,predictor_Opt);
+        end
     else
         %% error
         error('No such solver');

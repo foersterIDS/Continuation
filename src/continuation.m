@@ -15,7 +15,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %
     exitflag = -1;
     Opt = continuation_input(varargin,fun,var0,l_start,l_end);
-    [solver,default_solver_output] = continuation_solver(Opt);
+    [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
     ds = ds0;
     nv = length(var0);
@@ -92,11 +92,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
-                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
+                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,Opt);
+            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
         end
@@ -188,7 +188,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
             end
-            [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,Opt);
+            [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt);
         elseif ison(Opt.bifurcation) && val && numel(l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
@@ -223,7 +223,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% bifurcation tracing
     %
     if Opt.bifurcation.trace
-        [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end);
+        [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver);
     end
     %
     %% live plot finalization

@@ -23,7 +23,8 @@ function [nt,nf] = predictor_adaptive(var_all,l_all,s_all,Opt)
                         x_predictor_old = [var_old;l_old]+Opt.direction*ds_old;
                     end
                 else
-                    x_predictor_old = predictor_taylor(var_old,l_old,s_old,kt,kf,ds_old);
+                    fpt = predictor_taylor(var_old,l_old,s_old,kt,kf);
+                    x_predictor_old = fpt(ds_old);
                 end
                 err = norm(x_predictor_old-x_solution);
                 if err<errmin

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   26.05.2020 - Alwin Förster
 %
-function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,s_all,bif,sign_det_jacobian,Opt)
+function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt)
     bif_flag = 0;
     solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
@@ -36,7 +36,7 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
             ind_bif = length(l_all);
             for i=1:nds
                 dsp = dss(i);
-                [var_bif_predictor,l_bif_predictor] = predictor(var_all,l_all,s_all,dsp,solver_jacobian_red,fun,Opt);
+                [var_bif_predictor,l_bif_predictor] = predictor(var_all,l_all,s_all,dsp,solver_jacobian_red,fun,res_arle,predictor_solver,Opt);
                 dscale = get_dscale(Opt,var_bif_predictor,l_bif_predictor);
                 [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
                 if bif_solver_exitflag>0

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   12.11.2020 - Alwin Förster
 %
-function [xp] = predictor_ode(var_all,l_all,ds,solver_jacobian,fun)
+function [fun_predictor,Jac_predictor] = predictor_ode(var_all,l_all,s,solver_jacobian,fun)
     x_all = [var_all;l_all];
     xi = x_all(:,end);
     nd = length(xi);
@@ -31,5 +31,6 @@ function [xp] = predictor_ode(var_all,l_all,ds,solver_jacobian,fun)
     cex = [c(1:(m-1));dxmds;c(m:end)];
     a = sqrt(1/(sum(cex.^2)));
     dxds = cex*a;
-    xp = xi+dxds*ds;
+    fun_predictor = xi+dxds*s;
+    Jac_predictor = dxds;
 end

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   05.10.2020 - Alwin Förster
 %
-function [xp] = predictor_taylor(var_all,l_all,s_all,no,nf,ds)
+function [fun_predictor,Jac_predictor] = predictor_taylor(var_all,l_all,s_all,no,nf)
     no = min([length(l_all)-1,no]);
     ns = min([length(l_all),no+1+nf]);
     x_all = [var_all;l_all];
@@ -22,7 +22,14 @@ function [xp] = predictor_taylor(var_all,l_all,s_all,no,nf,ds)
     end
     %% calc taylor-predictor:
     p_sc = polyfitn((s_all(end+((-ns+1):0))-s_basis)./dsc_s,(x_all(:,end+((-ns+1):0))-x_basis)./kron(dsc_x,ones(1,ns)),no);
-    xp_sc = polyvaln(p_sc,(s_all(end)+ds-s_basis)/dsc_s,nd);
+    fun_predictor_sc = @(s) polyvaln(p_sc,(s_all(end)+s-s_basis)/dsc_s,nd);
+    if nargout>1
+        dp_sc = polydern(p_sc,nd);
+        Jac_predictor_sc = @(s) polyvaln(dp_sc,(s_all(end)+s-s_basis)/dsc_s,nd);
+    end
     %% descale predictor:
-    xp = xp_sc.*dsc_x+x_basis;
+    fun_predictor = @(s) fun_predictor_sc(s).*dsc_x+x_basis;
+    if nargout>1
+        Jac_predictor = @(s) Jac_predictor_sc(s).*dsc_x;
+    end
 end
