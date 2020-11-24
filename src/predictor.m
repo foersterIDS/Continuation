@@ -25,7 +25,10 @@ function [vp,lp,fun_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobia
     if Opt.predictor_solver
         xi = [var_all(:,end);l_all(end)];
         fun_solve = @(s) merge_arle_pred(fun_predictor,res_arle,s,xi,ds);
-        sp = predictor_solver(fun_solve,ds);
+        [sp,~,exitflag] = predictor_solver(fun_solve,ds);
+        if exitflag<=0
+            sp = ds;
+        end
     else
         sp = ds;
     end
