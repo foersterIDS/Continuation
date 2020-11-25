@@ -14,4 +14,4 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun08; % Pitchfork-Bifurkation
 % testfun09; % circle
 %% Solve:
-[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'bifurcation','mark','ds_max',ds_max,'plot',true);
+[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'bifurcation','mark','ds_max',ds_max,'plot','on');

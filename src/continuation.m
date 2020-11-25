@@ -49,7 +49,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         if ison(Opt.bifurcation)
             sign_det_jacobian = sign(det(initial_jacobian));
         end
-        if Opt.plot
+        if ison(Opt.plot)
             [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds0, ds0);
         end
     else
@@ -204,7 +204,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %
         %% live plot
         %
-        if Opt.plot && val
+        if ison(Opt.plot) && val
             [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, bif_flag, bif);
         end
         %
@@ -229,7 +229,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %
     %% live plot finalization
     %
-    if Opt.plot && initial_exitflag>0
+    if ison(Opt.plot) && initial_exitflag>0
         live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, -1);
     end
     %
