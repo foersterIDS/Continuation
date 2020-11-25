@@ -50,7 +50,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if Opt.plot
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds0, ds0);
         end
     else
         var_all = [];
@@ -199,12 +199,13 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %
         %% step size control
         %
+        dsim1 = ds;
         ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
         %
         %% live plot
         %
         if Opt.plot && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, bif_flag, bif);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, bif_flag, bif);
         end
         %
         %% end loop
@@ -229,7 +230,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% live plot finalization
     %
     if Opt.plot && initial_exitflag>0
-        live_plot(Opt, nv, l_start, l_end, l_all, var_all, pl, -1);
+        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, -1);
     end
     %
     %% final disp
