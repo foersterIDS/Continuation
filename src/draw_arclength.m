@@ -54,17 +54,17 @@ function [lal,val] = draw_arclength( var_all, l_all, ds, dsim1, Opt )
     elseif Opt.arclength.ellipsoid
         %% ellipsoid
         %
-        error('TODO');
+%         TODO
         %
     elseif Opt.arclength.ellipsoid2
         %% ellipsoid2
         %
-        error('TODO');
+%         TODO
         %
     elseif Opt.arclength.unique
         %% unique
         %
-        error('TODO');
+%         TODO
         %
     else
         error('arclength-method can not be drawn');
