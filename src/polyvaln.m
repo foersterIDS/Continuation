@@ -15,6 +15,6 @@ function yp = polyvaln(p,x,nd)
     end
     yp = zeros(nd,nx);
     for i=0:no
-        yp = yp+P(:,i+1)*x.^i;
+        yp = yp+P(:,i+1)*x.^(no-i);
     end
 end

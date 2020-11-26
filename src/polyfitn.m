@@ -25,4 +25,8 @@ function p = polyfitn(x,y,no)
     else
         p = ((X'*X)\X'*yy).';
     end
+    i = 1:((no+1)*nd);
+    j = kron(1:nd,ones(1,no+1));
+    ind = (j-1)*(no+1)-(no+1)*floor(no*i/(no+1))+no*i+1;
+    p = p(ind);
 end
