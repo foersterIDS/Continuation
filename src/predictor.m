@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp,fun_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt)
+function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt)
     if Opt.predictor.polynomial
         if length(l_all)==1
             fun_predictor = @(s) predictor_initial(var_all,l_all,s,Opt);

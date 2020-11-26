@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   25.11.2020 - Alwin Förster
 %
-function [lal,val] = draw_arclength( var_all, l_all, ds, dsim1, Opt )
+function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
     %% initialize
-    nres = 100;
+    nres = 50;
     nv = numel(var_all(:,1));
     lal = cell(1,2);
     val = cell(1,2);
@@ -21,12 +21,11 @@ function [lal,val] = draw_arclength( var_all, l_all, ds, dsim1, Opt )
         if numel(l_all)==1
             lc = l_all;
             vc = var_all;
-            dsc = ds*ones(nv,1);
         else
             lc = l_all(end-1);
             vc = var_all(:,end-1);
-            dsc = sqrt((var_all(:,end)-var_all(:,end-1)).^2+(l_all(end)-l_all(end-1))^2);
         end
+        dsc = dsim1*ones(nv,1);
         lal{2} = lc+dsc*cos(linspace(0,2*pi,nres));
         val{2} = vc+dsc*sin(linspace(0,2*pi,nres));
         %
@@ -64,7 +63,16 @@ function [lal,val] = draw_arclength( var_all, l_all, ds, dsim1, Opt )
     elseif Opt.arclength.unique
         %% unique
         %
-%         TODO
+        if numel(l_all)==1
+            lc = l_all;
+            vc = var_all;
+        else
+            lc = l_all(end-1);
+            vc = var_all(:,end-1);
+        end
+        dsc = dsim1*sign(Opt.direction(end))*ones(nv,1);
+        lal{2} = lc+dsc*ones(1,nres);
+        val{2} = vc+(2*max(abs(var_all).').')*linspace(-1,+1,nres);
         %
     else
         error('arclength-method can not be drawn');

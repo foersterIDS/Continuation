@@ -92,11 +92,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
-                [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
+                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
+            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
         end
@@ -205,7 +205,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% live plot
         %
         if ison(Opt.plot) && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, bif_flag, bif);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, fun_predictor, s_predictor, pl, bif_flag, bif);
         end
         %
         %% end loop
@@ -230,7 +230,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% live plot finalization
     %
     if ison(Opt.plot) && initial_exitflag>0
-        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl, -1);
+        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, fun_predictor, s_predictor, pl, -1);
     end
     %
     %% final disp

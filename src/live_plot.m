@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, pl_info, bif_flag, bif)
+function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, fun_predictor, s_predictor, pl_info, bif_flag, bif)
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
@@ -32,7 +32,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
         end
         
         drawnow;
-        pl_info = struct('fig',fig,'pl',pl);
+        pl_info = struct('fig',fig,'pl',pl,'plal1',[],'plal2',[],'plpr',[]);
         
         if isnan(Opt.live_plot_fig)
             Opt.live_plot_fig = fig.Number; % reference to existing fig
