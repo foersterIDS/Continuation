@@ -20,7 +20,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
         num_pl = numel(var_all(:,1));
         colors = cell(num_pl,1);        
         for k = 1:num_pl
-            colors(k) = {get_RGB(k,1,num_pl)};
+            colors(k) = {get_RGB(k,num_pl,1)};
         end
         
         if Opt.bifurcation.mark || ~ison(Opt.bifurcation)

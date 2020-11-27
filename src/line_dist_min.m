@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   26.11.2020 - Tido Kubatschek
 % 
-% src : http://geomalgorithms.com/a07-_distance.html#dist3D_Segment_to_Segment
+%   SRC: http://geomalgorithms.com/a07-_distance.html#dist3D_Segment_to_Segment
 %
 function [dist_min, tc, sc] = line_dist_min(p_1, p_2, q_1, q_2)
 
