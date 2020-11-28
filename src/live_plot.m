@@ -22,13 +22,25 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
         for k = 1:num_pl
             colors(k) = {get_RGB(k,num_pl,1)};
         end
-        
-        if Opt.bifurcation.mark || ~ison(Opt.bifurcation)
-            pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
-            set(pl, {'Color'}, colors);
-        elseif Opt.bifurcation.trace || Opt.bifurcation.determine
-            pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
-            set(pl, {'Color'}, colors);
+        if Opt.plot.basic
+            if Opt.bifurcation.mark || ~ison(Opt.bifurcation)
+                pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                set(pl, {'Color'}, colors);
+            elseif Opt.bifurcation.trace || Opt.bifurcation.determine
+                pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                set(pl, {'Color'}, colors);
+            end
+        elseif Opt.plot.detail
+            if Opt.bifurcation.mark || ~ison(Opt.bifurcation)
+                subplot
+                pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                set(pl, {'Color'}, colors);
+            elseif Opt.bifurcation.trace || Opt.bifurcation.determine
+                pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                set(pl, {'Color'}, colors);
+            end
+        else
+            error('No such plot method!');
         end
         
         if isnan(Opt.live_plot_fig) % test for existing figure to plot in, there must be no new labels or grid
