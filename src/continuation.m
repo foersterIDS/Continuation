@@ -34,7 +34,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% find initial solution
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [var_all,~,initial_exitflag,~,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
+    [var_all,~,initial_exitflag,solver_output,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
     bif = [];
     x_plus = [];
@@ -50,7 +50,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if ison(Opt.plot)
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds0, ds0);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds0, ds0, solver_output.iterations, loop_counter);
         end
     else
         var_all = [];
@@ -205,7 +205,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% live plot
         %
         if ison(Opt.plot) && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, fun_predictor, s_predictor, pl, bif_flag, bif);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
         end
         %
         %% end loop
@@ -230,7 +230,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% live plot finalization
     %
     if ison(Opt.plot) && initial_exitflag>0
-        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, fun_predictor, s_predictor, pl, -1);
+        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
     end
     %
     %% final disp
