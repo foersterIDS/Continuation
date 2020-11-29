@@ -221,16 +221,16 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %
     end
     %
-    %% bifurcation tracing
-    %
-    if Opt.bifurcation.trace
-        [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver);
-    end
-    %
     %% live plot finalization
     %
     if ison(Opt.plot) && initial_exitflag>0
         live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
+    end
+    %
+    %% bifurcation tracing
+    %
+    if Opt.bifurcation.trace
+        [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver);
     end
     %
     %% final disp
