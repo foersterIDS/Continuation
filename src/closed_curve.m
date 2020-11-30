@@ -16,10 +16,20 @@ function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
         eps_dist = min(norm(x_all(:,end)-x_all(:,end-1)),2*ds);
         eps_ang = 1*(2*pi / 360);
         eps_dir = 1e-1;
-
+        
+        %% exclude points before current points which are too close
+        %
+        ignored = 1;
+        last_dist = sqrt( sum((x_all(:,numel(l_all) - ignored) - x_all(:,end)).^2,1));
+        ignored_dist = 2*norm(x_all(:,end)-x_all(:,end-1));
+        while last_dist <= ignored_dist
+            ignored = ignored + 1;
+            last_dist = sqrt( sum((x_all(:,numel(l_all) - ignored) - x_all(:,end)).^2,1));
+        end
+        %
         flag = 0;
         if numel(l_all)>n
-            dist_x = sqrt(sum((x_all(:,nu:numel(l_all) - 2)-x_all(:,end)).^2,1));
+            dist_x = sqrt(sum((x_all(:,nu:numel(l_all) - ignored)-x_all(:,end)).^2,1));
             k_flags = find(dist_x <= eps_dist);
             if numel(k_flags)>0
                 flag = 1;
