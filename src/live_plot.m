@@ -166,7 +166,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
                 grid on;
                 title(['most changing variable: $v_',num2str(most_changing),'$'],'interpreter','latex');
                 xlabel('$\lambda$','interpreter','latex');
-                ylabel(['$v_', num2str(2),'$'],'interpreter','latex');
+                ylabel(['$v_',num2str(most_changing),'$'],'interpreter','latex');
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
                 set(hs3,'Tag','center');
             else
