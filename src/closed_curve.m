@@ -11,7 +11,8 @@ function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
     np = 4; % polynomial order (np = 2*k with k in N)
     eps_pol = 2.5e-2;
     nu = 1+np/2;
-    if length(l_all) > n+nu
+    ns = numel(l_all);
+    if ns > n+nu
         x_all = [var_all; l_all];
         eps_dist = min(norm(x_all(:,end)-x_all(:,end-1)),2*ds);
         eps_ang = 1*(2*pi / 360);
@@ -19,17 +20,14 @@ function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
         
         %% exclude points before current points which are too close
         %
-        ignored = 1;
-        last_dist = sqrt( sum((x_all(:,numel(l_all) - ignored) - x_all(:,end)).^2,1));
         ignored_dist = 2*norm(x_all(:,end)-x_all(:,end-1));
-        while last_dist <= ignored_dist
-            ignored = ignored + 1;
-            last_dist = sqrt( sum((x_all(:,numel(l_all) - ignored) - x_all(:,end)).^2,1));
-        end
+        distance = sqrt(sum((x_all(:,1:(ns - 1)) - x_all(:,end)).^2,1));
+        last_ind = find(distance>ignored_dist);
+        ignored = ns-last_ind(end);
         %
         flag = 0;
-        if numel(l_all)>n
-            dist_x = sqrt(sum((x_all(:,nu:numel(l_all) - ignored)-x_all(:,end)).^2,1));
+        if ns>n
+            dist_x = distance(nu:(ns - ignored));
             k_flags = find(dist_x <= eps_dist);
             if numel(k_flags)>0
                 flag = 1;
