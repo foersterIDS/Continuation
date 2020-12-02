@@ -104,7 +104,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
         end
     elseif Opt.plot.detail
         %% find most changing
-        most_changing = 1;
+        n_change = 20;
+        [~,most_changing] = max(mean(abs(diff(var_all(:,max([1,end-n_change]):end),1,2))')');
         
         if length(l_all) == 1
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
