@@ -14,10 +14,10 @@ function [fun_predictor,Jac_predictor] = predictor_ode(var_all,l_all,s,solver_ja
         if nj2==nd
             jac = solver_jacobian(1:nd-1,1:nd);
         else
-            jac = [solver_jacobian(1:nd-1,1:nj2),numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivative_dimensions',(nj2+1):nd)];
+            jac = [solver_jacobian(1:nd-1,1:nj2),numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivative_dimensions',(nj2+1):nd, 'jacob', Opt.jacob)];
         end
     else
-        jac = numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi);
+        jac = numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi, 'jacob', Opt.jacob);
     end
     %% build system of equations:
     [~,m] = max(abs(diff(x_all(:,end+(-1:0)),1,2)));
