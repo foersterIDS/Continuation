@@ -16,7 +16,7 @@ function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,O
             [fi,Ji] = fun(xi);
         else
             fi = fun(xi);
-            Ji = numeric_jacobian(fun,xi,'central_value',fi, 'jacob', Opt.jacob);
+            Ji = numeric_jacobian(fun,xi,'central_value',fi,'diffquot',Opt.diffquot);
         end
         Ji_sc = Ji*diag(dscale);
         nf = length(fi);
@@ -50,7 +50,7 @@ function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,O
                 'tolerance',abs_fi);
             if nargout>4
                 if ~Opt.jacobian
-                    Ji = numeric_jacobian(fun,xi,'central_value',fi, 'jacob', Opt.jacob);
+                    Ji = numeric_jacobian(fun,xi,'central_value',fi,'diffquot',Opt.diffquot);
                 end
                 jacobian = Ji;
             end

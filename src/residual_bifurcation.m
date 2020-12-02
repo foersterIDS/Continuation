@@ -13,7 +13,7 @@ function [R] = residual_bifurcation(fun,x,Opt,scale)
     else
         R1 = fun(x(1:end-1),x(end));
         fun_J = @(v) fun(v,x(end));
-        J1 = numeric_jacobian(fun_J,x(1:end-1),R1, 'jacob', Opt.jacob);
+        J1 = numeric_jacobian(fun_J,x(1:end-1),R1,'diffquot',Opt.diffquot);
     end
     R2 = det(J1)*scale;
     R = [R1;R2];

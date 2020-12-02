@@ -8,8 +8,8 @@ function [jacobian] = get_jacobian(fun,v,l)
     try
         [~,jacobian] = fun(v,l);
     catch
-        jacobian_v = numeric_jacobian(@(v) fun(v,l), v, 'jacob', Opt.jacob);
-        jacobian_l = numeric_jacobian(@(l) fun(v,l), l, 'jacob', Opt.jacob);
+        jacobian_v = numeric_jacobian(@(v) fun(v,l), v, 'diffquot', Opt.diffquot);
+        jacobian_l = numeric_jacobian(@(l) fun(v,l), l, 'diffquot', Opt.diffquot);
         jacobian = [jacobian_v,jacobian_l];
     end
 end

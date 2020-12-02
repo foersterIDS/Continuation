@@ -35,7 +35,7 @@ function jac = numeric_jacobian(f, x, varargin)
             is = varargin{ki+1};
             ii = true;
         end
-        if strcmp(varargin{ki}, 'jacob')
+        if strcmp(varargin{ki}, 'diffquot')
             diff_str = varargin{ki+1};
             if diff_str.central
                 diff_quo = 1;    
