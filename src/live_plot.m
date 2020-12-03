@@ -90,7 +90,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
                if ~isempty(bif)
                    hold on;
                    if bif(2,end) == 0
-                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'bo','LineWidth',2);
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
                    elseif bif(2,end) == 1
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
                    end
@@ -244,13 +244,16 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             % second one: showing most changing variable in detail
             %
             subplot 235
+            %% prediktor und bogenlänge vom vorletzten Schritt zum aktuellen Schritt
+            %% vorletzter Schritt zentriert
+            %% alle Punkte davor plotten, xlim anpassen
             pl_info.plal2.XData = l_all;
             pl_info.plal2.YData = var_all(most_changing,:);
             %
             xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
-            % third one: showing predictor
+            % third one: s_all über loop_counter
             %
-            subplot 236
+            subplot 236 %% s_all über  loop_counter
             pl_info.plpr.XData = l_all;
             pl_info.plpr.YData = var_all(most_changing,:);
             %
@@ -279,7 +282,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
                if ~isempty(bif)
                    hold on;
                    if bif(2,end) == 0
-                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'bo','LineWidth',2);
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
                    elseif bif(2,end) == 1
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
                    end
@@ -322,5 +325,5 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
     else
         error('No such plot method!');
     end
-    drawnow;
+    drawnow limitrate;
 end
