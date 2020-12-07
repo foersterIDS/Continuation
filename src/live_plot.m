@@ -4,10 +4,11 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, iterations, loop_counter, fun_predictor, s_predictor, pl_info, bif_flag, bif)
+function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, iterations, loop_counter, fun_predictor, s_predictor, pl_info, bif_flag, bif)
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
+    num_pl = numel(var_all(:,1));
     
     if Opt.plot.basic
         if length(l_all) == 1
@@ -22,7 +23,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             
             
             %% prepare colors 
-            num_pl = numel(var_all(:,1));
             colors = cell(num_pl,1);        
             for k = 1:num_pl
                 colors(k) = {get_RGB(k,num_pl,1)};
@@ -109,11 +109,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
         
         if length(l_all) == 1
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
-                fig = figure('units', 'normalized', 'position', [0.2,0.1,0.6,0.7]); % create new fig
+                fig = figure('units', 'normalized', 'position', [0.05,0.1,0.9,0.8]); % create new fig
                 clf;
             else
                 fig = figure(Opt.live_plot_fig); % use existing fig
-                hold on; % for new plot
+                %hold on; % for new plot
             end
             
             num_pl = numel(var_all(:,1));
@@ -124,7 +124,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             %% creater upper subplot
             %
             if isnan(Opt.live_plot_fig)
-                hs = subplot(2,3,1:3);
+%                 hs = subplot(2,3,1:3);
+                hs = subplot(2,3,1:2);
                 pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
                 set(pl, {'Color'}, colors);
                 grid on;
@@ -145,8 +146,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             % first one: showing iteration steps
             %
             if isnan(Opt.live_plot_fig)
-                hs2 = subplot(2,3,4);
-                plal1 = plot(loop_counter, iterations, 'r-x', 'LineWidth', 2);
+%                 hs2 = subplot(2,3,4);
+                hs2 = subplot(2,3,3);
+                pl_it = plot(loop_counter, iterations, 'r-x', 'LineWidth', 2);
                 grid on;
                 title('needed iterations per loop','interpreter','latex');
                 xlabel('loop counter','interpreter','latex');
@@ -155,15 +157,16 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             else
                 hs2 = findobj('Tag', 'left');
                 set(hs2, 'NextPlot', 'replacechildren'); %% maybe renew ???
-                plal1 = plot(hs2, loop_counter, iterations, 'r-x', 'LineWidth', 2);
+                pl_it = plot(hs2, loop_counter, iterations, 'r-x', 'LineWidth', 2);
             end
             %
             % second one: showing most changing variable in detail
             %
             if isnan(Opt.live_plot_fig)
-                hs3 = subplot(2,3,5);
-                plal2 = plot(l_all, var_all(most_changing,:),'LineWidth', 2);
-                set(plal2, {'Color'}, {get_RGB(most_changing,num_pl,1)});
+%                 hs3 = subplot(2,3,5);
+                hs3 = subplot(2,3,4:5);
+                pl_det = plot(l_all, var_all(most_changing,:),'LineWidth', 2);
+                set(pl_det, {'Color'}, colors(most_changing));
                 grid on;
                 title(['most changing variable: $v_',num2str(most_changing),'$'],'interpreter','latex');
                 xlabel('$\lambda$','interpreter','latex');
@@ -173,30 +176,28 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             else
                 hs3 = findobj('Tag', 'center');
                 set(hs3, 'NextPlot', 'add');
-                plal2 = plot(hs3, l_all, var_all(most_changing,:),'LineWidth', 2);
-                set(plal2, {'Color'}, colors);
+                pl_det = plot(hs3, l_all, var_all(most_changing,:),'LineWidth', 2);
+                set(pl_det, {'Color'}, colors(most_changing));
             end
             %
-            % third one: showing predictor
+            % third one: showing s_all over loop_counter
             %
             if isnan(Opt.live_plot_fig)
+%                 hs4 = subplot(2,3,6);
                 hs4 = subplot(2,3,6);
-                plpr = plot(l_all, var_all(most_changing,:),'LineWidth', 2);
-                set(plpr, {'Color'}, {get_RGB(most_changing,num_pl,1)});
+                pl_s = plot(loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
                 grid on;
-                title('placeholder','interpreter','latex');
-                xlabel('$\lambda$','interpreter','latex');
-                ylabel('$v_{i}$','interpreter','latex');
-                xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+                title('arc length $s$','interpreter','latex');
+                xlabel('loop counter','interpreter','latex');
+                ylabel('$s_{\mathrm{all}}$','interpreter','latex');
                 set(hs4,'Tag','right');
             else
                 hs4 = findobj('Tag', 'right');
                 set(hs4, 'NextPlot', 'add');
-                plpr = plot(hs4, l_all, var_all(most_changing,:),'LineWidth', 2);
-                set(plpr, {'Color'}, colors);
+                pl_s = plot(hs4, loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
             end
             %
-            pl_info = struct('fig',fig,'pl',pl,'plal1',plal1,'plal2',plal2,'plpr',plpr);            
+            pl_info = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s);            
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -207,7 +208,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             %
             %% upper subplot
             %
-            subplot(2,3,1:3);
+%             subplot(2,3,1:3);
+            subplot(2,3,1:2);
             %
             %% save plot data
             %
@@ -235,34 +237,32 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             %
             % first one: showing iteration steps
             %
-            subplot 234
-            %% save plot data
-            %
-            pl_info.plal1.XData = [pl_info.plal1.XData, loop_counter];
-            pl_info.plal1.YData = [pl_info.plal1.YData, iterations];
+               % no update needed
             %
             % second one: showing most changing variable in detail
             %
-            subplot 235
+%             subplot 235
+            subplot(2,3,4:5)
             %% prediktor und bogenlänge vom vorletzten Schritt zum aktuellen Schritt
             %% vorletzter Schritt zentriert
             %% alle Punkte davor plotten, xlim anpassen
-            pl_info.plal2.XData = l_all;
-            pl_info.plal2.YData = var_all(most_changing,:);
+            pl_info.pl_det.XData = l_all;
+            pl_info.pl_det.YData = var_all(most_changing,:);
+            set(pl_info.pl_det, {'Color'}, {get_RGB(most_changing,num_pl,1)});
+            title(['most changing variable: $v_',num2str(most_changing),'$'],'interpreter','latex');
+            ylabel(['$v_',num2str(most_changing),'$'],'interpreter','latex');
             %
             xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             % third one: s_all über loop_counter
             %
-            subplot 236 %% s_all über  loop_counter
-            pl_info.plpr.XData = l_all;
-            pl_info.plpr.YData = var_all(most_changing,:);
+                % no update needed
             %
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
         else
             set(0, 'currentfigure', pl_info.fig);
             %% creater upper subplot
             %
-            subplot(2,3,1:3)
+%             subplot(2,3,1:3)
+            subplot(2,3,1:2);
             %% save plot data
             %
             newXData = cell(length(Opt.plot_vars_index), 1);
@@ -298,28 +298,33 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, 
             %
             % first one: showing iteration steps
             %
-            subplot 234
+%             subplot 234
+            subplot 233
             %% save plot data
             %
-            pl_info.plal1.XData = [pl_info.plal1.XData, loop_counter];
-            pl_info.plal1.YData = [pl_info.plal1.YData, iterations];
+            pl_info.pl_it.XData = [pl_info.pl_it.XData, loop_counter];
+            pl_info.pl_it.YData = [pl_info.pl_it.YData, iterations];
             %
             %
             % second one: showing most changing variable in detail
             %
-            subplot 235
-            pl_info.plal2.XData = l_all;
-            pl_info.plal2.YData = var_all(most_changing,:);
+%             subplot 235
+            subplot(2,3,4:5);
+            pl_info.pl_det.XData = l_all;
+            pl_info.pl_det.YData = var_all(most_changing,:);
+            set(pl_info.pl_det, {'Color'}, {get_RGB(most_changing,num_pl,1)});
+            title(['most changing variable: $v_',num2str(most_changing),'$'],'interpreter','latex');
+            ylabel(['$v_',num2str(most_changing),'$'],'interpreter','latex');
             %
             xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             %
-            % third one: showing predictor
+            % third one: s_all over loop_counter
             %
+%             subplot 236
             subplot 236
-            pl_info.plpr.XData = l_all;
-            pl_info.plpr.YData = var_all(most_changing,:);
+            pl_info.pl_s.XData = [pl_info.pl_s.XData, loop_counter];
+            pl_info.pl_s.YData = [pl_info.pl_s.YData, s_all(end)];
             %
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             %            
         end
     else

@@ -50,7 +50,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if ison(Opt.plot)
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds0, ds0, solver_output.iterations, loop_counter);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds0, ds0, solver_output.iterations, loop_counter);
         end
     else
         var_all = [];
@@ -205,7 +205,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% live plot
         %
         if ison(Opt.plot) && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
         end
         %
         %% end loop
@@ -224,7 +224,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% live plot finalization
     %
     if ison(Opt.plot) && initial_exitflag>0
-        live_plot(Opt, nv, l_start, l_end, l_all, var_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
+        live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
     end
     %
     %% bifurcation tracing
