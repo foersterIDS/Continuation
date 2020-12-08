@@ -14,7 +14,24 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
         if length(l_all) == 1
             
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
-                fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]); % create new fig
+                %% delete used tags
+                %
+                if ~isempty(findobj('Tag', 'upperleft'))
+                    set(findobj('Tag', 'upperleft'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'upperright'))
+                    set(findobj('Tag', 'upperright'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'lowerleft'))
+                    set(findobj('Tag', 'lowerleft'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'lowerright'))
+                    set(findobj('Tag', 'lowerright'),'Tag','');
+                end
+                %
+                %% create new fig
+                %
+                fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
                 clf;
             else
                 fig = figure(Opt.live_plot_fig); % use existing fig
@@ -124,8 +141,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %% creater upper subplot
             %
             if isnan(Opt.live_plot_fig)
-%                 hs = subplot(2,3,1:3);
-                hs = subplot(2,3,1:2);
+                hs1 = subplot(2,3,1:2);
                 pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
                 set(pl, {'Color'}, colors);
                 grid on;
@@ -133,9 +149,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel('$v_{i}$','interpreter','latex');
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
-                set(hs,'Tag','upper');
+                set(hs1,'Tag','upperleft');
             else
-                hs1 = findobj('Tag', 'upper');
+                hs1 = findobj('Tag', 'upperleft');
                 set(hs1, 'NextPlot', 'add');
                 pl = plot(hs1, l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
                 set(pl, {'Color'}, colors);
@@ -146,16 +162,15 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             % first one: showing iteration steps
             %
             if isnan(Opt.live_plot_fig)
-%                 hs2 = subplot(2,3,4);
                 hs2 = subplot(2,3,3);
                 pl_it = plot(loop_counter, iterations, 'r-x', 'LineWidth', 2);
                 grid on;
                 title('needed iterations per loop','interpreter','latex');
                 xlabel('loop counter','interpreter','latex');
                 ylabel('iterations','interpreter','latex');
-                set(hs2,'Tag','left');
+                set(hs2,'Tag','upperright');
             else
-                hs2 = findobj('Tag', 'left');
+                hs2 = findobj('Tag', 'upperright');
                 set(hs2, 'NextPlot', 'replacechildren'); %% maybe renew ???
                 pl_it = plot(hs2, loop_counter, iterations, 'r-x', 'LineWidth', 2);
             end
@@ -163,7 +178,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             % second one: showing most changing variable in detail
             %
             if isnan(Opt.live_plot_fig)
-%                 hs3 = subplot(2,3,5);
                 hs3 = subplot(2,3,4:5);
                 pl_det = plot(l_all, var_all(most_changing,:),'LineWidth', 2);
                 set(pl_det, {'Color'}, colors(most_changing));
@@ -172,9 +186,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel(['$v_',num2str(most_changing),'$'],'interpreter','latex');
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
-                set(hs3,'Tag','center');
+                set(hs3,'Tag','lowerleft');
             else
-                hs3 = findobj('Tag', 'center');
+                hs3 = findobj('Tag', 'lowerleft');
                 set(hs3, 'NextPlot', 'add');
                 pl_det = plot(hs3, l_all, var_all(most_changing,:),'LineWidth', 2);
                 set(pl_det, {'Color'}, colors(most_changing));
@@ -183,16 +197,15 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             % third one: showing s_all over loop_counter
             %
             if isnan(Opt.live_plot_fig)
-%                 hs4 = subplot(2,3,6);
                 hs4 = subplot(2,3,6);
                 pl_s = plot(loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
                 grid on;
                 title('arc length $s$','interpreter','latex');
                 xlabel('loop counter','interpreter','latex');
                 ylabel('$s_{\mathrm{all}}$','interpreter','latex');
-                set(hs4,'Tag','right');
+                set(hs4,'Tag','lowerright');
             else
-                hs4 = findobj('Tag', 'right');
+                hs4 = findobj('Tag', 'lowerright');
                 set(hs4, 'NextPlot', 'add');
                 pl_s = plot(hs4, loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
             end
@@ -208,7 +221,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             %% upper subplot
             %
-%             subplot(2,3,1:3);
             subplot(2,3,1:2);
             %
             %% save plot data
@@ -241,7 +253,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % second one: showing most changing variable in detail
             %
-%             subplot 235
             subplot(2,3,4:5)
             %% prediktor und bogenlänge vom vorletzten Schritt zum aktuellen Schritt
             %% vorletzter Schritt zentriert
@@ -261,7 +272,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             set(0, 'currentfigure', pl_info.fig);
             %% creater upper subplot
             %
-%             subplot(2,3,1:3)
             subplot(2,3,1:2);
             %% save plot data
             %
@@ -298,7 +308,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % first one: showing iteration steps
             %
-%             subplot 234
             subplot 233
             %% save plot data
             %
@@ -308,7 +317,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % second one: showing most changing variable in detail
             %
-%             subplot 235
             subplot(2,3,4:5);
             pl_info.pl_det.XData = l_all;
             pl_info.pl_det.YData = var_all(most_changing,:);
@@ -320,7 +328,6 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % third one: s_all over loop_counter
             %
-%             subplot 236
             subplot 236
             pl_info.pl_s.XData = [pl_info.pl_s.XData, loop_counter];
             pl_info.pl_s.YData = [pl_info.pl_s.YData, s_all(end)];
