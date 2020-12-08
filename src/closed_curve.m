@@ -22,8 +22,11 @@ function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
         %
         ignored_dist = 2*norm(x_all(:,end)-x_all(:,end-1));
         distance = sqrt(sum((x_all(:,1:(ns - 1)) - x_all(:,end)).^2,1));
-        last_ind = find(distance>ignored_dist);
-        ignored = ns-last_ind(end);
+        last_ind = find(distance > ignored_dist);
+        if isempty(last_ind)
+            last_ind = ns - 2;
+        end
+        ignored = ns - last_ind(end);
         %
         flag = 0;
         if ns>n
