@@ -24,19 +24,20 @@ function [is_closed, Opt] = closed_curve(Opt, var_all,l_all, s_all, ds)
         distance = sqrt(sum((x_all(:,1:(ns - 1)) - x_all(:,end)).^2,1));
         last_ind = find(distance > ignored_dist);
         if isempty(last_ind)
-            last_ind = ns - 2;
-        end
-        ignored = ns - last_ind(end);
-        %
-        flag = 0;
-        if ns>n
-            dist_x = distance(nu:(ns - ignored));
-            k_flags = find(dist_x <= eps_dist);
-            if numel(k_flags)>0
-                flag = 1;
-                k_flags = k_flags + nu - 1;
+            flag = 0;
+        else
+            ignored = ns - last_ind(end);
+            %
+            flag = 0;
+            if ns>n
+                dist_x = distance(nu:(ns - ignored));
+                k_flags = find(dist_x <= eps_dist);
+                if numel(k_flags)>0
+                    flag = 1;
+                    k_flags = k_flags + nu - 1;
+                end
             end
-        end
+        end       
         %% check wether the found point is crossed under the same angle
         if flag == 1
             for i=1:numel(k_flags)
