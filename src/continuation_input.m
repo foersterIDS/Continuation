@@ -3,13 +3,14 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
+%   05.01.2020 - Tido Kubatschek
 %
 function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
     %% initialize Opt:
     %
     %  sub-structs:
     %   Sub-structs may only contain true or false values.
-    %   Wheter a true value exists can be checkt via 'ison(Opt_sub_struct)'.
+    %   Wheter a true value exists can be checked via 'ison(Opt_sub_struct)'.
     %   If a sub-struct contains multiple true values the first one is valid.
     Opt_arclength = struct('sphere',true,... % st.
                            'linear',false,...
