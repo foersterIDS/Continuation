@@ -122,8 +122,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
     elseif Opt.plot.detail
         %% find most changing
         n_change = 20;
-        [~,most_changing] = max(mean(abs(diff(var_all(:,max([1,end-n_change]):end),1,2))')');
-        
+%         [~,most_changing] = max(mean(abs(diff(var_all(Opt.plot_vars_index,max([1,end-n_change]):end),1,2))')');
+        [~,most_changing] = max(mean(abs(diff(var_all(Opt.plot_vars_index,:),1,2))')');
         if length(l_all) == 1
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
                 fig = figure('units', 'normalized', 'position', [0.05,0.1,0.9,0.8]); % create new fig
@@ -133,7 +133,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 %hold on; % for new plot
             end
             
-            num_pl = numel(var_all(:,1));
+            num_pl = numel(var_all(Opt.plot_vars_index,1));
             colors = cell(num_pl,1);        
             for k = 1:num_pl
                 colors(k) = {get_RGB(k,num_pl,1)};
@@ -313,6 +313,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             pl_info.pl_it.XData = [pl_info.pl_it.XData, loop_counter];
             pl_info.pl_it.YData = [pl_info.pl_it.YData, iterations];
+            xl = xlim();
+            xlim([xl(1), loop_counter]);
             %
             %
             % second one: showing most changing variable in detail
@@ -331,6 +333,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             subplot 236
             pl_info.pl_s.XData = [pl_info.pl_s.XData, loop_counter];
             pl_info.pl_s.YData = [pl_info.pl_s.YData, s_all(end)];
+            xlim([xl(1), loop_counter]);
             %
             %            
         end
