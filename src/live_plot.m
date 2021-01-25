@@ -8,7 +8,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
     l_lu = [min([l_start,l_end]),max([l_start,l_end])];
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
-    num_pl = numel(var_all(:,1));
+    num_pl = numel(Opt.plot_vars_index);
     
     if Opt.plot.basic
         if length(l_all) == 1
