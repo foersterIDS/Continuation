@@ -9,7 +9,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
     num_pl = numel(Opt.plot_vars_index);
-    
+    if Opt.bifurcation.trace
+        Opt.live_plot_fig = NaN;
+    end
     if Opt.plot.basic
         if length(l_all) == 1
             
@@ -49,7 +51,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
             set(pl, {'Color'}, colors);
             
-            if isnan(Opt.live_plot_fig) % test for existing figure to plot in, there must be no new labels or grid
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace % test for existing figure to plot in, there must be no new labels or grid
                 grid on;
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel('$v_{i}$','interpreter','latex');
@@ -140,7 +142,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             end
             %% creater upper subplot
             %
-            if isnan(Opt.live_plot_fig)
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs1 = subplot(2,3,1:2);
                 pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
                 set(pl, {'Color'}, colors);
@@ -161,7 +163,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % first one: showing iteration steps
             %
-            if isnan(Opt.live_plot_fig)
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs2 = subplot(2,3,3);
                 pl_it = plot(loop_counter, iterations, 'r-x', 'LineWidth', 2);
                 grid on;
@@ -177,7 +179,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % second one: showing most changing variable in detail
             %
-            if isnan(Opt.live_plot_fig)
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs3 = subplot(2,3,4:5);
                 pl_det = plot(l_all, var_all(most_changing,:),'LineWidth', 2);
                 set(pl_det, {'Color'}, colors(most_changing));
@@ -196,7 +198,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             % third one: showing s_all over loop_counter
             %
-            if isnan(Opt.live_plot_fig)
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs4 = subplot(2,3,6);
                 pl_s = plot(loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
                 grid on;
