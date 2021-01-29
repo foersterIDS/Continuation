@@ -15,7 +15,7 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
     Opt_arclength = struct('sphere',true,... % st.
                            'linear',false,...
                            'ellipsoid',false,... % coordinate transformed ellipsoid
-                           'ellipsoid2',false,... % normal ellipsoid
+                           'ellipsoid2',false,... % standard ellipsoid
                            'unique',false); % non-continuation with unique solutions                    
     Opt_bifurcation = struct('mark',false,... % st.
                              'determine',false,...
