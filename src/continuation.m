@@ -14,6 +14,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% initialize
     %
     exitflag = -1;
+    warning on;
     Opt = continuation_input(varargin,fun,var0,l_start,l_end);
     [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
     res_arle = residual_arclength(Opt);
