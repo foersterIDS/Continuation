@@ -6,10 +6,15 @@
 %   16.09.2020 - Tido Kubatschek 
 %
 function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,Opt)
-    max_step = 50;
+    if isfield(Opt,'max_step')
+        max_step = Opt.max_step;
+    else
+        max_step = 50;
+    end
     n_steps = 0;
     exitflag = -1;
     xi = x0;
+    xim1 = x0;
     xi_sc = x0./dscale;
     for i=1:max_step
         if Opt.jacobian
@@ -26,10 +31,15 @@ function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,O
         xi = xip1_sc.*dscale;
         n_steps = n_steps+1;
         abs_fi = sqrt(fi'*fi);
+        abs_dxi = norm(xi-xim1)/norm(xi);
         if abs_fi<Opt.solver_tol
+            exitflag = 2;
+            break;
+        elseif abs_dxi<Opt.solver_tol
             exitflag = 1;
             break;
         end
+        xim1 = xi;
     end
     %% make output
     x = xi;
