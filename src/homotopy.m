@@ -18,7 +18,7 @@ function [ xr, exitflag ] = homotopy( R, x0, Opt )
     elseif Opt.homotopy.newton
         G = @(x) homotopy_newton(R,x,x0);
     elseif Opt.homotopy.f2
-        
+        % nothing
     else
         error('unknown homotopy-type');
     end
