@@ -1,10 +1,10 @@
-%% path continuation - residual_arclength_ellipsoid2
+%% path continuation - residual_corrector_ellipsoid2
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   11.09.2020 - Alwin Förster
 %
-function [residual,jacobian] = residual_arclength_ellipsoid2(x,xs,ds)
+function [residual,jacobian] = residual_corrector_ellipsoid2(x,xs,ds)
     r = ds;
     fm = 10^6;
     if length(xs(1,:))==1

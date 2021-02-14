@@ -7,7 +7,7 @@
 function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver)
     nbif = numel(bif)/2;
     Opt_sphere = Opt;
-    Opt_sphere = seton(Opt_sphere,'arclength','sphere');
+    Opt_sphere = seton(Opt_sphere,'corrector','sphere');
     Opt_trace = Opt;
     Opt_trace.stop_on_bifurcation = true;
     Opt_trace = seton(Opt_trace,'bifurcation','determine');
@@ -16,7 +16,7 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
         xdirs_trace = [];
         ds_bif = mean(diff(s_all(bif(1,i)+(-1:1))));
         x0 = [var_all(:,bif(1,i));l_all(bif(1,i))];
-        residual_bif_sphere = @(x) merge_residuals(fun,residual_arclength(Opt_sphere),x,x0,ds_bif,Opt_sphere);
+        residual_bif_sphere = @(x) merge_residuals(fun,residual_corrector(Opt_sphere),x,x0,ds_bif,Opt_sphere);
         %% find directions of known path
         for j=1:2
             [var_bif_predictor,l_bif_predictor] = predictor(var_all(:,1:bif(1,i)),l_all(1:bif(1,i)),s_all(1:bif(1,i)),(-1)^j*ds_bif,[],fun,res_arle,predictor_solver,Opt_sphere);

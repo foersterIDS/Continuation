@@ -50,22 +50,22 @@ for i=1:2
     fprintf('\n### %d: solver: newton ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','newton');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: solver: newton ###\n',i),probinfo,probcounter);
-    %% arc-length:
-    fprintf('\n### %d: arc-length: sphere ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','arclength','sphere');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: arc-length: sphere ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: arc-length: linear ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','arclength','linear');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: arc-length: linear ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: arc-length: ellipsoid ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','arclength','ellipsoid','predictor','tangential');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: arc-length: ellipsoid ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: arc-length: ellipsoid2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','arclength','ellipsoid2');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: arc-length: ellipsoid2 ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: arc-length: unique ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','arclength','unique');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: arc-length: unique ###\n',i),probinfo,probcounter);
+    %% corrector:
+    fprintf('\n### %d: corrector: sphere ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','sphere');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: corrector: sphere ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: linear ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','linear');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: corrector: linear ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: ellipsoid ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','corrector','ellipsoid','predictor','tangential');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: ellipsoid2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','ellipsoid2');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: corrector: ellipsoid2 ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: unique ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','unique');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: corrector: unique ###\n',i),probinfo,probcounter);
     %% deflation:
     fprintf('\n### %d: deflation: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','deflation','on');

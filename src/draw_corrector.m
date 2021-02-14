@@ -1,10 +1,10 @@
-%% path continuation - draw_arclength
+%% path continuation - draw_corrector
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   25.11.2020 - Alwin Förster
 %
-function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
+function [lal,val] = draw_corrector( var_all, l_all, dsim1, Opt )
     %% initialize
     nres = 50;
     nv = numel(var_all(:,1));
@@ -15,7 +15,7 @@ function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
     lal{2} = NaN(nv,nres);
     val{2} = NaN(nv,nres);
     %% calc. curves
-    if Opt.arclength.sphere
+    if Opt.corrector.sphere
         %% sphere
         %
         if numel(l_all)==1
@@ -29,7 +29,7 @@ function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
         lal{2} = lc+dsc*cos(linspace(0,2*pi,nres));
         val{2} = vc+dsc*sin(linspace(0,2*pi,nres));
         %
-    elseif Opt.arclength.linear
+    elseif Opt.corrector.linear
         %% linear
         %
         if numel(l_all)>1
@@ -50,17 +50,17 @@ function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
             val{2} = var_all(:,end-1)+sec(1:end-1)+ort(1:end-1)*linspace(0,1,nres);
         end
         %
-    elseif Opt.arclength.ellipsoid
+    elseif Opt.corrector.ellipsoid
         %% ellipsoid
         %
 %         TODO
         %
-    elseif Opt.arclength.ellipsoid2
+    elseif Opt.corrector.ellipsoid2
         %% ellipsoid2
         %
 %         TODO
         %
-    elseif Opt.arclength.unique
+    elseif Opt.corrector.unique
         %% unique
         %
         if numel(l_all)==1
@@ -75,6 +75,6 @@ function [lal,val] = draw_arclength( var_all, l_all, dsim1, Opt )
         val{2} = vc+(2*max(abs(var_all).').')*linspace(-1,+1,nres);
         %
     else
-        error('arclength-method can not be drawn');
+        error('corrector-method can not be drawn');
     end
 end
