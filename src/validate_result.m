@@ -4,8 +4,9 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse] = validate_result(xs,fun_solution,vars,ls,ds,solver_exitflag,do_convergeToTarget,Opt)
+function [val,is_reverse,catch_flag] = validate_result(xs,fun_solution,vars,ls,ds,solver_exitflag,do_convergeToTarget,Opt)
     is_reverse = false;
+    catch_flag = 0;
     if solver_exitflag>0
         try
             if norm(fun_solution)<=Opt.solver_tol*10
@@ -42,6 +43,7 @@ function [val,is_reverse] = validate_result(xs,fun_solution,vars,ls,ds,solver_ex
             end
         catch
             val = false;
+            catch_flag = 1;
         end
     else
         val = false;

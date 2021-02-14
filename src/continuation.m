@@ -20,6 +20,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     res_arle = residual_corrector(Opt);
     ds = ds0;
     nv = length(var0);
+    catch_counter = 0;
     do_deflate = false;
     do_homotopy = false;
     do_stepback = false;
@@ -71,6 +72,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %
         loop_counter = loop_counter+1;
         is_current_jacobian = false;
+        catch_counter_old = catch_counter;
         %
         %% residual
         %
@@ -80,6 +82,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 residual = @(x) deflation(residual,x_deflation,x,Opt);
             catch
                 error('Error occured during deflation.');
+                catch_counter = catch_counter + 1;
+                if catch_counter >= 3
+                    warning('Error in input! catch was used too often!');
+                    break;
+                end
             end
         end
         %
@@ -100,6 +107,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
+            catch_counter = catch_counter + 1;
+            if catch_counter >= 3
+                    warning('Error in input! catch was used too often!');
+                    break;
+            end
         end
         %
         %% solve
@@ -126,11 +138,16 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             solver_output = default_solver_output;
             do_convergeToTarget = false;
             warning('solve: catch!');
+            catch_counter = catch_counter + 1;
+            if catch_counter >= 3
+                    warning('Error in input! catch was used too often!');
+                    break;
+            end
         end
         %
         %% check result
         %
-        [val,is_reverse] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,do_convergeToTarget,Opt);
+        [val,is_reverse, catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,do_convergeToTarget,Opt);
         if val
             %% valid result
             if isempty(x_plus)
@@ -178,6 +195,13 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 do_homotopy = true;
             else
                 do_homotopy = false;
+            end
+            if catch_flag
+                catch_counter = catch_counter + 1;
+                if catch_counter >= 3
+                    warning('Error in input! catch was used too often!');
+                    break;
+                end
             end
         end
         %
@@ -240,4 +264,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         fprintf('Time Elapsed: %.3f s\n',toc(t_display));
     end
     %
+    %% catch counter
+    if catch_counter_old == catch_counter
+        catch_counter = 0;
+    end
 end
