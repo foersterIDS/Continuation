@@ -227,12 +227,6 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         dsim1 = ds;
         ds = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,var_all,l_all,s_all,Opt);
         %
-        %% live plot
-        %
-        if ison(Opt.plot) && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
-        end
-        %
         %% end loop
         %
         if Opt.display
@@ -243,6 +237,12 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             end
         end
         [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds);
+        %
+        %% live plot
+        %
+        if ison(Opt.plot) && val
+            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
+        end
         %
     end
     %

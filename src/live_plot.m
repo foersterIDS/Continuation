@@ -121,30 +121,23 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);        
         end
-    elseif Opt.plot.detail || Opt.plot.detail_corrector
+    elseif Opt.plot.detail
         %% find interesting plot variable
-        if isnan(Opt.plot_vars_interesting)
+        if isnan(Opt.plot_var_of_interest)
             %% find most changing
             n_change = 20;
             [~,interesting] = max(mean(abs(diff(var_all(Opt.plot_vars_index,:),1,2))')');
         else
             %% take input by user
-            interesting = Opt.plot_vars_interesting;
+            interesting = Opt.plot_var_of_interest;
         end
         %
         %% get predictor and corrector
-        if Opt.plot.detail_corrector
-            [lco, vco] = draw_corrector(var_all, l_all, dsim1, Opt);
-            l_pred = lco{1};
-            l_cor = lco{2};
-            v_pred = vco{1};
-            v_cor = vco{2};
-        else
-            l_pred = NaN(num_pl, numel(l_all));
-            l_cor = NaN(num_pl, numel(l_all));
-            v_pred = NaN(num_pl, numel(l_all));
-            v_cor = NaN(num_pl, numel(l_all));
-        end
+        [lco, vco] = draw_corrector(var_all, l_all, dsim1, Opt);
+        l_pred = lco{1};
+        l_cor = lco{2};
+        v_pred = vco{1};
+        v_cor = vco{2};
         %
         if length(l_all) == 1
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
@@ -204,11 +197,12 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 set(pl_det, {'Color'}, colors(interesting));
                 grid on;
                 msg = ['interesting variable: $v_',num2str(interesting),'$'];
-                if isnan(Opt.plot_vars_interesting) msg = [msg, ' (most changing)']; end
+                if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
                 title(msg,'interpreter','latex');
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
-                xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+                xlim([l_all-2*dsim1, l_all+2*dsim1]);
+                ylim([var_all(interesting)-2*dsim1, var_all(interesting)+2*dsim1]);
                 set(hs3,'Tag','lowerleft');
             else
                 hs3 = findobj('Tag', 'lowerleft');
@@ -281,12 +275,13 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             pl_info.pl_det.YData = var_all(interesting,:);
             set(pl_info.pl_det, {'Color'}, {get_RGB(interesting,num_pl,1)});
             msg = ['interesting variable: $v_',num2str(interesting),'$'];
-            if isnan(Opt.plot_vars_interesting) msg = [msg, ' (most changing)']; end
+            if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
             %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
             ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
             %
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
+            ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
             hold on;
             pl_info.pl_pred = plot(l_pred(interesting,:), v_pred(interesting,:), 'r--', 'LineWidth', 1);
             pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
@@ -351,12 +346,13 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             pl_info.pl_det.YData = var_all(interesting,:);
             set(pl_info.pl_det, {'Color'}, {get_RGB(interesting,num_pl,1)});
             msg = ['interesting variable: $v_',num2str(interesting),'$'];
-            if isnan(Opt.plot_vars_interesting) msg = [msg, ' (most changing)']; end
+            if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
             %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
             ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
             %
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
+            ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
             hold on;
             delete(pl_info.pl_pred);
             delete(pl_info.pl_cor);
@@ -380,7 +376,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
     %
     %% Stop to show predictor and corrector
     %
-    if Opt.plot.detail_corrector && Opt.pause_corrector
+    if islogical(Opt.plot_pause) && Opt.plot_pause
+        fprintf('Press any key to continue or press Ctrl+c to stop...');
+        pause
+        fprintf(repmat('\b',1,52));
+    elseif numel(l_all) >= Opt.plot_pause && ~islogical(Opt.plot_pause)
         fprintf('Press any key to continue or press Ctrl+c to stop...');
         pause
         fprintf(repmat('\b',1,52));
