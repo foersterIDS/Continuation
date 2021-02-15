@@ -21,10 +21,14 @@ function [lco,vco] = draw_corrector( var_all, l_all, dsim1, Opt )
         if numel(l_all)==1
             lc = l_all;
             vc = var_all;
+            rpro = dsim1*ones(nv,1);
         else
             lc = l_all(end-1);
             vc = var_all(:,end-1);
+            rpro = sqrt((var_all(:,end)-var_all(:,end-1)).^2+(l_all(end)-l_all(end-1)).^2);
         end
+        lco{1} = lc+rpro*cos(linspace(0,2*pi,nres));
+        vco{1} = vc+rpro*sin(linspace(0,2*pi,nres));
         dsc = dsim1*ones(nv,1);
         lco{2} = lc+dsc*cos(linspace(0,2*pi,nres));
         vco{2} = vc+dsc*sin(linspace(0,2*pi,nres));
