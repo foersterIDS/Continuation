@@ -104,7 +104,7 @@ function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
                         case false
                             Opt.(lower(varargin_cell{i})) = false;
                         otherwise
-                            error('Unknown parameter %s for option %s',varargin_cell{i+1},varargin_cell{i});
+                            Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                     end
                 elseif isstruct(Opt.(lower(varargin_cell{i})))
                     sub_opts = fieldnames(Opt.(lower(varargin_cell{i})));
