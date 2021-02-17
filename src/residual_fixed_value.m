@@ -9,7 +9,7 @@ function [varargout] = residual_fixed_value(fun,v,l_fix,Opt)
         [R,J] = fun(v,l_fix);
         [n1,n2] = size(J);
         if n2<=n1 && n2<numel(v)
-            Jl = numeric_jacobian(@(x) fun(x(1:end-1),x(end)), x, 'derivative_dimensions', (n2+1):numel(v), 'diffquot', Opt.diffquot);
+            Jl = numeric_jacobian(@(v) fun(v,l_fix), v, 'derivative_dimensions', (n2+1):numel(v), 'diffquot', Opt.diffquot);
         else
             Jl = [];
         end
