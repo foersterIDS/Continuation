@@ -132,12 +132,23 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             interesting = Opt.plot_var_of_interest;
         end
         %
-        %% get predictor and corrector
+        %% get corrector
         [lco, vco] = draw_corrector(var_all, l_all, dsim1, Opt);
-        l_pred = lco{1};
+        l_cor_assist = lco{1};
         l_cor = lco{2};
-        v_pred = vco{1};
+        v_cor_assist = vco{1};
         v_cor = vco{2};
+        %
+        %% get predictor
+        if nargin>11
+            s_pre = linspace(0,s_predictor,50);
+            x_pre = fun_predictor(s_pre);
+            l_pre = kron(ones(nv,1),x_pre(end,:));
+            v_pre = x_pre(1:(end-1),:);
+        else
+            l_pre = NaN(nv,1);
+            v_pre = NaN(nv,1);
+        end
         %
         if length(l_all) == 1
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
@@ -227,7 +238,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 pl_s = plot(hs4, loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
             end
             %
-            pl_info = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s, 'pl_pred', [], 'pl_cor', []);            
+            pl_info = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s, 'pl_cor_assist', [], 'pl_cor', [], 'pl_pre', []);            
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -283,8 +294,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
             ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
             hold on;
-            pl_info.pl_pred = plot(l_pred(interesting,:), v_pred(interesting,:), 'r--', 'LineWidth', 1);
+            pl_info.pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
             pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
+            pl_info.pl_pre = plot(l_pre(interesting,:), v_pre(interesting,:), 'k-.', 'LineWidth', 1);
             hold off;
             % third one: s_all über loop_counter
             %
@@ -354,10 +366,20 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
             ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
             hold on;
-            delete(pl_info.pl_pred);
+            delete(pl_info.pl_cor_assist);
             delete(pl_info.pl_cor);
-            pl_info.pl_pred = plot(l_pred(interesting,:), v_pred(interesting,:), 'r--', 'LineWidth', 1);
+            delete(pl_info.pl_pre);
+            
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Wäre es hier nicht sinnvoller nicht immer die plots zu
+            % löschen, sondern nur XData und YData zu updaten?
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            
+            pl_info.pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
             pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
+            pl_info.pl_pre = plot(l_pre(interesting,:), v_pre(interesting,:), 'k-.', 'LineWidth', 1);
             hold off;
             %
             % third one: s_all over loop_counter
