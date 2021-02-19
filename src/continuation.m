@@ -241,7 +241,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         %% live plot
         %
         if ison(Opt.plot) && val
-            [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
+            try
+                [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
+            catch
+                warning('The plot update has failed.');
+            end
         end
         %
     end
@@ -249,7 +253,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %% live plot finalization
     %
     if ison(Opt.plot) && initial_exitflag>0
-        live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
+        try
+            live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
+        catch
+            warning('The plot update has failed.');
+        end
     end
     %
     %% bifurcation tracing
