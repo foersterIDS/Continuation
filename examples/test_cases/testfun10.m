@@ -1,6 +1,6 @@
 addpath('test_cases\testfun10_aux');
 
-v0 = 0.001;
+v0 = 10^-15;
 lams = 1;
 lame = 10;
 ds0 = 0.05;
