@@ -247,6 +247,10 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             set(0, 'currentfigure', pl_info.fig);
             %
+            %% calc limits
+            dl = abs(l_all(end)-l_all(end-1));
+            dv = abs(var_all(interesting,end)-var_all(interesting,end-1));
+            %
             %% upper subplot
             %
             subplot(2,3,1:2);
@@ -291,8 +295,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
             ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
             %
-            xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
-            ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
+            xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
+            ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
             hold on;
             pl_info.pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
             pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
@@ -304,6 +308,10 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
         else
             set(0, 'currentfigure', pl_info.fig);
+            %% calc limits
+            dl = abs(l_all(end)-l_all(end-1));
+            dv = abs(var_all(interesting,end)-var_all(interesting,end-1));
+            %
             %% creater upper subplot
             %
             subplot(2,3,1:2);
@@ -363,8 +371,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
             ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
             %
-            xlim([l_all(end-1)-2*dsim1, l_all(end-1)+2*dsim1]);
-            ylim([var_all(interesting,end-1)-2*dsim1, var_all(interesting,end-1)+2*dsim1]);
+            xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
+            ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
             hold on;
             delete(pl_info.pl_cor_assist);
             delete(pl_info.pl_cor);
