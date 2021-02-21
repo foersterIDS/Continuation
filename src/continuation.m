@@ -236,7 +236,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
             end
         end
-        [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds);
+        [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian);
         %
         %% live plot
         %

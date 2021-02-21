@@ -15,4 +15,4 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun09; % circle
 % testfun10; % NB-excitation gap-oszillator
 %% Solve:
-[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'bifurcation','off','ds_max',ds_max,'plot','detail');
+[vs,ls,exitflag,bifs] = continuation(fun,v0,lams,lame,ds0,'bifurcation','off','ds_max',ds_max,'plot','on');

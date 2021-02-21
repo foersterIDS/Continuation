@@ -50,6 +50,10 @@ for i=1:2
     fprintf('\n### %d: solver: newton ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','newton');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: solver: newton ###\n',i),probinfo,probcounter);
+    %% break_function:
+    fprintf('\n### %d: break_function ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','break_function',@(f,J,v,l) (l>1));
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: break_function ###\n',i),probinfo,probcounter);
     %% corrector:
     fprintf('\n### %d: corrector: sphere ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','sphere');
