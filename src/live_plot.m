@@ -207,11 +207,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 pl_det = plot(l_all, var_all(interesting,:),'LineWidth', 2);
                 set(pl_det, {'Color'}, colors(interesting));
                 grid on;
-                msg = ['interesting variable: $v_',num2str(interesting),'$'];
+                msg = ['interesting variable: $v_{',num2str(interesting),'}$'];
                 if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
                 title(msg,'interpreter','latex');
                 xlabel('$\lambda$','interpreter','latex');
-                ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
+                ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
                 xlim([l_all-2*dsim1, l_all+2*dsim1]);
                 ylim([var_all(interesting)-2*dsim1, var_all(interesting)+2*dsim1]);
                 set(hs3,'Tag','lowerleft');
@@ -289,11 +289,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             pl_info.pl_det.XData = l_all;
             pl_info.pl_det.YData = var_all(interesting,:);
             set(pl_info.pl_det, {'Color'}, {get_RGB(interesting,num_pl,1)});
-            msg = ['interesting variable: $v_',num2str(interesting),'$'];
+            msg = ['interesting variable: $v_{',num2str(interesting),'}$'];
             if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
             %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
-            ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
+            ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
@@ -365,11 +365,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             pl_info.pl_det.XData = l_all;
             pl_info.pl_det.YData = var_all(interesting,:);
             set(pl_info.pl_det, {'Color'}, {get_RGB(interesting,num_pl,1)});
-            msg = ['interesting variable: $v_',num2str(interesting),'$'];
+            msg = ['interesting variable: $v_{',num2str(interesting),'}$'];
             if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
-            %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
-            ylabel(['$v_',num2str(interesting),'$'],'interpreter','latex');
+            %title(['most changing variable: $v_{',num2str(interesting),'}$'],'interpreter','latex');
+            ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
