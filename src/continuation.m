@@ -21,6 +21,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     ds = ds0;
     nv = length(var0);
     catch_counter = 0;
+    catch_counter_old = 0;
     do_deflate = false;
     do_homotopy = false;
     do_stepback = false;
@@ -40,6 +41,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     solver_jacobian = initial_jacobian;
     bif = [];
     x_plus = [];
+    initial_exitflag = 0;
     if initial_exitflag>0
         l_all = Opt.l_0;
         s_all = 0;
