@@ -130,22 +130,15 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 %% regular solver
                 %
                 %% add a dummy equation to residual
-                if Opt.solver.fsolve
-                    residual = @(x) merge_residuals(@(x,g) residual(x),@(x,xs,ds) residual_dummy(x,xs,ds), x, [var_all;l_all],ds,Opt);
-                    % adjust predictor and dscale
-                    x_predictor = [x_predictor; 1.001];
-                    dscale = [dscale;1];
+                if Opt.solver.fsolve && Opt.solver_force1it
+                    [residual, x_predictor, dscale] = add_dummy(residual, ds, var_all, l_all, Opt, x_predictor, dscale);
                 end
                 %% solver
                 [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
                 do_convergeToTarget = false;
                 %% shorten results with dummy equation
-                if Opt.solver.fsolve
-                    x_solution = x_solution(1:(end-1));
-                    fun_solution = fun_solution(1:(end-1));
-                    solver_jacobian = solver_jacobian(1:(end-1), 1:(end-1));
-                    dscale = dscale(1:end-1);
-                    x_predictor = x_predictor(1:end-1);
+                if Opt.solver.fsolve && Opt.solver_force1it
+                    [x_solution, fun_solution, solver_jacobian, dscale, x_predictor] = shorten_dummy(x_solution, fun_solution, solver_jacobian, dscale, x_predictor);
                 end
             end
             is_current_jacobian = true;
