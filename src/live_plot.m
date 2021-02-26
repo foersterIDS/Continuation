@@ -214,7 +214,12 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
                 xlim([l_all-2*dsim1, l_all+2*dsim1]);
-                ylim([var_all(interesting)-2*dsim1, var_all(interesting)+2*dsim1]);
+                v_diff = abs(v_pre(interesting,end) - v_pre(interesting,1));
+                if 1.1*v_diff > 2*dsim1
+                    ylim([var_all(interesting)-v_diff, var_all(interesting)+v_diff]);
+                else
+                    ylim([var_all(interesting)-2*dsim1, var_all(interesting)+2*dsim1]);
+                end
                 hold on;
                 pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
                 pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
@@ -302,7 +307,12 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
-            ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
+            v_diff = abs(v_pre(interesting,end) - v_pre(interesting,1));
+            if 1.1*v_diff > 2*dv
+                ylim([var_all(interesting)-v_diff, var_all(interesting)+v_diff]);
+            else
+                ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
+            end
             pl_info.pl_cor_assist.XData = l_cor_assist(interesting,:);
             pl_info.pl_cor_assist.YData = v_cor_assist(interesting,:);
             pl_info.pl_cor.XData = l_cor(interesting,:);
@@ -379,7 +389,12 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
-            ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
+            v_diff = abs(v_pre(interesting,end) - v_pre(interesting,1));
+            if 1.1*v_diff > 2*dv
+                ylim([var_all(interesting)-v_diff, var_all(interesting)+v_diff]);
+            else
+                ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
+            end
             pl_info.pl_cor_assist.XData = l_cor_assist(interesting,:);
             pl_info.pl_cor_assist.YData = v_cor_assist(interesting,:);
             pl_info.pl_cor.XData = l_cor(interesting,:);
