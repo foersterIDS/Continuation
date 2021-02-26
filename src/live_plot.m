@@ -9,9 +9,9 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
     l_max = [min(l_all),max(l_all)];
     dl0 = abs(l_end-l_start)*0.05;
     num_pl = numel(Opt.plot_vars_index);
-    if Opt.bifurcation.trace
-        Opt.live_plot_fig = NaN;
-    end
+%     if Opt.bifurcation.trace
+%         Opt.live_plot_fig = NaN;
+%     end
     if Opt.plot.basic
         if length(l_all) == 1
             
@@ -156,7 +156,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 clf;
             else
                 fig = figure(Opt.live_plot_fig); % use existing fig
-                %hold on; % for new plot
+                hold on; % for new plot
             end
             
             colors = cell(num_pl,1);        
@@ -167,6 +167,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs1 = subplot(2,3,1:2);
+                hold on;
                 pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
                 set(pl, {'Color'}, colors);
                 grid on;
@@ -214,6 +215,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
                 xlim([l_all-2*dsim1, l_all+2*dsim1]);
                 ylim([var_all(interesting)-2*dsim1, var_all(interesting)+2*dsim1]);
+                hold on;
+                pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
+                pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
+                pl_pre = plot(l_pre(interesting,:), v_pre(interesting,:), 'k-.', 'LineWidth', 1);
+%                 hold off;
                 set(hs3,'Tag','lowerleft');
             else
                 hs3 = findobj('Tag', 'lowerleft');
@@ -238,7 +244,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                 pl_s = plot(hs4, loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
             end
             %
-            pl_info = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s, 'pl_cor_assist', [], 'pl_cor', [], 'pl_pre', []);            
+            pl_info = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s, 'pl_cor_assist', pl_cor_assist, 'pl_cor', pl_cor, 'pl_pre', pl_pre);            
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -297,12 +303,14 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
-            hold on;
-            pl_info.pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
-            pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
-            pl_info.pl_pre = plot(l_pre(interesting,:), v_pre(interesting,:), 'k-.', 'LineWidth', 1);
-            hold off;
-            % third one: s_all über loop_counter
+            pl_info.pl_cor_assist.XData = l_cor_assist(interesting,:);
+            pl_info.pl_cor_assist.YData = v_cor_assist(interesting,:);
+            pl_info.pl_cor.XData = l_cor(interesting,:);
+            pl_info.pl_cor.YData = v_cor(interesting,:);
+            pl_info.pl_pre.XData = l_pre(interesting,:);
+            pl_info.pl_pre.YData = v_pre(interesting,:);
+            %
+            % third one: s_all over loop_counter
             %
                 % no update needed
             %
@@ -368,27 +376,17 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             msg = ['interesting variable: $v_{',num2str(interesting),'}$'];
             if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
-            %title(['most changing variable: $v_{',num2str(interesting),'}$'],'interpreter','latex');
             ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
-            hold on;
-            delete(pl_info.pl_cor_assist);
-            delete(pl_info.pl_cor);
-            delete(pl_info.pl_pre);
-            
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % Wäre es hier nicht sinnvoller nicht immer die plots zu
-            % löschen, sondern nur XData und YData zu updaten?
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
-            
-            pl_info.pl_cor_assist = plot(l_cor_assist(interesting,:), v_cor_assist(interesting,:), 'r--', 'LineWidth', 1);
-            pl_info.pl_cor = plot(l_cor(interesting,:), v_cor(interesting,:), 'r', 'LineWidth', 1);
-            pl_info.pl_pre = plot(l_pre(interesting,:), v_pre(interesting,:), 'k-.', 'LineWidth', 1);
-            hold off;
+            pl_info.pl_cor_assist.XData = l_cor_assist(interesting,:);
+            pl_info.pl_cor_assist.YData = v_cor_assist(interesting,:);
+            pl_info.pl_cor.XData = l_cor(interesting,:);
+            pl_info.pl_cor.YData = v_cor(interesting,:);
+            pl_info.pl_pre.XData = l_pre(interesting,:);
+            pl_info.pl_pre.YData = v_pre(interesting,:);
+            %
             %
             % third one: s_all over loop_counter
             %
