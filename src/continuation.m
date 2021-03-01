@@ -46,6 +46,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         s_all = 0;
         do_continuation = true;
         do_loop = true;
+        previous_jacobian = solver_jacobian;
+        last_jacobian = solver_jacobian;
         if Opt.display
             fprintf('Initial solution at l = %.2e\n',Opt.l_0);
         end
@@ -101,11 +103,11 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
-                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
+                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_arle,predictor_solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt);
+            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_arle,predictor_solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
             catch_counter = catch_counter + 1;
@@ -165,11 +167,16 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 var_all = [var_all,x_solution(1:end-1)];
                 l_all = [l_all,x_solution(end)];
                 s_all = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-1);l_all(end-1)])];
+                previous_jacobian = last_jacobian;
+                last_jacobian = solver_jacobian;
             else
                 var_all = [var_all,x_solution(1:end-1),x_plus(1:end-1)];
                 l_all = [l_all,x_solution(end),x_plus(end)];
                 s_all = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-2);l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
                 x_plus = [];
+                previous_jacobian = solver_jacobian;
+                last_jacobian = plus_jacobian;
+                plus_jacobian = [];
             end
             do_deflate = false;
             do_homotopy = false;
@@ -191,6 +198,8 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
                 var_all(:,end) = [];
                 l_all(end) = [];
                 s_all(end) = [];
+                plus_jacobian = last_jacobian;
+                last_jacobian = previous_jacobian;
             elseif (error_counter==Opt.stepback_error_counter+1) && (length(l_all)>1)
                 var_all = [var_all,x_plus(1:end-1)];
                 l_all = [l_all,x_plus(end)];
