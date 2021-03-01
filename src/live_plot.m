@@ -309,7 +309,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             v_diff = abs(v_pre(interesting,end) - v_pre(interesting,1));
             if 1.1*v_diff > 2*dv
-                ylim([var_all(interesting)-v_diff, var_all(interesting)+v_diff]);
+                ylim([var_all(interesting,end-1)-v_diff, var_all(interesting,end-1)+v_diff]);
             else
                 ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
             end
@@ -391,7 +391,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             xlim([l_all(end-1)-2*dl, l_all(end-1)+2*dl]);
             v_diff = abs(v_pre(interesting,end) - v_pre(interesting,1));
             if 1.1*v_diff > 2*dv
-                ylim([var_all(interesting)-v_diff, var_all(interesting)+v_diff]);
+                ylim([var_all(interesting,end-1)-v_diff, var_all(interesting,end-1)+v_diff]);
             else
                 ylim([var_all(interesting,end-1)-2*dv, var_all(interesting,end-1)+2*dv]);
             end
