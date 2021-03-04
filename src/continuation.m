@@ -10,7 +10,7 @@
 %   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
-function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,bif,s_all,last_jacobian] = continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     exitflag = -1;
@@ -41,6 +41,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     solver_jacobian = initial_jacobian;
     bif = [];
     x_plus = [];
+    last_jacobian = [];
     if initial_exitflag>0
         l_all = Opt.l_0;
         s_all = 0;
@@ -183,6 +184,9 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
             do_stepback = false;
             error_counter = 0;
             step_loop = step_loop + 1;
+            if do_convergeToTarget
+                last_jacobian = get_jacobian(fun,var_all(:,end),l_all(end),Opt);
+            end
         else
             %% invalid result
             error_counter = error_counter+1;
@@ -231,13 +235,13 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
         if ison(Opt.bifurcation) && val && ~do_homotopy && numel(l_all)>2
             if ~is_current_jacobian
                 %% get jacobian if not current
-                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
+                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end),Opt);
             end
             [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt);
         elseif ison(Opt.bifurcation) && val && numel(l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
-                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end));
+                solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end),Opt);
             end
             sign_det_jacobian = sign(det(solver_jacobian(1:nv,1:nv)));
         end
@@ -284,6 +288,7 @@ function [var_all,l_all,exitflag,bif,s_all] = continuation(fun,var0,l_start,l_en
     %
     if Opt.bifurcation.trace
         [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver);
+        last_jacobian = [];
     end
     %
     %% final disp
