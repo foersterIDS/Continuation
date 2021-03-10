@@ -10,7 +10,7 @@
 %   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
-function [var_all,l_all,exitflag,bif,s_all,last_jacobian] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     exitflag = -1;
@@ -37,18 +37,21 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian] = continuation(fun,var
     %% find initial solution
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [var_all,~,initial_exitflag,solver_output,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
+    [var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
     bif = [];
     x_plus = [];
     last_jacobian = [];
+    break_fun_out = [];
     if initial_exitflag>0
         l_all = Opt.l_0;
         s_all = 0;
         do_continuation = true;
         do_loop = true;
+        solver_jacobian = [solver_jacobian,numeric_jacobian(@(x) fun(x(1:nv),x(nv+1)),[var_all;Opt.l_0],'central_value',fun_initial,'derivative_dimensions',nv+1,'diffquot',Opt.diffquot)];
         previous_jacobian = solver_jacobian;
         last_jacobian = solver_jacobian;
+        [~,break_fun_out] = Opt.break_function(fun_initial,solver_jacobian,var_all,l_all,break_fun_out);
         if Opt.display
             fprintf('Initial solution at l = %.2e\n',Opt.l_0);
         end
@@ -260,7 +263,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian] = continuation(fun,var
                 fprintf('-----> invalid point\t\t\t\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',ds,loop_counter,step_loop,solver_output.iterations,Opt.n_iter_opt);
             end
         end
-        [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian);
+        [do_continuation,exitflag,var_all,l_all,s_all,break_fun_out,Opt] = exit_loop(do_continuation,exitflag,l_start,l_end,var_all,l_all,s_all,Opt,loop_counter,error_counter,bif_flag,bif,ds,fun_solution,solver_jacobian,break_fun_out,val);
         %
         %% live plot
         %

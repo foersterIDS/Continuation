@@ -5,14 +5,19 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian)
+function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian, break_fun_out, val)
     %% eval. break function:
     try
-        bfun = Opt.break_function(fun_solution,solver_jacobian,var_all(:,end),l_all(end));
+        if val
+            [bfun,break_fun_out] = Opt.break_function(fun_solution,solver_jacobian,var_all(:,end),l_all(end),break_fun_out);
+        else
+            bfun = false;
+        end
     catch
         warning('Unable to evaluate user defined break function.');
         bfun = false;
     end
+    %
     %% exit without complete results:
     if error_counter>=Opt.max_error_counter
         exitflag = -1;
@@ -37,6 +42,7 @@ function [do_continuation, exitflag, var_all, l_all, s_all, Opt] = exit_loop(do_
         do_continuation = false;
         exitflag = 2;
     end
+    %
     %% exit with bifurcation:
     if bif_flag>0 && Opt.stop_on_bifurcation
         do_continuation = false;
