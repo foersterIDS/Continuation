@@ -166,7 +166,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %
         %% check result
         %
-        [val,is_reverse, catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,do_convergeToTarget,Opt);
+        [val,is_reverse, catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,solver_jacobian,last_jacobian,do_convergeToTarget,Opt);
         if val
             %% valid result
             if isempty(x_plus)
