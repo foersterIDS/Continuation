@@ -134,18 +134,20 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 do_convergeToTarget = true;
             else
                 %% regular solver
-                %
-                %% add a dummy equation to residual
+                %            
                 if Opt.solver.fsolve && Opt.solver_force1it
-                    [residual, x_predictor, dscale] = add_dummy(residual, ds, var_all, l_all, Opt, x_predictor, dscale);
+                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
+                    if solver_output.iterations < 1
+                        % perturbate initial solution by tolerance of
+                        % solver
+                        pert = Opt.solver_tol * ones(numel(x_predictor),1) / numel(x_predictor);
+                        x_predictor = x_predictor + pert;
+                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
+                    end
+                else
+                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
                 end
-                %% solver
-                [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
                 do_convergeToTarget = false;
-                %% shorten results with dummy equation
-                if Opt.solver.fsolve && Opt.solver_force1it
-                    [x_solution, fun_solution, solver_jacobian, dscale, x_predictor] = shorten_dummy(x_solution, fun_solution, solver_jacobian, dscale, x_predictor);
-                end
             end
             is_current_jacobian = true;
         catch
