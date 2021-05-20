@@ -12,7 +12,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
 %     if Opt.bifurcation.trace
 %         Opt.live_plot_fig = NaN;
 %     end
-    if Opt.plot.basic
+    if (Opt.plot.basic || Opt.plot.semilogx || Opt.plot.semilogy || Opt.plot.loglog)
         if length(l_all) == 1
             
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
@@ -50,6 +50,19 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %% create plot with colors
             pl = plot(l_all,var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
             set(pl, {'Color'}, colors);
+            if Opt.plot.semilogx || Opt.plot.loglog
+                set(gca, 'XScale', 'log')
+                % check whether all lambda are positive
+                if(find(l_all<0))
+                    error('To use semilogx-/loglog-scale lamdba must not contain negative values!');
+                end
+            end
+            if Opt.plot.semilogy || Opt.plot.loglog
+                set(gca, 'YScale', 'log')
+                if find(var_all < 0)
+                    error('To use semilogy-/loglog-scale variables must not contain any negative values! Consinder using the abs()-function.')
+                end
+            end           
             
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace % test for existing figure to plot in, there must be no new labels or grid
                 grid on;
