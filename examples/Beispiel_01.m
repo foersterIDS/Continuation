@@ -15,6 +15,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun09; % circle
 % testfun10; % NB-excitation gap-oszillator
 % testfun11; % basic test solver_force1it
+% testfun12; % parabola intersecting lines
 %% Solve:
 [var_all,l_all,exitflag,bifs,s_all,last_jacobian,break_fun_out] = ...
     continuation(fun,v0,lams,lame,ds0,'bifurcation','off','ds_max',ds_max,'plot','on');
