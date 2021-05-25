@@ -53,13 +53,14 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             if Opt.plot.semilogx || Opt.plot.loglog
                 set(gca, 'XScale', 'log')
                 % check whether all lambda are positive
-                if(find(l_all<0))
+                if sum(l_all<0)
                     error('To use semilogx-/loglog-scale lamdba must not contain negative values!');
                 end
             end
             if Opt.plot.semilogy || Opt.plot.loglog
                 set(gca, 'YScale', 'log')
-                if find(var_all < 0)
+                % check whether all variables are positive
+                if sum(var_all<0)
                     error('To use semilogy-/loglog-scale variables must not contain any negative values! Consinder using the abs()-function.')
                 end
             end           
