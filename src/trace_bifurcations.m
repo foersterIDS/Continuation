@@ -32,7 +32,7 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
         if ~isempty(xdirs_old)
             %% find directions of unknown paths
             for j=1:Opt.n_bif_search
-                dx_bif_predictor = randn(numel(x0));
+                dx_bif_predictor = randn(numel(x0),1);
                 for i = 1:2
                     x_bif_predictor = x0+(-1)^i*ds_bif*dx_bif_predictor/norm(dx_bif_predictor);
                     dscale = get_dscale(Opt,x_bif_predictor(1:end-1,:),x_bif_predictor(end,:));
