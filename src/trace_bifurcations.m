@@ -56,6 +56,13 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
                     bif = [bif,bif_j];
                 end
             end
+            % live plot axis adjustment
+            if Opt.plot.detail
+                subplot(2,3,1:2);
+                axis([l_all(1), l_all(end), min(min(var_all)), max(max(var_all))]);
+            else
+                axis([l_all(1), l_all(end), min(min(var_all)), max(max(var_all))]);
+            end
         end
     end
 end
