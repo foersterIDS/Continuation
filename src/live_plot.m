@@ -126,6 +126,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
                    elseif bif(2,end) == 1
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
+                   elseif isnan(bif(2,end))
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rs','LineWidth',2);
                    end
                    hold off;
                end
@@ -369,6 +371,8 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
                    elseif bif(2,end) == 1
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
+                   elseif isnan(bif(2,end))
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rs','LineWidth',2);
                    end
                    hold off;
                end
