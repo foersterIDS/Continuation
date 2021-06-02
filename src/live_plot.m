@@ -101,7 +101,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             end
             %
             %% adjust x axis
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            if Opt.bifurcation.trace
+                axis([l_start, l_end, min(min(var_all)), max(max(var_all))]);
+            else
+                xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            end
         else
             set(0, 'currentfigure', pl_info.fig);
             %% save plot data
@@ -253,6 +257,7 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             %
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs4 = subplot(2,3,6);
+                hold off;
                 pl_s = plot(loop_counter, s_all,'LineWidth', 2, 'Color', 'r');
                 grid on;
                 title('arc length $s$','interpreter','latex');
@@ -302,7 +307,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             end
             %
             %% adjust x axis
-            xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            if Opt.bifurcation.trace
+                axis([l_start, l_end, min(min(var_all)), max(max(var_all))]);
+            else
+                xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            end
             %
             %% lower subplots
             %

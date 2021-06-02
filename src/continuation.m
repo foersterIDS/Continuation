@@ -279,16 +279,6 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %
     end
     %
-    %% live plot finalization
-    %
-    if ison(Opt.plot) && initial_exitflag>0
-        try
-            live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
-        catch
-            warning('The plot update has failed.');
-        end
-    end
-    %
     %% bifurcation tracing
     %
     if Opt.bifurcation.trace
@@ -297,6 +287,16 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
             last_jacobian = [];
         catch
             warning('Failed to trace bifurcations.');
+        end
+    end
+    %
+    %% live plot finalization
+    %
+    if ison(Opt.plot) && initial_exitflag>0
+        try
+            live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_all, ds, dsim1, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, -1);
+        catch
+            warning('The plot update has failed.');
         end
     end
     %
