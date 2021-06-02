@@ -9,11 +9,9 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
     solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
         %% mark bifurcations:
-        full_rank = length(solver_jacobian_red(:,1));
-        rank_tol = 10^-2; % TODO!!!
         sign_det_current_jacobian = sign(det(solver_jacobian_red));
         if sign_det_current_jacobian*sign_det_jacobian<=0
-            bif_type = (rank(solver_jacobian_red,rank_tol)==full_rank); % 1: true bif.; 0: zero point
+            bif_type = NaN; % 1: true bif.; 0: zero point; NaN: unknown
             bif = [bif,[length(l_all);bif_type]];
             sign_det_jacobian = sign_det_current_jacobian;
             bif_flag = 1;
@@ -22,6 +20,7 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
         %% determine bifurcation-points:
         Opt_bif = Opt;
         Opt_bif.jacobian = false;
+        Opt_bif.solver_tol = 10^-12;
         [bif_solver,default_bif_solver_output] = continuation_solver(Opt_bif);
         det_solver_jacobian_red = det(solver_jacobian_red);
         residual_bif = @(x) residual_bifurcation(fun,x,Opt,1/det_solver_jacobian_red);
@@ -43,12 +42,14 @@ function [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcatio
                     s_all = [s_all(1:end-1),s_all(end-1)+[norm(x_bif-[var_all(:,end-1);l_all(end-1)]),norm(x_bif-[var_all(:,end-1);l_all(end-1)])+norm([var_all(:,end);l_all(end)]-x_bif)]];
                     var_all = [var_all(:,1:end-1),x_bif(1:end-1),var_all(:,end)];
                     l_all = [l_all(1:end-1),x_bif(end),l_all(end)];
-                    solver_jacobian_red = bif_solver_jacobian;
+                    nv = numel(var_all(:,1));
+                    solver_jacobian_red = bif_solver_jacobian(1:nv,1:nv);
+                    solver_jacobian_lam = bif_solver_jacobian(1:nv,nv+1);
                     full_rank = length(solver_jacobian_red(:,1));
                     break;
                 end
             end
-            bif_type = (rank(solver_jacobian_red,rank_tol)==full_rank); % 1: true bif.; 0: zero point
+            bif_type = (rank(solver_jacobian_red,rank_tol)==full_rank); % 1: true bif.; 0: zero point; NaN: unknown
             bif = [bif,[ind_bif;bif_type]];
             sign_det_jacobian = sign_det_current_jacobian;
             bif_flag = 1;
