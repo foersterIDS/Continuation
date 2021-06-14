@@ -126,11 +126,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             if ison(Opt.bifurcation) && bif_flag 
                if ~isempty(bif)
                    hold on;
-                   if bif(2,end) == 0
-                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
-                   elseif bif(2,end) == 1
+                   if bif(2,end) == 0 % brach point bif
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
-                   elseif isnan(bif(2,end))
+                   elseif bif(2,end) == 1 % fold bif
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
+                   elseif isnan(bif(2,end)) % bif, but no further information
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rs','LineWidth',2);
                    end
                    hold off;
@@ -376,11 +376,11 @@ function [pl_info,Opt] = live_plot(Opt, nv, l_start, l_end, l_all, var_all, s_al
             if ison(Opt.bifurcation) && bif_flag 
                if ~isempty(bif)
                    hold on;
-                   if bif(2,end) == 0
-                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
-                   elseif bif(2,end) == 1
+                   if bif(2,end) == 0 % brach point bif
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rx','LineWidth',2);
-                   elseif isnan(bif(2,end))
+                   elseif bif(2,end) == 1 % fold bif
+                       plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'ro','LineWidth',2);
+                   elseif isnan(bif(2,end)) % bif, but no further information
                        plot(l_all(bif(1,end)),var_all(Opt.plot_vars_index,bif(1,end)),'rs','LineWidth',2);
                    end
                    hold off;
