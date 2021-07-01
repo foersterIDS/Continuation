@@ -29,6 +29,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     error_counter = 0;
     loop_counter = 0;
     step_loop = 0;
+    bif_dirs = cell(1,2);
     if Opt.display
         fprintf('Starting path continuation...\n');
         t_display = tic;
@@ -242,7 +243,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end),Opt);
             end
-            [bif,sign_det_jacobian,bif_flag,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt);
+            [bif,sign_det_jacobian,bif_flag,bif_dirs,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt,bif_dirs);
         elseif ison(Opt.bifurcation) && val && numel(l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
@@ -283,7 +284,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     %
     if Opt.bifurcation.trace
         try
-            [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver);
+            [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver,bif_dirs);
             last_jacobian = [];
         catch
             warning('Failed to trace bifurcations.');
