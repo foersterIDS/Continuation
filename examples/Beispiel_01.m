@@ -1,9 +1,13 @@
-clear all;
+clear;
 close all;
 clc;
+% move to folder of Beispiel_01.m
+if(~isdeployed)
+  cd(fileparts(which('Beispiel_01.m')));
+end
 addpath('..\src');
 addpath('test_cases');
-%% Testfunktions:
+%% Testfunctions:
 % testfun01; % 0=!v.^2+5-exp((1/l)*v)
 testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( Om * t )
 % testfun03; % Stochastic Duffing
