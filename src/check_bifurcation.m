@@ -3,6 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   26.05.2020 - Alwin Förster
+%   02.07.2021 - Tido Kubatschek
 %
 function [bif,sign_det_jacobian,bif_flag,bif_dirs,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian_red,var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt,bif_dirs)
     bif_flag = 0;

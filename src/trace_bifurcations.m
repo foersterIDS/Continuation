@@ -3,6 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   28.10.2020 - Alwin Förster
+%   02.07.2021 - Tido Kubatschek
 %
 function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver,bif_dirs)
     nbif = numel(bif(2,bif(2,:) == 0));
@@ -32,18 +33,20 @@ function [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,
         end
         %% unknown paths
         if ~isempty(xdirs_old)
-            %% find directions of unknown paths
-            for j=1:Opt.n_bif_search
-                dx_bif_predictor = randn(numel(x0),1);
-                for ki = 1:2
-                    x_bif_predictor = x0+(-1)^ki*ds_bif*dx_bif_predictor/norm(dx_bif_predictor);
-                    dscale = get_dscale(Opt,x_bif_predictor(1:end-1,:),x_bif_predictor(end,:));
-                    [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor,dscale);
-                    if solver_bif_exitflag>0 && norm(x_bif_ij-x0)>=ds_bif*0.99 && norm(x_bif_ij-x0)<=ds_bif*1.01
-                        xdirs_trace = [xdirs_trace,x_bif_ij-x0];
-                        residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
-                    end
-                end              
+            %% find directions of unknown paths by using random direction
+            if Opt.bif_rand_dir
+                for j=1:Opt.n_bif_search
+                    dx_bif_predictor = randn(numel(x0),1);
+                    for ki = 1:2
+                        x_bif_predictor = x0+(-1)^ki*ds_bif*dx_bif_predictor/norm(dx_bif_predictor);
+                        dscale = get_dscale(Opt,x_bif_predictor(1:end-1,:),x_bif_predictor(end,:));
+                        [x_bif_ij,~,solver_bif_exitflag] = solver(residual_bif_sphere,x_bif_predictor,dscale);
+                        if solver_bif_exitflag>0 && norm(x_bif_ij-x0)>=ds_bif*0.99 && norm(x_bif_ij-x0)<=ds_bif*1.01
+                            xdirs_trace = [xdirs_trace,x_bif_ij-x0];
+                            residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
+                        end
+                    end              
+                end
             end
             %% use tangent vectors - experimental!
             for j=1:(numel(bif_dirs)/2)
