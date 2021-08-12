@@ -1,0 +1,128 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration file="C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples\app_resources\continuation_App.prj" location="C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples\app_resources" name="continuation_App" target="target.mlapps" target-name="Package App">
+    <param.appname>continuation_App</param.appname>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot>C:\Users\Tido Kubatschek\AppData\Local\Temp\tp084b1948_f48d_4c71_86e0_ff79040d62ff.png</param.screenshot>
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms />
+    <param.output>${PROJECT_ROOT}</param.output>
+    <param.guid>7009c8a9-0cd7-443c-abcf-0c20b4d0446b</param.guid>
+    <unset>
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\Continuation.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\icon.png</file>
+      <file>${PROJECT_ROOT}\ids_logo.png</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\check_bifurcation.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\closed_curve.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation_input.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation_solver.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\deflation.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\diff_xs.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\draw_corrector.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\exit_loop.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\fncHndToVal.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\get_dscale.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\get_jacobian.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\get_RGB.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_f2.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_f2_LM_init.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_fix.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_merge.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_newton.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\include_reverse.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\initial_break_function.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\ison.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\live_plot.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\merge_arle_pred.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\merge_residuals.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\numeric_jacobian.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\polydern.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\polyfitn.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\polyvaln.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\predictor.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\predictor_adaptive.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\predictor_initial.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\predictor_ode.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\predictor_taylor.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_bifurcation.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector_ellipsoid.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector_ellipsoid2.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector_linear.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector_sphere.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_corrector_unique.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\residual_fixed_value.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\RnRotation.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\seton.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\solver_basic_newton.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\solver_lsqnonlin.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\step_size_control.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\step_size_control_angle.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\step_size_control_curvature.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\step_size_control_iterations.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\step_size_control_pid.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\trace_bifurcations.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\validate_result.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\vector_angle.m</file>
+    </fileset.depfun>
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples" name="app_resources" optional="false">C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples\app_resources</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2021a</root>
+      <toolboxes>
+        <toolbox name="neuralnetwork" />
+      </toolboxes>
+      <toolbox>
+        <neuralnetwork>
+          <enabled>true</enabled>
+        </neuralnetwork>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.0</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
