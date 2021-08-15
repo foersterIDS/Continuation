@@ -1,14 +1,18 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
   <configuration file="C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples\app_resources\continuation_App.prj" location="C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\examples\app_resources" name="continuation_App" target="target.mlapps" target-name="Package App">
     <param.appname>continuation_App</param.appname>
-    <param.authnamewatermark />
+    <param.authnamewatermark>Alwin Förster, Tido Kubatschek</param.authnamewatermark>
     <param.email />
     <param.company />
-    <param.icon />
-    <param.icons />
+    <param.icon>${PROJECT_ROOT}\continuation_App_resources\icon_24.png</param.icon>
+    <param.icons>
+      <file>${PROJECT_ROOT}\continuation_App_resources\icon_48.png</file>
+      <file>${PROJECT_ROOT}\continuation_App_resources\icon_24.png</file>
+      <file>${PROJECT_ROOT}\continuation_App_resources\icon_16.png</file>
+    </param.icons>
     <param.summary />
     <param.description />
-    <param.screenshot>C:\Users\Tido Kubatschek\AppData\Local\Temp\tp084b1948_f48d_4c71_86e0_ff79040d62ff.png</param.screenshot>
+    <param.screenshot>C:\Users\Tido Kubatschek\AppData\Local\Temp\tpac2a4757_15d5_48fe_8075_56f8927d0132.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.products.name />
     <param.products.id />
@@ -17,11 +21,8 @@
     <param.output>${PROJECT_ROOT}</param.output>
     <param.guid>7009c8a9-0cd7-443c-abcf-0c20b4d0446b</param.guid>
     <unset>
-      <param.authnamewatermark />
       <param.email />
       <param.company />
-      <param.icon />
-      <param.icons />
       <param.summary />
       <param.description />
       <param.version />
@@ -35,8 +36,9 @@
       <file>${PROJECT_ROOT}\Continuation.mlapp</file>
     </fileset.main>
     <fileset.depfun>
-      <file>${PROJECT_ROOT}\icon.png</file>
-      <file>${PROJECT_ROOT}\ids_logo.png</file>
+      <file>${PROJECT_ROOT}\icon.svg</file>
+      <file>${PROJECT_ROOT}\ids_1000.png</file>
+      <file>${PROJECT_ROOT}\luh_1000.png</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\check_bifurcation.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\closed_curve.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation.m</file>
