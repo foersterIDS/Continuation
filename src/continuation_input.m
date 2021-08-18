@@ -5,7 +5,17 @@
 %   08.05.2020 - Alwin Förster
 %   05.01.2020 - Tido Kubatschek
 %
-function [Opt] = continuation_input(varargin_cell,fun,var0,l_start,l_end)
+function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0)
+    %% check mandatory input:
+    %
+    if ~isa(var0,'double') || ~isa(l_start,'double') || ~isa(l_end,'double') || ~isa(ds0,'double')
+        error('var0, l_start, l_end and ds0 must be double!');
+    end
+    if l_start==l_end
+        error('l_start and l_end must not be equal!');
+    end
+    ds0 = abs(ds0);
+    %
     %% initialize Opt:
     %
     %  sub-structs:
