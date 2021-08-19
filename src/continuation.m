@@ -18,7 +18,6 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
     [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
     res_arle = residual_corrector(Opt);
-    ds0 = abs(ds0);
     ds = ds0;
     nv = length(var0);
     catch_counter = 0;

@@ -7,6 +7,7 @@
 %
 function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian, break_fun_out, val)
     %% eval. break function:
+    %
     try
         if val
             [bfun,break_fun_out] = Opt.break_function(fun_solution,solver_jacobian,var_all(:,end),l_all(end),break_fun_out);
@@ -19,6 +20,7 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     end
     %
     %% exit without complete results:
+    %
     if error_counter>=Opt.max_error_counter
         exitflag = -1;
         warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
@@ -26,24 +28,28 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     end
     %
     %% exit with l<l_start:
+    %
     if sign(l_end-l_start)*(l_all(end)-l_start)<0
         do_continuation = false;
         exitflag = 0;
     end
     %
     %% exit with success:
+    %
     if sign(l_end-l_start)*(l_all(end)-l_end)>=0
         do_continuation = false;
         exitflag = 1;
     end
     %
     %% exit with n_step_max reached:
+    %
     if loop_counter>=Opt.n_step_max
         do_continuation = false;
         exitflag = 2;
     end
     %
     %% exit with bifurcation:
+    %
     if bif_flag>0 && Opt.stop_on_bifurcation
         do_continuation = false;
         exitflag = 3;
@@ -53,6 +59,7 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     end
     %
     %% exit on closed curve:
+    %
     if Opt.closed_curve_detection
         [is_closed, Opt] = closed_curve(Opt,var_all,l_all,s_all, ds);
         if is_closed
@@ -63,6 +70,7 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     end
     %
     %% exit due to break function:
+    %
     if bfun
         do_continuation = false;
         exitflag = 5;
