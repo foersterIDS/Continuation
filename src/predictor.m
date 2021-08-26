@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_arle,predictor_solver,Opt)
+function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_corr,predictor_solver,Opt)
     if Opt.predictor.polynomial
         if length(l_all)==1
             fun_predictor = @(s) predictor_initial(var_all,l_all,s,Opt);
@@ -24,7 +24,7 @@ function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jaco
     end
     if Opt.predictor_solver
         xi = [var_all(:,end);l_all(end)];
-        fun_solve = @(s) merge_arle_pred(fun_predictor,res_arle,s,xi,ds);
+        fun_solve = @(s) merge_arle_pred(fun_predictor,res_corr,s,xi,ds);
         [sp,~,exitflag] = predictor_solver(fun_solve,ds);
         if exitflag<=0
             sp = ds;

@@ -17,7 +17,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     warning on;
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
     [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
-    res_arle = residual_corrector(Opt);
+    res_corr = residual_corrector(Opt);
     ds = ds0;
     nv = length(var0);
     catch_counter = 0;
@@ -84,7 +84,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %
         %% residual
         %
-        residual = @(x) merge_residuals(fun,res_arle,x,[var_all;l_all],ds,Opt);
+        residual = @(x) merge_residuals(fun,res_corr,x,[var_all;l_all],ds,Opt);
         if do_deflate
             try
                 residual = @(x) deflation(residual,x_deflation,x,Opt);
@@ -108,11 +108,11 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
-                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_arle,predictor_solver,Opt);
+                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_corr,predictor_solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_arle,predictor_solver,Opt);
+            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(var_all,l_all,s_all,ds,last_jacobian,fun,res_corr,predictor_solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
             catch_counter = catch_counter + 1;
@@ -243,7 +243,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,var_all(:,end),l_all(end),Opt);
             end
-            [bif,sign_det_jacobian,bif_flag,bif_dirs,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_arle,predictor_solver,Opt,bif_dirs);
+            [bif,sign_det_jacobian,bif_flag,bif_dirs,var_all,l_all,s_all] = check_bifurcation(fun,solver_jacobian(1:nv,1:nv),var_all,l_all,s_all,bif,sign_det_jacobian,res_corr,predictor_solver,Opt,bif_dirs);
         elseif ison(Opt.bifurcation) && val && numel(l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
@@ -284,7 +284,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     %
     if Opt.bifurcation.trace
         try
-            [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_arle,predictor_solver,bif_dirs);
+            [var_all,l_all,s_all,bif] = trace_bifurcations(Opt,var_all,l_all,s_all,bif,solver,fun,l_start,l_end,res_corr,predictor_solver,bif_dirs);
             last_jacobian = [];
         catch
             warning('Failed to trace bifurcations.');
