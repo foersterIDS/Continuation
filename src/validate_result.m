@@ -9,7 +9,7 @@ function [val,is_reverse,catch_flag] = validate_result(xs,fun_solution,vars,ls,d
     catch_flag = 0;
     if solver_exitflag>0
         try
-            if norm(fun_solution)<=Opt.solver_tol*10
+            if ~Opt.check_residual || (norm(fun_solution)<=Opt.solver_tol*10)
                 xi = [vars(:,end);ls(end)];
                 norm_xs_xi = norm(xs-xi);
                 if ((norm_xs_xi>=0.8*ds && norm_xs_xi<=1.2*ds || numel(ls)==1)) || do_convergeToTarget || Opt.corrector.unique

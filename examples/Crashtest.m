@@ -20,6 +20,10 @@ for i=1:2
     fprintf('\n### %d: standard-config ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max);
     probinfo = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: standard-config ###\n',i),probinfo,probcounter);
+    %% check residual on:
+    fprintf('\n### %d: check residual: on ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'check_residual','on');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: check residual: on ###\n',i),probinfo,probcounter);
     %% display off:
     fprintf('\n### %d: display: off ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off');

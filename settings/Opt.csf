@@ -2,6 +2,7 @@ alpha_reverse<>double<>pi/2<>#scalar#double#positive#nonzero
 bifurcation<>struct<>Opt_bifurcation<>#struct
 bif_rand_dir<>eval<>true<>#scalar#logical
 break_function<>eval<>@(f,J,v,l,break_fun_out)initial_break_function(f,J,v,l,break_fun_out)<>#function_handle
+check_residual<>eval<>false<>#scalar#logical
 closed_counter<>double<>3<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>false<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
