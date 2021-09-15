@@ -5,6 +5,7 @@
 %   08.05.2020 - Alwin Förster
 %
 function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jacobian,fun,res_corr,predictor_solver,Opt)
+    %% get fun_predictor:
     if Opt.predictor.polynomial
         if length(l_all)==1
             fun_predictor = @(s) predictor_initial(var_all,l_all,s,Opt);
@@ -22,6 +23,7 @@ function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jaco
     else
         error('predictor not set or of unknown type');
     end
+    %% predictor_solver:
     if Opt.predictor_solver
         xi = [var_all(:,end);l_all(end)];
         fun_solve = @(s) merge_arle_pred(fun_predictor,res_corr,s,xi,ds);
@@ -32,7 +34,18 @@ function [vp,lp,fun_predictor,sp] = predictor(var_all,l_all,s_all,ds,solver_jaco
     else
         sp = ds;
     end
+    %% get predictor:
     xip1 = fun_predictor(sp);
+    %% correct_predictor:
+    if Opt.correct_predictor && numel(l_all)>1
+        dxi = [var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)];
+        dxip1 = xip1-[var_all(:,end);l_all(end)];
+        if dot(dxip1,dxi)<0
+            dxip1 = -dxip1;
+            xip1 = [var_all(:,end);l_all(end)]+dxip1;
+        end
+    end
+    %% make output:
     vp = xip1(1:end-1);
     lp = xip1(end);
 end

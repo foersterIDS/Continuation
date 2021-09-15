@@ -6,6 +6,7 @@ check_residual<>eval<>false<>#scalar#logical
 closed_counter<>double<>3<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>false<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
+correct_predictor<>eval<>true<>#scalar#logical
 deflation<>eval<>true<>#scalar#logical
 deflation_error_counter<>double<>5<>#scalar#integer#positive#nonzero
 diffquot<>struct<>Opt_diffquot<>#struct
