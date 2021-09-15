@@ -28,6 +28,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     do_convergeToTarget = false;
     error_counter = 0;
     loop_counter = 0;
+    last_valid_used_x_plus = 0;
     step_loop = 0;
     bif_dirs = cell(1,2);
     if Opt.display
@@ -167,7 +168,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %
         %% check result
         %
-        [val,is_reverse, catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,solver_jacobian,last_jacobian,do_convergeToTarget,Opt);
+        [val,is_reverse,catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,solver_jacobian,last_jacobian,do_convergeToTarget,bif,Opt);
         if val
             %% valid result
             if isempty(x_plus)
@@ -176,6 +177,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 s_all = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-1);l_all(end-1)])];
                 previous_jacobian = last_jacobian;
                 last_jacobian = solver_jacobian;
+                last_valid_used_x_plus = 0;
             else
                 var_all = [var_all,x_solution(1:end-1),x_plus(1:end-1)];
                 l_all = [l_all,x_solution(end),x_plus(end)];
@@ -184,6 +186,7 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
                 previous_jacobian = solver_jacobian;
                 last_jacobian = plus_jacobian;
                 plus_jacobian = [];
+                last_valid_used_x_plus = last_valid_used_x_plus+1;
             end
             do_deflate = false;
             do_homotopy = false;
@@ -202,21 +205,27 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
             else
                 do_deflate = false;
             end
-            do_stepback = (error_counter==Opt.stepback_error_counter) && (length(l_all)>1);
-            if (error_counter==Opt.stepback_error_counter) && (length(l_all)>1)
-                x_plus = [var_all(:,end);l_all(end)];
+            if (error_counter==Opt.stepback_error_counter) && (numel(l_all)>1)
+                if last_valid_used_x_plus<Opt.stepback_error_counter
+                    do_stepback = true;
+                    x_plus = [var_all(:,end);l_all(end)];
+                else
+                    do_stepback = false;
+                end
                 var_all(:,end) = [];
                 l_all(end) = [];
                 s_all(end) = [];
                 plus_jacobian = last_jacobian;
                 last_jacobian = previous_jacobian;
-            elseif (error_counter==Opt.stepback_error_counter+1) && (length(l_all)>1)
+            elseif (error_counter==Opt.stepback_error_counter+1) && (numel(l_all)>1)
                 var_all = [var_all,x_plus(1:end-1)];
                 l_all = [l_all,x_plus(end)];
                 s_all = [s_all,s_all(end)+norm([var_all(:,end);l_all(end)]-[var_all(:,end-1);l_all(end-1)])];
                 x_plus = [];
+                do_stepback = false;
             else
                 x_plus = [];
+                do_stepback = false;
             end
             if Opt.include_reverse && is_reverse && solver_exitflag>0
                 [var_all,l_all] = include_reverse(x_solution,var_all,l_all);
@@ -278,6 +287,10 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
             end
         end
         %
+        %% catch counter
+        if catch_counter_old == catch_counter
+            catch_counter = 0;
+        end
     end
     %
     %% bifurcation tracing
@@ -307,8 +320,4 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         fprintf('Time Elapsed: %.3f s\n',toc(t_display));
     end
     %
-    %% catch counter
-    if catch_counter_old == catch_counter
-        catch_counter = 0;
-    end
 end
