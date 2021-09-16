@@ -15,12 +15,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     warning on;
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
-    [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs();
+    [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs(var0,l_start,l_end);
     [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
     res_corr = residual_corrector(Opt);
     ds = ds0;
-    Info.exitflag = -1;
-    Info.nv = numel(var0);
     if Opt.display
         fprintf('Starting path continuation...\n');
         t_display = tic;
@@ -50,7 +48,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if ison(Opt.plot)
-            [Plot, Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds0, ds0, solver_output.iterations, Counter);
+            [Plot, Opt] = live_plot(Opt, Info, Path, ds0, ds0, solver_output.iterations, Counter);
         end
     else
         Path.var_all = [];
@@ -158,47 +156,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         %% check result
         %
-        [val,is_reverse,catch_flag] = validate_result(x_solution,fun_solution,Path,ds,solver_exitflag,solver_jacobian,last_jacobian,Do,Bifurcation,Opt);
-        if val && ((islogical(Opt.approve_manually) && Opt.approve_manually) || (~islogical(Opt.approve_manually) && (x_solution(end)-Opt.approve_manually)*(Path.l_all(end)-Opt.approve_manually)<=0))
-            %% approve manually
-            Opt.approve_manually = true;
-            if numel(Path.l_all)>1
-                try
-                    Path_app = Path;
-                    if isempty(x_plus)
-                        Path_app.var_all = [Path.var_all,x_solution(1:end-1)];
-                        Path_app.l_all = [Path.l_all,x_solution(end)];
-                        Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-1);Path.l_all(end-1)])];
-                    else
-                        Path_app.var_all = [Path.var_all,x_solution(1:end-1),x_plus(1:end-1)];
-                        Path_app.l_all = [Path.l_all,x_solution(end),x_plus(end)];
-                        Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
-                    end
-                    [Plot, Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds, ds, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
-                catch
-                    warning('The plot update for approval has failed.');
-                end
-            end
-            prompt = sprintf('------> approve point at l = %.4e (y/n): ',Path.l_all(end));
-            correct_input = false;
-            while ~correct_input
-                y_or_n = input(prompt,'s');
-                if strcmp(y_or_n,'y')
-                    correct_input = true;
-                elseif strcmp(y_or_n,'n')
-                    correct_input = true;
-                    val = false;
-                elseif strcmp(y_or_n,'off')
-                    correct_input = true;
-                    Opt.approve_manually = false;
-                elseif ~isnan(str2double(y_or_n))
-                    correct_input = true;
-                    Opt.approve_manually = str2double(y_or_n);
-                else
-                    fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'' or set double limit)\n');
-                end
-            end
-        end
+        [val,is_reverse,catch_flag,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt);
         if val
             %% valid result
             if isempty(x_plus)
@@ -315,7 +273,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         if ison(Opt.plot) && val
             try
-                [Plot, Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
+                [Plot, Opt] = live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
                 warning('The plot update has failed.');
             end
@@ -346,7 +304,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         try
             Bifurcation_last_plot = Bifurcation;
             Bifurcation_last_plot.flag = -1;
-            live_plot(Opt, Info, l_start, l_end, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
+            live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
         catch
             warning('The plot update has failed.');
         end

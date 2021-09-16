@@ -4,10 +4,10 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [Plot,Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation)
-    l_lu = [min([l_start,l_end]),max([l_start,l_end])];
+function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation)
+    l_lu = [min([Info.l_start,Info.l_end]),max([Info.l_start,Info.l_end])];
     l_max = [min(Path.l_all),max(Path.l_all)];
-    dl0 = abs(l_end-l_start)*0.05;
+    dl0 = abs(Info.l_end-Info.l_start)*0.05;
     num_pl = numel(Opt.plot_vars_index);
 %     if Opt.bifurcation.trace
 %         Opt.live_plot_fig = NaN;
@@ -102,7 +102,7 @@ function [Plot,Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds, dsim1, iter
             %
             %% adjust x axis
             if Opt.bifurcation.trace
-                axis([l_start, l_end, min(min(Path.var_all)), max(max(Path.var_all))]);
+                axis([Info.l_start, Info.l_end, min(min(Path.var_all)), max(max(Path.var_all))]);
             else
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             end
@@ -308,7 +308,7 @@ function [Plot,Opt] = live_plot(Opt, Info, l_start, l_end, Path, ds, dsim1, iter
             %
             %% adjust x axis
             if Opt.bifurcation.trace
-                axis([l_start, l_end, min(min(Path.var_all)), max(max(Path.var_all))]);
+                axis([Info.l_start, Info.l_end, min(min(Path.var_all)), max(max(Path.var_all))]);
             else
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             end

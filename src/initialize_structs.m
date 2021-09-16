@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
 %
-function [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs()
+function [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs(var0,l_start,l_end)
     %% Bifurcation
     %
     Bifurcation = struct('bif',[],...
@@ -32,7 +32,9 @@ function [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs()
     %% Info
     %
     Info = struct('exitflag',-1,...
-                  'nv',NaN);
+                  'nv',numel(var0),...
+                  'l_start',l_start,...
+                  'l_end',l_end);
 	%
     %% Path
     %
