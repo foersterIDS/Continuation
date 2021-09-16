@@ -6,5 +6,11 @@
 %
 function [state] = ison(Opt_sub_struct)
     % Returns true/false weather a sub-struct has one option 'on'
-    state = (sum(structfun(@(x) x,Opt_sub_struct))>0);
+    if isstruct(Opt_sub_struct)
+        state = (sum(structfun(@(x) x,Opt_sub_struct))>0);
+    elseif islogical(Opt_sub_struct)
+        state = Opt_sub_struct;
+    else
+        error('Input must be struct or logical!');
+    end
 end
