@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse,catch_flag,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
+function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
     %% automated validation
     %
     is_reverse = false;
@@ -78,20 +78,24 @@ function [val,is_reverse,catch_flag,Opt] = validate_result(x_solution,x_plus,fun
         prompt = sprintf('------> approve point at l = %.4e (y/n): ',Path.l_all(end));
         correct_input = false;
         while ~correct_input
-            y_or_n = input(prompt,'s');
-            if strcmp(y_or_n,'y')
+            input_string = input(prompt,'s');
+            if strcmp(input_string,'y')
                 correct_input = true;
-            elseif strcmp(y_or_n,'n')
+            elseif strcmp(input_string,'n')
                 correct_input = true;
                 val = false;
-            elseif strcmp(y_or_n,'off')
+            elseif strcmp(input_string,'off')
                 correct_input = true;
                 Opt.approve_manually = false;
-            elseif ~isnan(str2double(y_or_n))
+            elseif strcmp(input_string,'exit')
                 correct_input = true;
-                Opt.approve_manually = str2double(y_or_n);
+                val = false;
+                Do.continuation = false;
+            elseif ~isnan(str2double(input_string))
+                correct_input = true;
+                Opt.approve_manually = str2double(input_string);
             else
-                fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'' or set double limit)\n');
+                fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'', set double limit or leave using ''exit'')\n');
             end
         end
     end
