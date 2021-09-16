@@ -169,8 +169,9 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %% check result
         %
         [val,is_reverse,catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,solver_jacobian,last_jacobian,do_convergeToTarget,bif,Opt);
-        if val && Opt.approve_manually
+        if val && ((islogical(Opt.approve_manually) && Opt.approve_manually) || (~islogical(Opt.approve_manually) && (x_solution(end)-Opt.approve_manually)*(l_all(end)-Opt.approve_manually)<=0))
             %% approve manually
+            Opt.approve_manually = true;
             if numel(l_all)>1
                 try
                     if isempty(x_plus)
@@ -191,17 +192,19 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
             correct_input = false;
             while ~correct_input
                 y_or_n = input(prompt,'s');
-                switch y_or_n
-                    case 'y'
-                        correct_input = true;
-                    case 'n'
-                        correct_input = true;
-                        val = false;
-                    case 'off'
-                        correct_input = true;
-                        Opt.approve_manually = false;
-                    otherwise
-                        fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'')\n');
+                if strcmp(y_or_n,'y')
+                    correct_input = true;
+                elseif strcmp(y_or_n,'n')
+                    correct_input = true;
+                    val = false;
+                elseif strcmp(y_or_n,'off')
+                    correct_input = true;
+                    Opt.approve_manually = false;
+                elseif ~isnan(str2double(y_or_n))
+                    correct_input = true;
+                    Opt.approve_manually = str2double(y_or_n);
+                else
+                    fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'' or set double limit)\n');
                 end
             end
         end
