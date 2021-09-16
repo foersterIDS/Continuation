@@ -19,17 +19,17 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
     [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
     res_corr = residual_corrector(Opt);
     ds = ds0;
-    nv = length(var0);
+    nv = numel(var0);
+    last_valid_used_x_plus = 0;
     catch_counter = 0;
     catch_counter_old = 0;
+    error_counter = 0;
+    loop_counter = 0;
+    step_loop = 0;
     do_deflate = false;
     do_homotopy = false;
     do_stepback = false;
     do_convergeToTarget = false;
-    error_counter = 0;
-    loop_counter = 0;
-    last_valid_used_x_plus = 0;
-    step_loop = 0;
     bif_dirs = cell(1,2);
     if Opt.display
         fprintf('Starting path continuation...\n');
@@ -169,6 +169,42 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         %% check result
         %
         [val,is_reverse,catch_flag] = validate_result(x_solution,fun_solution,var_all,l_all,ds,solver_exitflag,solver_jacobian,last_jacobian,do_convergeToTarget,bif,Opt);
+        if val && Opt.approve_manually
+            %% approve manually
+            if numel(l_all)>1
+                try
+                    if isempty(x_plus)
+                        var_all_app = [var_all,x_solution(1:end-1)];
+                        l_all_app = [l_all,x_solution(end)];
+                        s_all_app = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-1);l_all(end-1)])];
+                    else
+                        var_all_app = [var_all,x_solution(1:end-1),x_plus(1:end-1)];
+                        l_all_app = [l_all,x_solution(end),x_plus(end)];
+                        s_all_app = [s_all,s_all(end)+norm(x_solution-[var_all(:,end-2);l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
+                    end
+                    [pl, Opt] = live_plot(Opt, nv, l_start, l_end, l_all_app, var_all_app, s_all_app, ds, ds, solver_output.iterations, loop_counter, fun_predictor, s_predictor, pl, bif_flag, bif);
+                catch
+                    warning('The plot update for approval has failed.');
+                end
+            end
+            prompt = sprintf('------> approve point at l = %.4e (y/n): ',l_all(end));
+            correct_input = false;
+            while ~correct_input
+                y_or_n = input(prompt,'s');
+                switch y_or_n
+                    case 'y'
+                        correct_input = true;
+                    case 'n'
+                        correct_input = true;
+                        val = false;
+                    case 'off'
+                        correct_input = true;
+                        Opt.approve_manually = false;
+                    otherwise
+                        fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'')\n');
+                end
+            end
+        end
         if val
             %% valid result
             if isempty(x_plus)
@@ -288,9 +324,11 @@ function [var_all,l_all,exitflag,bif,s_all,last_jacobian,break_fun_out] = contin
         end
         %
         %% catch counter
+        %
         if catch_counter_old == catch_counter
             catch_counter = 0;
         end
+        %
     end
     %
     %% bifurcation tracing
