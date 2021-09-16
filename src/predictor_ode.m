@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   12.11.2020 - Alwin Förster
 %
-function [fun_predictor,Jac_predictor] = predictor_ode(var_all,l_all,s,solver_jacobian,fun)
-    x_all = [var_all;l_all];
+function [fun_predictor,Jac_predictor] = predictor_ode(Path,s,solver_jacobian,fun)
+    x_all = [Path.var_all;Path.l_all];
     xi = x_all(:,end);
     nd = length(xi);
     %% check jacobian:

@@ -6,7 +6,7 @@
 %
 %   DOI: 10.1002/ﬂd.1998
 %
-function [dsn] = step_size_control_pid(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt)
+function [dsn] = step_size_control_pid(ds,ds0,Counter,solver_output,Do,Path,Opt)
     % parameters of pid control 
     k_P = 0.1;
     k_I = 0.01;
@@ -14,7 +14,7 @@ function [dsn] = step_size_control_pid(ds,ds0,error_counter,solver_output,do_def
     
     e_max = Opt.step_size_e_max;
     
-    dvarsdl = @(k) (vars(:,end+k) - vars(:,end+k-1)) / (ls(end+k) - ls(end+k-1));
+    dvarsdl = @(k) (Path.var_all(:,end+k) - Path.var_all(:,end+k-1)) / (Path.l_all(end+k) - Path.l_all(end+k-1));
     
     e_star = @(k) norm(dvarsdl(k) - dvarsdl(k-1)) / norm(dvarsdl(k));
     

@@ -118,9 +118,9 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','l_0',(lame-lams)/2+lams);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: l_0: (l_end-l_start)/2+l_start ###\n',i),probinfo,probcounter);
     %% l_target:
-    fprintf('\n### %d: l_target: (l_end-l_start)/2+l_start ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','l_target',(lame-lams)/2+lams);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: l_target: (l_end-l_start)/2+l_start ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: l_target: (l_end-l_start)/3+l_start ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'ds_min',10^-6,'display','off','l_target',(lame-lams)/3+lams);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('### %d: l_target: (l_end-l_start)/3+l_start ###\n',i),probinfo,probcounter);
     %% l_target:
     fprintf('\n### %d: alpha_reverse: pi/4 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','alpha_reverse',pi/4);

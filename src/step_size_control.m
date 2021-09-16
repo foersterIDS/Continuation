@@ -6,25 +6,25 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = step_size_control(ds,ds0,error_counter,solver_output,do_deflate,do_stepback,x_plus,vars,ls,s_all,Opt)
-    if ~do_stepback
-        if ~do_deflate
-            if error_counter == 0
+function [dsn] = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,Opt)
+    if ~Do.stepback
+        if ~Do.deflate
+            if Counter.error == 0
                 if Opt.step_size_control.iterations
-                    dsn = step_size_control_iterations(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                    dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                 elseif Opt.step_size_control.angle
-                    dsn = step_size_control_angle(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                    dsn = step_size_control_angle(ds,ds0,Counter,solver_output,Do,Path,Opt);
                 elseif Opt.step_size_control.curvature
-                    if length(ls) > 3
-                        dsn = step_size_control_curvature(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,s_all,Opt);
+                    if length(Path.l_all) > 3
+                        dsn = step_size_control_curvature(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     else
-                        dsn = step_size_control_iterations(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                        dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     end
                 elseif Opt.step_size_control.pid
-                    if length(ls) > 4
-                        dsn = step_size_control_pid(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                    if length(Path.l_all) > 4
+                        dsn = step_size_control_pid(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     else
-                        dsn = step_size_control_iterations(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt);
+                        dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     end
                 else
                     error('Invalid settings for step size control!');
@@ -39,7 +39,7 @@ function [dsn] = step_size_control(ds,ds0,error_counter,solver_output,do_deflate
         dsn = min([Opt.ds_max,dsn]);
         dsn = max([Opt.ds_min,dsn]);
     else
-        xe = [vars(:,end);ls(end)];
+        xe = [Path.var_all(:,end);Path.l_all(end)];
         dsn = norm(x_plus-xe)/2;
     end
 end

@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = step_size_control_curvature(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,s_all,Opt)
-    % create vector with vars and ls
-    x_all = [vars;ls];
+function [dsn] = step_size_control_curvature(ds,ds0,Counter,solver_output,Do,Path,Opt)
+    % create vector with Path.var_all and Path.l_all
+    x_all = [Path.var_all;Path.l_all];
     
     % calc derivatives with respect to s
-    delta_s = s_all(end) - s_all(end-1);
+    delta_s = Path.s_all(end) - Path.s_all(end-1);
     r_p = (x_all(:,end) - x_all(:,end-1)) / delta_s;
     r_pp = (x_all(:,end-2) - 2 * x_all(:,end-1) + x_all(:,end)) / delta_s^2;
     
@@ -20,7 +20,7 @@ function [dsn] = step_size_control_curvature(ds,ds0,error_counter,solver_output,
     
     % find max value and mean value (of abs vals) of e_2 to detect curvature
     max_curv = max(e_2);
-    mean_curv = sum(abs(e_2)) / length(ls);
+    mean_curv = sum(abs(e_2)) / length(Path.l_all);
     
     % if value is close to zero, set it to zero
     if max_curv <= 1e-6

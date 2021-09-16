@@ -5,12 +5,12 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] = exit_loop(do_continuation, exitflag, l_start, l_end, var_all, l_all, s_all, Opt, loop_counter, error_counter, bif_flag, bif, ds, fun_solution, solver_jacobian, break_fun_out, val)
+function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_end, Path, Opt, Counter, Bifurcation, ds, fun_solution, solver_jacobian, break_fun_out, val)
     %% eval. break function:
     %
     try
         if val
-            [bfun,break_fun_out] = Opt.break_function(fun_solution,solver_jacobian,var_all(:,end),l_all(end),break_fun_out);
+            [bfun,break_fun_out] = Opt.break_function(fun_solution,solver_jacobian,Path.var_all(:,end),Path.l_all(end),break_fun_out);
         else
             bfun = false;
         end
@@ -21,50 +21,50 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     %
     %% exit without complete results:
     %
-    if error_counter>=Opt.max_error_counter
-        exitflag = -1;
+    if Counter.error>=Opt.max_error_counter
+        Info.exitflag = -1;
         warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
-        do_continuation = false;
+        Do.continuation = false;
     end
     %
     %% exit with l<l_start:
     %
-    if sign(l_end-l_start)*(l_all(end)-l_start)<0
-        do_continuation = false;
-        exitflag = 0;
+    if sign(l_end-l_start)*(Path.l_all(end)-l_start)<0
+        Do.continuation = false;
+        Info.exitflag = 0;
     end
     %
     %% exit with success:
     %
-    if sign(l_end-l_start)*(l_all(end)-l_end)>=0
-        do_continuation = false;
-        exitflag = 1;
+    if sign(l_end-l_start)*(Path.l_all(end)-l_end)>=0
+        Do.continuation = false;
+        Info.exitflag = 1;
     end
     %
     %% exit with n_step_max reached:
     %
-    if loop_counter>=Opt.n_step_max
-        do_continuation = false;
-        exitflag = 2;
+    if Counter.loop>=Opt.n_step_max
+        Do.continuation = false;
+        Info.exitflag = 2;
     end
     %
     %% exit with bifurcation:
     %
-    if bif_flag>0 && Opt.stop_on_bifurcation
-        do_continuation = false;
-        exitflag = 3;
-        var_all = var_all(:,1:bif(1,end));
-        l_all = l_all(1:bif(1,end));
-        s_all = s_all(1:bif(1,end));
+    if Bifurcation.flag>0 && Opt.stop_on_bifurcation
+        Do.continuation = false;
+        Info.exitflag = 3;
+        Path.var_all = Path.var_all(:,1:Bifurcation.bif(1,end));
+        Path.l_all = Path.l_all(1:Bifurcation.bif(1,end));
+        Path.s_all = Path.s_all(1:Bifurcation.bif(1,end));
     end
     %
     %% exit on closed curve:
     %
     if Opt.closed_curve_detection
-        [is_closed, Opt] = closed_curve(Opt,var_all,l_all,s_all, ds);
+        [is_closed, Opt] = closed_curve(Opt,Path, ds);
         if is_closed
-            do_continuation = false;
-            exitflag = 4;
+            Do.continuation = false;
+            Info.exitflag = 4;
             warning('closed curve detected. stopping continuation!');
         end
     end
@@ -72,8 +72,8 @@ function [do_continuation, exitflag, var_all, l_all, s_all, break_fun_out, Opt] 
     %% exit due to break function:
     %
     if bfun
-        do_continuation = false;
-        exitflag = 5;
+        Do.continuation = false;
+        Info.exitflag = 5;
     end
     %
 end

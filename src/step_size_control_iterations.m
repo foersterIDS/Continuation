@@ -7,7 +7,7 @@
 %
 %   DOI: 10.1007/978-1-4419-1740-9
 %
-function [dsn] = step_size_control_iterations(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt)
+function [dsn] = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt)
     % calculate step size
     dsn = ds*sqrt(Opt.n_iter_opt/solver_output.iterations);
     dsn = max(ds/2,dsn);

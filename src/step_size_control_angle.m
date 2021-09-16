@@ -5,16 +5,16 @@
 %   07.10.2020 - Tido Kubatschek
 %   08.10.2020 - Alwin Förster
 %
-function [dsn] = step_size_control_angle(ds,ds0,error_counter,solver_output,do_deflate,vars,ls,Opt)
+function [dsn] = step_size_control_angle(ds,ds0,Counter,solver_output,Do,Path,Opt)
     %% calc angular change
-    if length(ls) > 2
-        vh = length(vars(:,1));
+    if length(Path.l_all) > 2
+        vh = length(Path.var_all(:,1));
         angle_max = 0;
         
         % calculate greatest angle
         for k = 1:vh
-            vr = vars(k,end-2:end);
-            lr = ls(end-2:end);
+            vr = Path.var_all(k,end-2:end);
+            lr = Path.l_all(end-2:end);
             vec = [lr;vr];
             v1 = vec(:,end) - vec(:,end-1);
             v2 = vec(:,end-1) - vec(:,end-2);
