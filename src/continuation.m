@@ -15,8 +15,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     warning on;
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
-    [Bifurcation,Counter,Do,Info,Path,Plot] = initialize_structs(var0,l_start,l_end);
-    [solver,predictor_solver,default_solver_output] = continuation_solver(Opt);
+    [Bifurcation,Counter,Do,Info,Path,Plot,Solver] = initialize_structs(var0,l_start,l_end,Opt);
     res_corr = residual_corrector(Opt);
     ds = ds0;
     if Opt.display
@@ -27,7 +26,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %% find initial solution
     %
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = solver(residual_initial,var0,Opt.dscale0(1:end-1));
+    [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = Solver.main(residual_initial,var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
     x_plus = [];
     last_jacobian = [];
@@ -97,11 +96,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
-                [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(Path,ds,last_jacobian,fun,res_corr,predictor_solver,Opt);
+                [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = predictor(Path,ds,last_jacobian,fun,res_corr,Solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor,fun_predictor,s_predictor] = predictor(Path,ds,last_jacobian,fun,res_corr,predictor_solver,Opt);
+            [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = predictor(Path,ds,last_jacobian,fun,res_corr,Solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             warning('predictor: catch!');
             Counter.catch = Counter.catch + 1;
@@ -119,23 +118,23 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 %% try to converge to target
                 residual_target = @(v) residual_fixed_value(fun,v,Opt.l_target,Opt);
                 var_predictor_ctt = (var_predictor - Path.var_all(:,end))*(abs(Opt.l_target-Path.l_all(end))/abs(l_predictor-Path.l_all(end)))+Path.var_all(:,end);
-                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual_target,var_predictor_ctt,dscale(1:end-1));
+                [var_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual_target,var_predictor_ctt,dscale(1:end-1));
                 x_solution = [var_solution;Opt.l_target];
                 Do.convergeToTarget = true;
             else
                 %% regular solver
                 %            
                 if Opt.solver.fsolve && Opt.solver_force1it
-                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
+                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
                     if solver_output.iterations < 1
                         % perturbate initial solution by tolerance of
                         % solver
                         pert = Opt.solver_tol * ones(numel(x_predictor),1) / numel(x_predictor);
                         x_predictor = x_predictor + pert;
-                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
+                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
                     end
                 else
-                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = solver(residual,x_predictor,dscale);
+                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
                 end
                 Do.convergeToTarget = false;
             end
@@ -144,7 +143,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             x_solution = NaN(size(x_predictor));
             fun_solution = inf(size(x_predictor));
             solver_exitflag = -2;
-            solver_output = default_solver_output;
+            solver_output = Solver.default_output;
             Do.convergeToTarget = false;
             warning('solve: catch!');
             Counter.catch = Counter.catch + 1;
@@ -206,10 +205,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 plus_jacobian = last_jacobian;
                 last_jacobian = previous_jacobian;
             elseif (Counter.error==Opt.stepback_error_counter+1) && (numel(Path.l_all)>1)
-                Path.var_all = [Path.var_all,x_plus(1:end-1)];
-                Path.l_all = [Path.l_all,x_plus(end)];
+                if ~isempty(x_plus)
+                    Path.var_all = [Path.var_all,x_plus(1:end-1)];
+                    Path.l_all = [Path.l_all,x_plus(end)];
+                    x_plus = [];
+                end
                 Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
-                x_plus = [];
                 Do.stepback = false;
             else
                 x_plus = [];
@@ -240,7 +241,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 %% get jacobian if not current
                 solver_jacobian = get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jacobian(1:Info.nv,1:Info.nv),Path,Bifurcation,sign_det_jacobian,res_corr,predictor_solver,Opt);
+            [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jacobian(1:Info.nv,1:Info.nv),Path,Bifurcation,sign_det_jacobian,res_corr,Solver,Opt);
         elseif ison(Opt.bifurcation) && val && numel(Path.l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
@@ -291,7 +292,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     if Opt.bifurcation.trace
         try
-            [Path,Bifurcation] = trace_bifurcations(Opt,Path,Bifurcation,solver,fun,l_start,l_end,res_corr,predictor_solver);
+            [Path,Bifurcation] = trace_bifurcations(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr);
             last_jacobian = [];
         catch
             warning('Failed to trace bifurcations.');

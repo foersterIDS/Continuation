@@ -55,7 +55,14 @@ function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,
         val = false;
     end
     %
+    %% enforce_ds_max
+    %
+    if val && Opt.enforce_ds_max
+        val = logical(heaviside(min(Opt.ds_max-(x_solution-xi))));
+    end
+    %
     %% approve manually
+    %
     if val && ((islogical(Opt.approve_manually) && Opt.approve_manually) || (~islogical(Opt.approve_manually) && (x_solution(end)-Opt.approve_manually)*(Path.l_all(end)-Opt.approve_manually)<=0))
         Opt.approve_manually = true;
         if numel(Path.l_all)>1

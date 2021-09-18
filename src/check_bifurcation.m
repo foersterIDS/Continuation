@@ -5,7 +5,7 @@
 %   26.05.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jacobian_red,Path,Bifurcation,sign_det_jacobian,res_corr,predictor_solver,Opt)
+function [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jacobian_red,Path,Bifurcation,sign_det_jacobian,res_corr,Solver,Opt)
     Bifurcation.flag = 0;
     solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
@@ -36,7 +36,7 @@ function [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jac
             bif_type = NaN;
             for i=1:nds
                 dsp = dss(i);
-                [var_bif_predictor,l_bif_predictor] = predictor(Path,dsp,solver_jacobian_red,fun,res_corr,predictor_solver,Opt);
+                [var_bif_predictor,l_bif_predictor] = predictor(Path,dsp,solver_jacobian_red,fun,res_corr,Solver,Opt);
                 dscale = get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
                 [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
                 if bif_solver_exitflag>0

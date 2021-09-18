@@ -36,7 +36,7 @@ function [dsn] = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,O
             dsn = ds;
         end
         %% Limit to max./min. step size:
-        dsn = min([Opt.ds_max,dsn]);
+        dsn = min([norm(Opt.ds_max),dsn]);
         dsn = max([Opt.ds_min,dsn]);
     else
         xe = [Path.var_all(:,end);Path.l_all(end)];
