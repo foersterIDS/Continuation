@@ -5,6 +5,7 @@
 %   25.11.2020 - Alwin Förster
 %
 function [ rgb ] = get_RGB( value, maxvalue, minvalue, cm_name )
+    value = value(:);
     if nargin<4
         cm_name = 'parula';
     elseif nargin<3
@@ -29,7 +30,7 @@ function [ rgb ] = get_RGB( value, maxvalue, minvalue, cm_name )
         end
     else
         P = (value-minvalue)/(maxvalue-minvalue);
-        P = max([0,min([1,P])]);
+        P = max([zeros(size(P)),min([ones(size(P)),P],[],2)],[],2);
     end
     rgb = interp1(Pcm,cm,P);
 end
