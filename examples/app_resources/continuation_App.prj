@@ -12,7 +12,7 @@
     </param.icons>
     <param.summary />
     <param.description />
-    <param.screenshot>C:\Users\Tido Kubatschek\AppData\Local\Temp\tpac2a4757_15d5_48fe_8075_56f8927d0132.png</param.screenshot>
+    <param.screenshot>C:\Users\Tido Kubatschek\AppData\Local\Temp\tp44810f66_a150_469e_9625_320fe37455f5.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.products.name />
     <param.products.id />
@@ -36,6 +36,8 @@
       <file>${PROJECT_ROOT}\Continuation.mlapp</file>
     </fileset.main>
     <fileset.depfun>
+      <file>${PROJECT_ROOT}\arrow.png</file>
+      <file>${PROJECT_ROOT}\icon-1.png</file>
       <file>${PROJECT_ROOT}\icon.svg</file>
       <file>${PROJECT_ROOT}\ids_1000.png</file>
       <file>${PROJECT_ROOT}\luh_1000.png</file>
@@ -44,6 +46,7 @@
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation_input.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\continuation_solver.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\csf2struct.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\deflation.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\diff_xs.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\draw_corrector.m</file>
@@ -59,7 +62,7 @@
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_merge.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\homotopy_newton.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\include_reverse.m</file>
-      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\initial_break_function.m</file>
+      <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\initialize_structs.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\ison.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\live_plot.m</file>
       <file>C:\Users\Tido Kubatschek\Documents\GitHub\Continuation\src\merge_arle_pred.m</file>
