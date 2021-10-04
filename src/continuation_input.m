@@ -29,64 +29,77 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
 	%
     %% read varargin_cell:
     %
-    for i=1:2:numel(varargin_cell)-1
+    err_msg = [];
+    for i=1:2:numel(varargin_cell)
         try
             if isfield(Opt,lower(varargin_cell{i}))
-                if islogical(Opt.(lower(varargin_cell{i})))
-                    switch lower(varargin_cell{i+1})
-                        case 'on'
-                            Opt.(lower(varargin_cell{i})) = true;
-                        case 'off'
-                            Opt.(lower(varargin_cell{i})) = false;
-                        case true
-                            Opt.(lower(varargin_cell{i})) = true;
-                        case false
-                            Opt.(lower(varargin_cell{i})) = false;
-                        otherwise
-                            Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
-                    end
-                elseif isstruct(Opt.(lower(varargin_cell{i})))
-                    sub_opts = fieldnames(Opt.(lower(varargin_cell{i})));
-                    if isfield(Opt.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
-                        for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
-                            switch lower(varargin_cell{i+1})
-                                case sub_opts{j}
-                                    Opt.(lower(varargin_cell{i})).(sub_opts{j}) = true;
-                                otherwise
-                                    Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
-                            end 
+                if i+1<=numel(varargin_cell)
+                    if islogical(Opt.(lower(varargin_cell{i})))
+                        switch lower(varargin_cell{i+1})
+                            case 'on'
+                                Opt.(lower(varargin_cell{i})) = true;
+                            case 'off'
+                                Opt.(lower(varargin_cell{i})) = false;
+                            case true
+                                Opt.(lower(varargin_cell{i})) = true;
+                            case false
+                                Opt.(lower(varargin_cell{i})) = false;
+                            otherwise
+                                Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                         end
-                    elseif strcmpi(varargin_cell{i+1},'on')
-                        for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
-                            switch j
-                                case 1
-                                    Opt.(lower(varargin_cell{i})).(sub_opts{j}) = true;
-                                otherwise
-                                    Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
-                            end 
+                    elseif isstruct(Opt.(lower(varargin_cell{i})))
+                        sub_opts = fieldnames(Opt.(lower(varargin_cell{i})));
+                        if isfield(Opt.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
+                            for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
+                                switch lower(varargin_cell{i+1})
+                                    case sub_opts{j}
+                                        Opt.(lower(varargin_cell{i})).(sub_opts{j}) = true;
+                                    otherwise
+                                        Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
+                                end
+                            end
+                        elseif strcmpi(varargin_cell{i+1},'on')
+                            for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
+                                switch j
+                                    case 1
+                                        Opt.(lower(varargin_cell{i})).(sub_opts{j}) = true;
+                                    otherwise
+                                        Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
+                                end
+                            end
+                        elseif strcmpi(varargin_cell{i+1},'off')
+                            for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
+                                Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
+                            end
+                        else
+                            err_msg = sprintf('Unknown parameter %s for option %s.',varargin_cell{i+1},varargin_cell{i});
+                            error(err_msg);
                         end
-                    elseif strcmpi(varargin_cell{i+1},'off')
-                        for j=1:numel(fieldnames(Opt.(lower(varargin_cell{i}))))
-                            Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
-                        end
+                    elseif isnumeric(Opt.(lower(varargin_cell{i}))) && isnumeric(varargin_cell{i+1})
+                        Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
+                    elseif isa(Opt.(lower(varargin_cell{i})),'function_handle') && isa(varargin_cell{i+1},'function_handle')
+                        Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                     else
-                        error('Unknown parameter %s for option %s',varargin_cell{i+1},varargin_cell{i});
+                        err_msg = sprintf('invalid input');
+                        error(err_msg);
                     end
-                elseif isnumeric(Opt.(lower(varargin_cell{i}))) && isnumeric(varargin_cell{i+1})
-                    Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
-                elseif isa(Opt.(lower(varargin_cell{i})),'function_handle') && isa(varargin_cell{i+1},'function_handle')
-                    Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                 else
-                    error('invalid input');
+                    err_msg = sprintf('Option %s has no value.',varargin_cell{i});
+                    error(err_msg);
                 end
             elseif strcmpi(varargin_cell{i},'Opt')
                 Opt = varargin_cell{i+1};
                 break;
             else
-                error('Unknown option %s',varargin_cell{i});
+                err_msg = sprintf('Unknown option %s.',varargin_cell{i});
+                error(err_msg);
             end
         catch
-            error('Check optional input variables');
+            if isempty(err_msg)
+                error('Check optional input variables.');
+            else
+                error(err_msg);
+            end
         end
     end
     %
