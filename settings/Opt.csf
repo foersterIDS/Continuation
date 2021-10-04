@@ -42,7 +42,7 @@ reverse<>struct<>Opt_reverse<>#struct
 scaling<>struct<>Opt_scaling<>#struct
 solver<>struct<>Opt_solver<>#struct#ison:solver
 solver_force1it<>eval<>false<>#scalar#logical
-solver_tol<>double<>10^-6<>#scalar#double#positive#nonzero
+solver_tol<>double<>10^-10<>#scalar#double#positive#nonzero
 stepback_error_counter<>double<>3<>#scalar#integer#positive#nonzero
 step_size_alpha_max<>double<>0.45<>#scalar#double#positive#nonzero
 step_size_angle<>eval<>(5/360)*(2*pi)<>#scalar#double#positive
