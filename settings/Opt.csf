@@ -5,7 +5,7 @@ bif_rand_dir<>eval<>true<>#scalar#logical
 break_function<>eval<>@(f,J,v,l,break_fun_out)initial_break_function(f,J,v,l,break_fun_out)<>#function_handle
 check_residual<>eval<>false<>#scalar#logical
 closed_counter<>double<>3<>#scalar#integer#positive#nonzero
-closed_curve_detection<>eval<>false<>#scalar#logical
+closed_curve_detection<>eval<>true<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
 correct_predictor<>eval<>true<>#scalar#logical
 deflation<>eval<>true<>#scalar#logical
