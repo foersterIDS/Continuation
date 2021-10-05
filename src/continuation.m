@@ -292,6 +292,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     if Opt.bifurcation.trace
         try
+            delete(Plot.pl_curr);
             [Path,Bifurcation] = trace_bifurcations(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr);
             last_jacobian = [];
         catch
@@ -306,6 +307,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             Bifurcation_last_plot = Bifurcation;
             Bifurcation_last_plot.flag = -1;
             live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
+            if isfield(Plot,'pl_curr')
+                delete(Plot.pl_curr);
+            end
         catch
             warning('The plot update has failed.');
         end

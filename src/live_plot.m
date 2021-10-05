@@ -48,8 +48,10 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             end
             
             %% create plot with colors
-            pl = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
-            set(pl, {'Color'}, colors);
+            pl = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'-','LineWidth',2);
+            set(pl, {'Color'}, colors); hold on;
+            pl_curr = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'*','LineWidth',2);
+            set(pl_curr, {'Color'}, colors); hold off;
             if Opt.plot.semilogx || Opt.plot.loglog
                 set(gca, 'XScale', 'log')
                 % check whether all lambda are positive
@@ -71,7 +73,9 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 ylabel('$v_{i}$','interpreter','latex');
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             end
-            Plot = struct('fig',fig,'pl',pl);         
+            Plot.fig = fig;
+            Plot.pl = pl;
+            Plot.pl_curr = pl_curr;
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -85,14 +89,19 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             newXData = cell(length(Opt.plot_vars_index), 1);
             newYData = cell(length(Opt.plot_vars_index), 1);
+            newXData_curr = cell(length(Opt.plot_vars_index), 1);
+            newYData_curr = cell(length(Opt.plot_vars_index), 1);
             for k = 1:length(Opt.plot_vars_index)
                 newXData{k,1} = Path.l_all;
                 newYData{k,1} = Path.var_all(Opt.plot_vars_index(k),:);
+%                 newXData_curr{k,1} = Path.l_all(end);
+%                 newYData_curr{k,1} = Path.var_all(Opt.plot_vars_index(k),end);
             end
             %
             %% plot new plot Data
             %
             set(Plot.pl, {'XData'}, newXData, {'YData'},  newYData);
+%             set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
             %
             %% add third information to plot (current step)
             for k = 1:length(Opt.plot_vars_index)
@@ -112,14 +121,19 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             newXData = cell(length(Opt.plot_vars_index), 1);
             newYData = cell(length(Opt.plot_vars_index), 1);
+            newXData_curr = cell(length(Opt.plot_vars_index), 1);
+            newYData_curr = cell(length(Opt.plot_vars_index), 1);
             for k = 1:length(Opt.plot_vars_index)
                 newXData{k,1} = Path.l_all;
                 newYData{k,1} = Path.var_all(Opt.plot_vars_index(k),:);
+                newXData_curr{k,1} = Path.l_all(end);
+                newYData_curr{k,1} = Path.var_all(Opt.plot_vars_index(k),end);
             end
             %
             %% plot new plot Data
             %
             set(Plot.pl, {'XData'}, newXData, {'YData'},  newYData);
+            set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
             %
             %% mark bifurcation points
             %
@@ -188,8 +202,10 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs1 = subplot(2,3,1:2);
                 hold on;
-                pl = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                pl = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'-','LineWidth',2);
                 set(pl, {'Color'}, colors);
+                pl_curr = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'*','LineWidth',2);
+                set(pl_curr, {'Color'}, colors);
                 grid on;
                 title('path continuation','interpreter','latex');
                 xlabel('$\lambda$','interpreter','latex');
@@ -199,13 +215,13 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             else
                 hs1 = findobj('Tag', 'upperleft');
                 set(hs1, 'NextPlot', 'add');
-                pl = plot(hs1, Path.l_all,Path.var_all(Opt.plot_vars_index,:),'.-','LineWidth',2);
+                pl = plot(hs1, Path.l_all,Path.var_all(Opt.plot_vars_index,:),'-','LineWidth',2);
                 set(pl, {'Color'}, colors);
+                pl_curr = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'*','LineWidth',2);
+                set(pl_curr, {'Color'}, colors);
             end
             %
-            %% create lower subplots
-            %
-            % first one: showing iteration steps
+            % second one: showing iteration steps
             %
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs2 = subplot(2,3,3);
@@ -221,7 +237,9 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 pl_it = plot(hs2, Counter.loop, iterations, 'r-x', 'LineWidth', 2);
             end
             %
-            % second one: showing most changing variable in detail
+            %% create lower subplots
+            %
+            % first one: showing most changing variable in detail
             %
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs3 = subplot(2,3,4:5);
@@ -253,7 +271,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 set(pl_det, {'Color'}, colors(interesting));
             end
             %
-            % third one: showing Path.s_all over Counter.loop
+            % second one: showing Path.s_all over Counter.loop
             %
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace
                 hs4 = subplot(2,3,6);
@@ -270,7 +288,10 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 pl_s = plot(hs4, Counter.loop, Path.s_all,'LineWidth', 2, 'Color', 'r');
             end
             %
-            Plot = struct('fig',fig,'pl',pl,'pl_it',pl_it,'pl_det',pl_det,'pl_s',pl_s, 'pl_cor_assist', pl_cor_assist, 'pl_cor', pl_cor, 'pl_pre', pl_pre);            
+            Plot.fig = fig; Plot.pl = pl; Plot.pl_it = pl_it;
+            Plot.pl_det = pl_det; Plot.pl_s = pl_s; Plot.pl_cor_assist = pl_cor_assist;
+            Plot.pl_cor = pl_cor; Plot.pl_pre = pl_pre;
+            Plot.pl_curr = pl_curr;
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -283,7 +304,9 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             dl = abs(Path.l_all(end)-Path.l_all(end-1));
             dv = abs(Path.var_all(interesting,end)-Path.var_all(interesting,end-1));
             %
-            %% upper subplot
+            %% upper subplots
+            %
+            % first one
             %
             subplot(2,3,1:2);
             %
@@ -291,14 +314,19 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             newXData = cell(length(Opt.plot_vars_index), 1);
             newYData = cell(length(Opt.plot_vars_index), 1);
+%             newXData_curr = cell(length(Opt.plot_vars_index), 1);
+%             newYData_curr = cell(length(Opt.plot_vars_index), 1);
             for k = 1:length(Opt.plot_vars_index)
                 newXData{k,1} = Path.l_all;
                 newYData{k,1} = Path.var_all(Opt.plot_vars_index(k),:);
+%                 newXData_curr{k,1} = Path.l_all(end);
+%                 newYData_curr{k,1} = Path.var_all(Opt.plot_vars_index(k),end);
             end
             %
             %% plot new plot Data
             %
             set(Plot.pl, {'XData'}, newXData, {'YData'},  newYData);
+%             set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
             %
             %% add third information to plot (current step)
             for k = 1:length(Opt.plot_vars_index)
@@ -313,13 +341,12 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             end
             %
-            %% lower subplots
-            %
-            % first one: showing iteration steps
+            % second one: showing iteration steps
             %
                % no update needed
             %
-            % second one: showing most changing variable in detail
+            %% lower subplots
+            % first one: showing most changing variable in detail
             %
             subplot(2,3,4:5)
             Plot.pl_det.XData = Path.l_all;
@@ -328,7 +355,6 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             msg = ['interesting variable: $v_{',num2str(interesting),'}$'];
             if isnan(Opt.plot_var_of_interest) msg = [msg, ' (most changing)']; end
             title(msg,'interpreter','latex');
-            %title(['most changing variable: $v_',num2str(interesting),'$'],'interpreter','latex');
             ylabel(['$v_{',num2str(interesting),'}$'],'interpreter','latex');
             %
             xlim([Path.l_all(end-1)-2*dl, Path.l_all(end-1)+2*dl]);
@@ -345,7 +371,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             Plot.pl_pre.XData = l_pre(interesting,:);
             Plot.pl_pre.YData = v_pre(interesting,:);
             %
-            % third one: Path.s_all over Counter.loop
+            % second one: Path.s_all over Counter.loop
             %
                 % no update needed
             %
@@ -355,21 +381,28 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             dl = abs(Path.l_all(end)-Path.l_all(end-1));
             dv = abs(Path.var_all(interesting,end)-Path.var_all(interesting,end-1));
             %
-            %% creater upper subplot
+            %% creater upper subplots
+            %
+            % first one
             %
             subplot(2,3,1:2);
             %% save plot data
             %
             newXData = cell(length(Opt.plot_vars_index), 1);
             newYData = cell(length(Opt.plot_vars_index), 1);
+            newXData_curr = cell(length(Opt.plot_vars_index), 1);
+            newYData_curr = cell(length(Opt.plot_vars_index), 1);
             for k = 1:length(Opt.plot_vars_index)
                 newXData{k,1} = Path.l_all;
                 newYData{k,1} = Path.var_all(Opt.plot_vars_index(k),:);
+                newXData_curr{k,1} = Path.l_all(end);
+                newYData_curr{k,1} = Path.var_all(Opt.plot_vars_index(k),end);
             end
             %
             %% plot new plot Data
             %
             set(Plot.pl, {'XData'}, newXData, {'YData'},  newYData);
+            set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
             %
             %% mark bifurcation points
             %
