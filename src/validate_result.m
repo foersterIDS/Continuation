@@ -4,17 +4,18 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
+function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
     %% automated validation
     %
     is_reverse = false;
     catch_flag = 0;
+    inv_poi_str = '                          ';
     if solver_exitflag>0
         try
             if ~Opt.check_residual || (norm(fun_solution)<=Opt.solver_tol*10)
                 xi = [Path.var_all(:,end);Path.l_all(end)];
                 norm_xs_xi = norm(x_solution-xi);
-                if ((norm_xs_xi>=0.8*ds && norm_xs_xi<=1.2*ds || numel(Path.l_all)==1)) || Do.convergeToTarget || Opt.corrector.unique
+                if ((norm_xs_xi>=0.5*ds && norm_xs_xi<=1.5*ds || numel(Path.l_all)==1)) || Do.convergeToTarget || Opt.corrector.unique
                     if numel(Path.l_all)==1
                         if numel(Opt.direction)==1 && sign(x_solution(end)-Path.l_all(end))==sign(Opt.direction)
                             val = true;
@@ -25,6 +26,8 @@ function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,
                             else
                                 val = false;
                                 is_reverse = true;
+                                inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
+                                inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
                             end
                         end
                     else
@@ -38,27 +41,36 @@ function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,
                             else
                                 val = false;
                                 is_reverse = true;
+                                inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
+                                inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
                             end
                         end
                     end
                 else
                     val = false;
+                    inv_poi_str(1:25) = '(dx outside of ds-bounds)';
                 end
             else
                 val = false;
+                inv_poi_str(1:18) = '(fun=0 not solved)';
             end
         catch
             val = false;
             catch_flag = 1;
+            inv_poi_str(1:24) = '(error while validating)';
         end
     else
         val = false;
+        inv_poi_str(1:26) = '(Solver does not converge)';
     end
     %
     %% enforce_ds_max
     %
     if val && Opt.enforce_ds_max
         val = logical(heaviside(min(Opt.ds_max-(x_solution-xi))));
+        if ~val
+            inv_poi_str(1:17) = '(ds_max exceeded)';
+        end
     end
     %
     %% approve manually
@@ -91,6 +103,7 @@ function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,
             elseif strcmp(input_string,'n')
                 correct_input = true;
                 val = false;
+                inv_poi_str(1:19) = '(rejected manually)';
             elseif strcmp(input_string,'off')
                 correct_input = true;
                 Opt.approve_manually = false;
@@ -98,6 +111,7 @@ function [val,is_reverse,catch_flag,Do,Opt] = validate_result(x_solution,x_plus,
                 correct_input = true;
                 val = false;
                 Do.continuation = false;
+                inv_poi_str(1:19) = '(rejected manually)';
             elseif ~isnan(str2double(input_string))
                 correct_input = true;
                 Opt.approve_manually = str2double(input_string);
