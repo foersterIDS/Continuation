@@ -502,9 +502,13 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 %
                 fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
                 clf;
+                old_fig = false;
+            elseif ~ishandle(Opt.live_plot_fig)
+                error('No such figure exists!');
             else
                 fig = figure(Opt.live_plot_fig); % use existing fig
                 hold on; % for new plot
+                old_fig = true;
             end
             %% prepare colors       
             color = get_RGB(1,num_pl,1);
@@ -513,8 +517,10 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             set(pl, 'Color', color); hold on;
             pl_curr = plot3(Path.l_all,Path.var_all(Opt.plot_vars_index(1),:),Path.var_all(Opt.plot_vars_index(2),:),'*','LineWidth',2);
             set(pl_curr, 'Color', color); hold off;
-            [caz,cel] = view();
-            view(caz+180,cel);
+            if ~old_fig
+                [caz,cel] = view();
+                view(caz+180,cel);
+            end
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace % test for existing figure to plot in, there must be no new labels or grid
                 grid on;
                 xlabel('$\lambda$','interpreter','latex');
