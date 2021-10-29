@@ -477,6 +477,8 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             warning('3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.');
             Opt.plot_vars_index = [1,2];
             num_pl = 1;
+        elseif num_pl+1 < 3
+            error('3D plot only works with at least two variables!');
         end
         if length(Path.l_all) == 1
             
@@ -504,12 +506,8 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 fig = figure(Opt.live_plot_fig); % use existing fig
                 hold on; % for new plot
             end
-            
-            
             %% prepare colors       
             color = get_RGB(1,num_pl,1);
-
-            
             %% create plot with colors
             pl = plot3(Path.l_all,Path.var_all(Opt.plot_vars_index(1),:),Path.var_all(Opt.plot_vars_index(2),:),'-','LineWidth',2);
             set(pl, 'Color', color); hold on;
@@ -582,11 +580,11 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                if ~isempty(Bifurcation.bif)
                    hold on;
                    if Bifurcation.bif(2,end) == 0 % brach point Bifurcation.bif
-                       plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'rx','LineWidth',2);
+                       plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(1),Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(2),Bifurcation.bif(1,end)),'rx','LineWidth',2);
                    elseif Bifurcation.bif(2,end) == 1 % fold Bifurcation.bif
-                       plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'ro','LineWidth',2);
+                       plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(1),Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(2),Bifurcation.bif(1,end)),'ro','LineWidth',2);
                    elseif isnan(Bifurcation.bif(2,end)) % Bifurcation.bif, but no further information
-                       plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'rs','LineWidth',2);
+                       plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(1),Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index(2),Bifurcation.bif(1,end)),'rs','LineWidth',2);
                    end
                    hold off;
                end
