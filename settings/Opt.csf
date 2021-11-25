@@ -32,7 +32,7 @@ n_step_max<>eval<>inf<>#scalar#integer#positive#nonzero
 plot<>struct<>Opt_plot<>#struct
 plot_pause<>eval<>false<>#scalar#positive#nonzero#integer|#scalar#logical
 plot_var_of_interest<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
-plot_vars_index<>eval<>1:numel(var0)<>#array#integer#positive#nonzero#unique#max:numel(var0)
+plot_vars_index<>eval<>1:numel(var0)<>#array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
 predictor<>struct<>Opt_predictor<>#struct#ison:predictor
 predictor_polynomial_adaptive<>eval<>false<>#scalar#logical
 predictor_polynomial_fit<>double<>0<>#scalar#integer#positive
