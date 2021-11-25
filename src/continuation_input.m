@@ -191,12 +191,22 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be smaller equal %.2e',Opt_fieldnames{i},eval(type(5:end)))];
                                     end
                                 elseif prod(type(1:4)=='ison')
-                                    if (isstruct(Opt.(Opt_fieldnames{i})) || (islogical(Opt.(Opt_fieldnames{i})) && Opt.(Opt_fieldnames{i})))
+                                    if (isstruct(Opt.(Opt_fieldnames{i})) && ison(Opt.(Opt_fieldnames{i}))) || (islogical(Opt.(Opt_fieldnames{i})) && Opt.(Opt_fieldnames{i})) || sum(ismember(varargin_cell(1:2:end),Opt_fieldnames{i}))
+                                        if isfield(Opt,type(6:end))
+                                            fieldname = type(6:end);
+                                        else
+                                            fieldname = [];
+                                        end
                                         try
-                                            if ~ison(eval(['Opt.',type(6:end)]))
-                                                Opt_sub_fieldnames = fieldnames(eval(['Opt.',type(6:end)]));
-                                                eval(['Opt.',type(6:end),'.',Opt_sub_fieldnames{1},' = true;']);
-                                                warning('%s has to be on. %s was set to option %s.',type(6:end),type(6:end),Opt_sub_fieldnames{1});
+                                            if ~ison(eval(['Opt.',fieldname]))
+                                                if isstruct(Opt.(fieldname))
+                                                    Opt_sub_fieldnames = fieldnames(eval(['Opt.',fieldname]));
+                                                    eval(['Opt.',fieldname,'.',Opt_sub_fieldnames{1},' = true;']);
+                                                    warning('%s has to be on when using %s. %s was set to option %s.',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
+                                                elseif islogical(Opt.(fieldname))
+                                                    Opt.(fieldname) = true;
+                                                    warning('%s has to be on when using %s. %s was set to option ''on''.',fieldname,Opt_fieldnames{i},fieldname);
+                                                end
                                             end
                                         catch
                                             errmsg_temp = [errmsg_temp,sprintf('\n%s has to be on when using %s',type(6:end),Opt_fieldnames{i})];
