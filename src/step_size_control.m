@@ -26,11 +26,17 @@ function [dsn] = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,O
                     else
                         dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     end
+                elseif Opt.step_size_control.fix
+                    dsn = ds0;
                 else
                     error('Invalid settings for step size control!');
                 end
             else
-                dsn = ds/2;
+                if Opt.step_size_control.fix
+                    dsn = ds0;
+                else
+                    dsn = ds/2;
+                end
             end
         else
             dsn = ds;
