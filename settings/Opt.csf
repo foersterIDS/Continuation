@@ -4,6 +4,7 @@ bifurcation<>struct<>Opt_bifurcation<>#struct
 bif_rand_dir<>eval<>true<>#scalar#logical
 break_function<>eval<>@(f,J,v,l,break_fun_out)initial_break_function(f,J,v,l,break_fun_out)<>#function_handle
 check_residual<>eval<>false<>#scalar#logical
+check_step_size_options<>eval<>true<>#scalar#logical
 closed_counter<>double<>3<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>true<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
@@ -14,7 +15,7 @@ diffquot<>struct<>Opt_diffquot<>#struct
 direction<>eval<>sign(l_end-l_start)*[zeros(size(var0));1]<>#scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
 display<>eval<>true<>#scalar#logical
 ds_max<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforce_ds_max
-ds_min<>double<>0<>#scalar#double#positive#smaller:norm(Opt.ds_max)
+ds_min<>double<>10^-9<>#scalar#double#positive#smaller:norm(Opt.ds_max)
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscale_min<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
 enforce_ds_max<>eval<>false<>#scalar#logical#ison:predictor_solver
