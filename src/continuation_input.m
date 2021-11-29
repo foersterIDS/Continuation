@@ -260,7 +260,10 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     %
     if Opt.check_step_size_options
         if ds0 < Opt.ds_min % ds0 must not be lower than ds_min
-            error('ds0 cannot be smaller than ds_min.');
+            error('ds0 cannot be smaller than ds_min. Consider adapting one of them.');
+        end
+        if ds0 > Opt.ds_max
+            error('ds0 cannot be larger than ds_max. Consider adapting one of them.');
         end
         if Opt.ds_min < 10*Opt.solver_tol % ds_min cannot be lower than tolerance of solver
             warning('ds_min has to be at least 10*solver_tol = %.2e. ds_min is set to %.2e.',10*Opt.solver_tol,10*Opt.solver_tol);
