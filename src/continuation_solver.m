@@ -9,9 +9,9 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = contin
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10,'StepTolerance',Opt.solver_tol/10,'OptimalityTolerance',Opt.solver_tol/10);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10,'StepTolerance',Opt.solver_tol/10,'OptimalityTolerance',Opt.solver_tol/10,'MaxIterations',Opt.solver_max_iterations);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10,'StepTolerance',Opt.solver_tol/10,'OptimalityTolerance',Opt.solver_tol/10);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10,'StepTolerance',Opt.solver_tol/10,'OptimalityTolerance',Opt.solver_tol/10,'MaxIterations',Opt.solver_max_iterations);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
@@ -24,9 +24,9 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = contin
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol/10,'MaxIterations',Opt.solver_max_iterations);
         else
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol/10,'MaxIterations',Opt.solver_max_iterations);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) solver_lsqnonlin(fun,x0,optfun(dscale));

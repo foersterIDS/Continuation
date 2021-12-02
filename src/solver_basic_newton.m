@@ -6,11 +6,7 @@
 %   16.09.2020 - Tido Kubatschek 
 %
 function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,Opt)
-    if isfield(Opt,'max_step')
-        max_step = Opt.max_step;
-    else
-        max_step = 50;
-    end
+    max_step = Opt.solver_max_iterations;
     n_steps = 0;
     exitflag = -1;
     xi = x0;
