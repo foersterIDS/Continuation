@@ -66,9 +66,9 @@ for i=1:2
     fprintf('\n### %d: corrector: sphere ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','sphere');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: sphere ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: corrector: linear ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','linear');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: linear ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: orthogonal ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','corrector','ellipsoid','predictor','tangential');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
