@@ -1,11 +1,11 @@
-%% path continuation - residual_corrector_linear
+%% path continuation - residual_corrector_orthogonal
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   17.09.2020 - Tido Kubatschek
 %   22.09.2020 - Alwin Förster
 %
-function [residual,jacobian] = residual_corrector_linear(x,xs,ds,Opt)
+function [residual,jacobian] = residual_corrector_orthogonal(x,xs,ds,Opt)
     [b,a] = size(xs);    
     % approximate tangent with secant
     if a == 1

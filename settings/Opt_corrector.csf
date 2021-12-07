@@ -1,5 +1,5 @@
 sphere<>eval<>true<>#scalar#logical
-linear<>eval<>false<>#scalar#logical
+orthogonal<>eval<>false<>#scalar#logical
 ellipsoid<>eval<>false<>#scalar#logical
 ellipsoid2<>eval<>false<>#scalar#logical
 unique<>eval<>false<>#scalar#logical
