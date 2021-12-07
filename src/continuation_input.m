@@ -3,7 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
-%   05.01.2020 - Tido Kubatschek
+%   05.01.2021 - Tido Kubatschek
 %
 function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %% check mandatory input:
@@ -30,9 +30,12 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     %% read varargin_cell:
     %
     err_msg = [];
-    for i=1:2:numel(varargin_cell)
+    name_legacy = [];
+    i = 1;
+    while i<=numel(varargin_cell)
         try
             if isfield(Opt,lower(varargin_cell{i}))
+                %% set option:
                 if i+1<=numel(varargin_cell)
                     if islogical(Opt.(lower(varargin_cell{i})))
                         switch lower(varargin_cell{i+1})
@@ -72,8 +75,17 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                                 Opt.(lower(varargin_cell{i})).(sub_opts{j}) = false;
                             end
                         else
-                            err_msg = sprintf('Unknown parameter %s for option %s.',varargin_cell{i+1},varargin_cell{i});
-                            error(err_msg);
+                            %% check name_legacy for Opt-sub-struct:
+                            if isempty(name_legacy)
+                                name_legacy = clf2struct('name_legacy');
+                            end
+                            if isfield(name_legacy.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
+                                varargin_cell{i+1} = name_legacy.(lower(varargin_cell{i})).(lower(varargin_cell{i+1}));
+                                i = i-2;
+                            else
+                                err_msg = sprintf('Unknown parameter %s for option %s.',varargin_cell{i+1},varargin_cell{i});
+                                error(err_msg);
+                            end
                         end
                     elseif isnumeric(Opt.(lower(varargin_cell{i}))) && isnumeric(varargin_cell{i+1})
                         Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
@@ -88,19 +100,30 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                     error(err_msg);
                 end
             elseif strcmpi(varargin_cell{i},'Opt')
+                %% set Opt-struct:
                 Opt = varargin_cell{i+1};
                 break;
             else
-                err_msg = sprintf('Unknown option %s.',varargin_cell{i});
-                error(err_msg);
+                %% check name_legacy for Opt-struct:
+                if isempty(name_legacy)
+                    name_legacy = clf2struct('name_legacy');
+                end
+                if isfield(name_legacy,lower(varargin_cell{i}))
+                    varargin_cell{i} = name_legacy.(lower(varargin_cell{i}));
+                    i = i-2;
+                else
+                    err_msg = sprintf('Unknown option %s.',varargin_cell{i});
+                    error(err_msg);
+                end
             end
         catch
             if isempty(err_msg)
-                error('Check optional input variables.');
+                error('Unknown error. Check optional input variables.');
             else
                 error(err_msg);
             end
         end
+        i = i+2;
     end
     %
     %% read fun:
