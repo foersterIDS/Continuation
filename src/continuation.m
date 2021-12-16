@@ -55,6 +55,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Path.s_all = [];
         exitflag = -2; % no initial solution found
         Info.exitflag = -2;
+        var_all = Path.var_all;
+        l_all = Path.l_all;
+        s_all = Path.s_all;
         Do.continuation = false;
         if Opt.display
             fprintf('No initial solution found.\n');
