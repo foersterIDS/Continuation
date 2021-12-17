@@ -30,12 +30,12 @@ function [R,J] = residual_fun10(v,l,solver)
     invAz = inv(Az);
     Bz = [Bx,-a*SMx,-b*SMx;zeros(2),By];
     Bnlz = zeros(4);
-    mufnlq = @(muq) (knl*(vz1*sqrt(Kqq/(2*pi))*exp(-(muq-du1)^2/(2*Kqq))+(muq-du1)/2*(1+vz1*erf((muq-du1)/sqrt(2*Kqq)))))+...
-                    (knl*(vz2*sqrt(Kqq/(2*pi))*exp(-(muq-du2)^2/(2*Kqq))+(muq-du2)/2*(1+vz2*erf((muq-du2)/sqrt(2*Kqq)))));
+    mufnlq = @(muq) knl*(vz1*sqrt(Kqq/(2*pi))*exp(-(muq-du1)^2/(2*Kqq))+(muq-du1)/2*(1+vz1*erf((muq-du1)/sqrt(2*Kqq))))+...
+                    knl*(vz2*sqrt(Kqq/(2*pi))*exp(-(muq-du2)^2/(2*Kqq))+(muq-du2)/2*(1+vz2*erf((muq-du2)/sqrt(2*Kqq))));
     fun_muq = @(muq) k*muq+mufnlq(muq);
     muq = solver(fun_muq,0);
-    Bnlz(2,1) = (knl/2*(1+vz1*erf((muq-du1)/sqrt(2*Kqq)))+knl*vz1*du1/sqrt(2*pi*Kqq)*exp(-(muq-du1)^2/(2*Kqq)))+...
-                (knl/2*(1+vz2*erf((muq-du2)/sqrt(2*Kqq)))+knl*vz2*du2/sqrt(2*pi*Kqq)*exp(-(muq-du2)^2/(2*Kqq)));
+    Bnlz(2,1) = knl/2*(1+vz1*erf((muq-du1)/sqrt(2*Kqq)))+...
+                knl/2*(1+vz2*erf((muq-du2)/sqrt(2*Kqq)));
     %% lyap:
     Gz = -invAz*(Bz+Bnlz);
     Dz = conj(invAz*SMz)*S0*(invAz*SMz).';
@@ -44,12 +44,12 @@ function [R,J] = residual_fun10(v,l,solver)
     ffix = damper*Kqq+(1-damper)*Kqqip1;
     R = ffix-Kqq;
     %% Jacobi:
-    dmufnlqdv = @(dmuqdv) (knl*vz1/sqrt(2*pi*Kqq)*exp(-(muq-du1)^2/(2*Kqq))*(1/2-(1/(2*Kqq))*(muq-du1)*(2*Kqq*dmuqdv-muq+du1)+(muq-du1)*(dmuqdv-(muq-du1)/(2*Kqq)))+knl/2*dmuqdv*(1+vz1*erf((muq-du1)/sqrt(2*Kqq))))+...
-                          (knl*vz2/sqrt(2*pi*Kqq)*exp(-(muq-du2)^2/(2*Kqq))*(1/2-(1/(2*Kqq))*(muq-du2)*(2*Kqq*dmuqdv-muq+du2)+(muq-du2)*(dmuqdv-(muq-du2)/(2*Kqq)))+knl/2*dmuqdv*(1+vz2*erf((muq-du2)/sqrt(2*Kqq))));
+    dmufnlqdv = @(dmuqdv) 1/2*knl*vz1/sqrt(2*pi*Kqq)*exp(-(muq-du1)^2/(2*Kqq))+knl/2*dmuqdv*(1+vz1*erf((muq-du1)/sqrt(2*Kqq)))+...
+                          1/2*knl*vz2/sqrt(2*pi*Kqq)*exp(-(muq-du2)^2/(2*Kqq))+knl/2*dmuqdv*(1+vz2*erf((muq-du2)/sqrt(2*Kqq)));
     fun_dmuqdv = @(dmuqdv) k*dmuqdv+dmufnlqdv(dmuqdv);
     dmuqdv = solver(fun_dmuqdv,0);
-    dBnlz21dv = (knl*vz1/sqrt(2*pi*Kqq)*exp(-(muq-du1)^2/(2*Kqq))*(dmuqdv-(muq-du1)/(2*Kqq)+du1*(-1/(2*Kqq)+(muq-du1)^2/(2*Kqq^2)-(muq-du1)*dmuqdv/Kqq)))+...
-                (knl*vz2/sqrt(2*pi*Kqq)*exp(-(muq-du2)^2/(2*Kqq))*(dmuqdv-(muq-du2)/(2*Kqq)+du2*(-1/(2*Kqq)+(muq-du2)^2/(2*Kqq^2)-(muq-du2)*dmuqdv/Kqq)));
+    dBnlz21dv = knl*vz1/(2*Kqq*sqrt(2*pi*Kqq))*exp(-(muq-du1)^2/(2*Kqq))*(-(muq-du1)+2*Kqq*dmuqdv)+...
+                knl*vz2/(2*Kqq*sqrt(2*pi*Kqq))*exp(-(muq-du2)^2/(2*Kqq))*(-(muq-du2)+2*Kqq*dmuqdv);
     dBnlzdv = zeros(4);
     dBnlzdv(2,1) = dBnlz21dv;
     dBnlzdl = zeros(4);
