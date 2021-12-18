@@ -15,7 +15,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
             if ~Opt.check_residual || (norm(fun_solution)<=Opt.solver_tol*10)
                 xi = [Path.var_all(:,end);Path.l_all(end)];
                 norm_xs_xi = norm(x_solution-xi);
-                if ((norm_xs_xi>=0.5*ds && norm_xs_xi<=1.5*ds || numel(Path.l_all)==1)) || Do.convergeToTarget || Opt.corrector.unique
+                if ((norm_xs_xi>=(1-Opt.ds_tol)*ds && norm_xs_xi<=(1+Opt.ds_tol)*ds || numel(Path.l_all)==1)) || Do.convergeToTarget || Opt.corrector.unique
                     if numel(Path.l_all)==1
                         if numel(Opt.direction)==1 && sign(x_solution(end)-Path.l_all(end))==sign(Opt.direction)
                             val = true;

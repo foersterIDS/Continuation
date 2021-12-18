@@ -16,6 +16,7 @@ direction<>eval<>sign(l_end-l_start)*[zeros(size(var0));1]<>#scalar#pmone|#array
 display<>eval<>true<>#scalar#logical
 ds_max<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforce_ds_max
 ds_min<>double<>10^-9<>#scalar#double#positive#smaller:norm(Opt.ds_max)
+ds_tol<>double<>0.5<>#scalar#double#positive#nonzero
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscale_min<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
 enforce_ds_max<>eval<>false<>#scalar#logical#ison:predictor_solver
