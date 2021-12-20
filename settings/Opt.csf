@@ -21,7 +21,7 @@ dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel
 dscale_min<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
 enforce_ds_max<>eval<>false<>#scalar#logical#ison:predictor_solver
 homotopy<>struct<>Opt_homotopy<>#struct
-homotopy_error_counter<>double<>2<>#scalar#integer#positive#nonzero
+homotopy_error_counter<>double<>2<>#scalar#integer#positive#nonzero#neq:Opt.deflation_error_counter
 include_reverse<>eval<>false<>#scalar#logical
 jacobian<>eval<>false<>#scalar#logical
 l_0<>eval<>l_start<>#scalar#double
@@ -40,15 +40,17 @@ predictor_polynomial_adaptive<>eval<>false<>#scalar#logical
 predictor_polynomial_fit<>double<>0<>#scalar#integer#positive
 predictor_polynomial_order<>double<>1<>#scalar#integer#positive#nonzero
 predictor_solver<>eval<>false<>#scalar#logical
+remove_error_counter<>double<>0<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter#neq:Opt.suspend_continuation_error_counter
 reverse<>struct<>Opt_reverse<>#struct
 scaling<>struct<>Opt_scaling<>#struct
 solver<>struct<>Opt_solver<>#struct#ison:solver
 solver_force1it<>eval<>false<>#scalar#logical
 solver_max_iterations<>double<>50<>#scalar#integer#positive#nonzero
 solver_tol<>double<>10^-10<>#scalar#double#positive#nonzero
-stepback_error_counter<>double<>3<>#scalar#integer#positive#nonzero
+stepback_error_counter<>double<>3<>#scalar#integer#positive#nonzero#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter
 step_size_alpha_max<>double<>0.45<>#scalar#double#positive#nonzero
 step_size_angle<>eval<>(5/360)*(2*pi)<>#scalar#double#positive
 step_size_control<>struct<>Opt_stepsize<>#struct#ison:step_size_control
 step_size_e_max<>double<>0.3<>#scalar#double#positive
 stop_on_bifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
+suspend_continuation_error_counter<>double<>6<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter

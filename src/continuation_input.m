@@ -213,6 +213,10 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                                     if ~prod(Opt.(Opt_fieldnames{i})<=eval(type(5:end)))
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be smaller equal %.2e',Opt_fieldnames{i},eval(type(5:end)))];
                                     end
+                                elseif prod(type(1:3)=='neq')
+                                    if ~prod(Opt.(Opt_fieldnames{i})~=eval(type(5:end)))
+                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be not equal %s',Opt_fieldnames{i},type(5:end))];
+                                    end
                                 elseif prod(type(1:4)=='ison')
                                     if (isstruct(Opt.(Opt_fieldnames{i})) && ison(Opt.(Opt_fieldnames{i}))) || (islogical(Opt.(Opt_fieldnames{i})) && Opt.(Opt_fieldnames{i})) || sum(ismember(varargin_cell(1:2:end),Opt_fieldnames{i}))
                                         if isfield(Opt,type(6:end))
@@ -252,6 +256,10 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                                 elseif prod(type(1:6)=='equals')
                                     if ~prod(Opt.(Opt_fieldnames{i})==eval(type(8:end)))
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be equal %s',Opt_fieldnames{i},type(8:end))];
+                                    end
+                                elseif prod(type(1:6)=='larger')
+                                    if ~prod(Opt.(Opt_fieldnames{i})>eval(type(8:end)))
+                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be larger %.2e',Opt_fieldnames{i},eval(type(8:end)))];
                                     end
                                 elseif prod(type(1:7)=='smaller')
                                     if ~prod(Opt.(Opt_fieldnames{i})<=eval(type(9:end)))
