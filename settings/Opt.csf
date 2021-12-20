@@ -5,7 +5,7 @@ bif_rand_dir<>eval<>true<>#scalar#logical
 break_function<>eval<>@(f,J,v,l,break_fun_out)initial_break_function(f,J,v,l,break_fun_out)<>#function_handle
 check_residual<>eval<>false<>#scalar#logical
 check_step_size_options<>eval<>true<>#scalar#logical
-closed_counter<>double<>3<>#scalar#integer#positive#nonzero
+closed_counter<>double<>5<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>true<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
 correct_predictor<>eval<>true<>#scalar#logical
@@ -40,7 +40,7 @@ predictor_polynomial_adaptive<>eval<>false<>#scalar#logical
 predictor_polynomial_fit<>double<>0<>#scalar#integer#positive
 predictor_polynomial_order<>double<>1<>#scalar#integer#positive#nonzero
 predictor_solver<>eval<>false<>#scalar#logical
-remove_error_counter<>double<>0<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter#neq:Opt.suspend_continuation_error_counter
+remove_error_counter<>double<>0<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter#neq:Opt.suspend_continuation_error_counter|#scalar#integer#equals:0
 reverse<>struct<>Opt_reverse<>#struct
 scaling<>struct<>Opt_scaling<>#struct
 solver<>struct<>Opt_solver<>#struct#ison:solver
