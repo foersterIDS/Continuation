@@ -33,8 +33,8 @@ function [lco,vco] = draw_corrector( Path, dsim1, Opt )
         lco{2} = lc+dsc*cos(linspace(0,2*pi,nres));
         vco{2} = vc+dsc*sin(linspace(0,2*pi,nres));
         %
-    elseif Opt.corrector.linear
-        %% linear
+    elseif Opt.corrector.orthogonal
+        %% orthogonal
         %
         if numel(Path.l_all)>1
             if numel(Path.l_all)==2
