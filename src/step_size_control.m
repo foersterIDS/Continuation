@@ -41,6 +41,10 @@ function [dsn] = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,O
         else
             dsn = ds;
         end
+        %% additional penalty
+        if Do.remove
+            dsn = dsn*rand;
+        end
         %% Limit to max./min. step size:
         dsn = min([norm(Opt.ds_max),dsn]);
         dsn = max([Opt.ds_min,dsn]);

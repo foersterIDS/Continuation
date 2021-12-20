@@ -72,10 +72,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
+        Do.remove = false;
         %
         %% residual
         %
-        residual = @(x) merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,Opt);
         if Do.deflate
             try
                 residual = @(x) deflation(residual,x_deflation,x,Opt);
@@ -87,6 +87,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                     break;
                 end
             end
+        elseif Do.suspend
+            residual = @(x) residual_suspend_continuation(fun,x,Opt);
+        else
+            residual = @(x) merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,Opt);
         end
         %
         %% predictor
@@ -181,6 +185,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             Do.deflate = false;
             Do.homotopy = false;
             Do.stepback = false;
+            Do.suspend = false;
             Counter.error = 0;
             Counter.step = Counter.step + 1;
             if Do.convergeToTarget
@@ -215,9 +220,30 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 end
                 Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
                 Do.stepback = false;
+                Do.suspend = false;
+            elseif (Counter.error==Opt.suspend_continuation_error_counter) && (numel(Path.l_all)>1)
+                x_plus = [];
+                Do.stepback = false;
+                Do.suspend = true;
+            elseif logical(Opt.remove_error_counter) && ((Counter.error==Opt.remove_error_counter) && (numel(Path.l_all)>1))
+                n_path = numel(Path.l_all);
+                n_rmv = min([3*Opt.remove_error_counter,n_path-1]);
+                Path.var_all(:,end+((-n_rmv+1):0)) = [];
+                Path.l_all(end+((-n_rmv+1):0)) = [];
+                Path.s_all(end+((-n_rmv+1):0)) = [];
+                dscale_rmv = get_dscale(Opt,Path);
+                residual_fixed_value_rmv = @(v) residual_fixed_value(fun,v,Path.l_all(end),Opt);
+                [var_rmv,fun_rmv,~,~,rmv_jacobian] = Solver.main(residual_fixed_value_rmv,Path.var_all(:,end),dscale_rmv(1:end-1));
+                Path.var_all(:,end) = var_rmv;
+                last_jacobian = [rmv_jacobian,numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
+                x_plus = [];
+                Do.stepback = false;
+                Do.suspend = false;
+                Do.remove = true;
             else
                 x_plus = [];
                 Do.stepback = false;
+                Do.suspend = false;
             end
             if Opt.include_reverse && is_reverse && solver_exitflag>0
                 Path = include_reverse(x_solution,Path);
