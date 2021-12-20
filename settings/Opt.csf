@@ -51,6 +51,8 @@ stepback_error_counter<>double<>3<>#scalar#integer#positive#nonzero#neq:Opt.homo
 step_size_alpha_max<>double<>0.45<>#scalar#double#positive#nonzero
 step_size_angle<>eval<>(5/360)*(2*pi)<>#scalar#double#positive
 step_size_control<>struct<>Opt_stepsize<>#struct#ison:step_size_control
-step_size_e_max<>double<>0.3<>#scalar#double#positive
+step_size_iterations_beta<>double<>0.5<>#scalar#double#positive#nonzero#smaller:2
+step_size_iterations_type<><>struct<>Opt_step_size_iterations_type<>#struct
+step_size_pid_tol<>double<>0.3<>#scalar#double#positive
 stop_on_bifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
 suspend_continuation_error_counter<>double<>6<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter

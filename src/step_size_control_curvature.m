@@ -46,6 +46,4 @@ function [dsn] = step_size_control_curvature(ds,ds0,Counter,solver_output,Do,Pat
         
     % calc new stepsize
     dsn = ds*sqrt(Opt.n_iter_opt/(solver_output.iterations*alpha));
-    dsn = max(ds/2,dsn);
-    dsn = min(ds*2,dsn);    
 end

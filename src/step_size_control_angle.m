@@ -44,6 +44,4 @@ function [dsn] = step_size_control_angle(ds,ds0,Counter,solver_output,Do,Path,Op
     
     % calculate step size
     dsn = ds*sqrt(Opt.n_iter_opt/(solver_output.iterations*ch));
-    dsn = max(ds/2,dsn);
-    dsn = min(ds*2,dsn);
 end

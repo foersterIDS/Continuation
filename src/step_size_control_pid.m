@@ -12,7 +12,7 @@ function [dsn] = step_size_control_pid(ds,ds0,Counter,solver_output,Do,Path,Opt)
     k_I = 0.01;
     k_D = 0.5;
     
-    e_max = Opt.step_size_e_max;
+    pid_tol = Opt.step_size_pid_tol;
     
     dvarsdl = @(k) (Path.var_all(:,end+k) - Path.var_all(:,end+k-1)) / (Path.l_all(end+k) - Path.l_all(end+k-1));
     
@@ -20,10 +20,8 @@ function [dsn] = step_size_control_pid(ds,ds0,Counter,solver_output,Do,Path,Opt)
     
     e = [e_star(0), e_star(-1), e_star(-2)];
 
-    e = e / e_max;
+    e = e / pid_tol;
     
     % calculate step size
     dsn = (e(2) / e(1))^k_P * (1 / e(1))^k_I * (e(2)^2 / (e(1) * e(3)) )^k_D * ds;
-    dsn = max(ds/2,dsn);
-    dsn = min(ds*2,dsn);
 end
