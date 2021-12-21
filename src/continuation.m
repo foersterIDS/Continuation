@@ -234,8 +234,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             elseif logical(Opt.remove_error_counter) && ((Counter.error==Opt.remove_error_counter) && (numel(Path.l_all)>1))
                 n_path = numel(Path.l_all);
                 s_rmv = Path.s_all(n_path);
-                Opt.ds_max = max([ds*0.75,Opt.ds_min]);
                 n_rmv = min([2*Opt.remove_error_counter,n_path-1]);
+                Opt.ds_max = max([mean(diff(Path.s_all(n_path+((-ceil(n_rmv/2)+1):0))))*0.75,Opt.ds_min]);
                 Path.var_all(:,n_path+((-n_rmv+1):0)) = [];
                 Path.l_all(n_path+((-n_rmv+1):0)) = [];
                 Path.s_all(n_path+((-n_rmv+1):0)) = [];
