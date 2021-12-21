@@ -2,7 +2,7 @@
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
-%   20.05.2020 - Alwin Förster
+%   20.12.2021 - Alwin Förster
 %
 function [varargout] = residual_suspend_continuation(fun,x,Opt)
     v = x(1:(end-1));

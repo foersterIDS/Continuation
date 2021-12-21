@@ -15,7 +15,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     warning on;
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
-    [Bifurcation,Counter,Do,Info,Path,Plot,Solver] = initialize_structs(var0,l_start,l_end,Opt);
+    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = initialize_structs(var0,l_start,l_end,Opt);
     res_corr = residual_corrector(Opt);
     ds = ds0;
     if Opt.display
@@ -72,7 +72,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
-        Do.remove = false;
         %
         %% residual
         %
@@ -191,6 +190,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             if Do.convergeToTarget
                 last_jacobian = get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
+            if Do.remove
+                if Path.s_all(end)>(s_rmv+ds_rmv)
+                    Opt.ds_max = Initial.ds_max;
+                    Do.remove = false;
+                    Counter.remove = 0;
+                end
+            end
         else
             %% invalid result
             Counter.error = Counter.error+1;
@@ -216,9 +222,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 if ~isempty(x_plus)
                     Path.var_all = [Path.var_all,x_plus(1:end-1)];
                     Path.l_all = [Path.l_all,x_plus(end)];
+                    Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
                     x_plus = [];
                 end
-                Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
                 Do.stepback = false;
                 Do.suspend = false;
             elseif (Counter.error==Opt.suspend_continuation_error_counter) && (numel(Path.l_all)>1)
@@ -227,19 +233,30 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Do.suspend = true;
             elseif logical(Opt.remove_error_counter) && ((Counter.error==Opt.remove_error_counter) && (numel(Path.l_all)>1))
                 n_path = numel(Path.l_all);
-                n_rmv = min([3*Opt.remove_error_counter,n_path-1]);
-                Path.var_all(:,end+((-n_rmv+1):0)) = [];
-                Path.l_all(end+((-n_rmv+1):0)) = [];
-                Path.s_all(end+((-n_rmv+1):0)) = [];
+                s_rmv = Path.s_all(n_path);
+                Opt.ds_max = max([ds*0.75,Opt.ds_min]);
+                n_rmv = min([2*Opt.remove_error_counter,n_path-1]);
+                Path.var_all(:,n_path+((-n_rmv+1):0)) = [];
+                Path.l_all(n_path+((-n_rmv+1):0)) = [];
+                Path.s_all(n_path+((-n_rmv+1):0)) = [];
+                ds_rmv = s_rmv-Path.s_all(end);
                 dscale_rmv = get_dscale(Opt,Path);
                 residual_fixed_value_rmv = @(v) residual_fixed_value(fun,v,Path.l_all(end),Opt);
                 [var_rmv,fun_rmv,~,~,rmv_jacobian] = Solver.main(residual_fixed_value_rmv,Path.var_all(:,end),dscale_rmv(1:end-1));
+                if ~isempty(Bifurcation.bif) && numel(Bifurcation.bif(1,:))>0
+                    n_bifs_rmv = sum(sum(Bifurcation.bif(1,:)'==(n_path+((-n_rmv+1):0))));
+                    if n_bifs_rmv>0
+                        Bifurcation.bif(:,end+((1-n_bifs_rmv):0)) = [];
+                        sign_det_jacobian = sign_det_jacobian*(-1)^(n_bifs_rmv);
+                    end
+                end
                 Path.var_all(:,end) = var_rmv;
                 last_jacobian = [rmv_jacobian,numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
                 x_plus = [];
                 Do.stepback = false;
                 Do.suspend = false;
                 Do.remove = true;
+                Counter.remove = Counter.remove+1;
             else
                 x_plus = [];
                 Do.stepback = false;

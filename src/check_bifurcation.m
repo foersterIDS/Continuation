@@ -13,7 +13,7 @@ function [Bifurcation,sign_det_jacobian,Path] = check_bifurcation(fun,solver_jac
         sign_det_current_jacobian = sign(det(solver_jacobian_red));
         if sign_det_current_jacobian*sign_det_jacobian<=0
             bif_type = NaN; % 1: fold bif.; 0: branch point bif; NaN: unknown
-            Bifurcation.bif = [Bifurcation.bif,[length(Path.l_all);bif_type]];
+            Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
             sign_det_jacobian = sign_det_current_jacobian;
             Bifurcation.flag = 1;
         end

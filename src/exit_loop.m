@@ -19,6 +19,13 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
         bfun = false;
     end
     %
+    %% exit with max_remove_counter reached:
+    %
+    if Counter.remove>Opt.max_remove_counter
+        Do.continuation = false;
+        Info.exitflag = -2;
+    end
+    %
     %% exit without complete results:
     %
     if Counter.error>=Opt.max_error_counter
