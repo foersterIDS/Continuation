@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
 %
-function [residual,jacobian] = residual_corrector_sphere(x,xs,ds)
-    residual = ds^2-(x-xs(:,end))'*(x-xs(:,end));
-    jacobian = -2*(x-xs(:,end))';
+function [residual,jacobian] = residual_corrector_sphere(x,x_all,ds)
+    residual = ds^2-(x-x_all(:,end))'*(x-x_all(:,end));
+    jacobian = -2*(x-x_all(:,end))';
 end

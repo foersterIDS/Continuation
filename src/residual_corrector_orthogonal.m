@@ -5,8 +5,8 @@
 %   17.09.2020 - Tido Kubatschek
 %   22.09.2020 - Alwin Förster
 %
-function [residual,jacobian] = residual_corrector_orthogonal(x,xs,ds,Opt)
-    [b,a] = size(xs);    
+function [residual,jacobian] = residual_corrector_orthogonal(x,x_all,ds,Opt)
+    [b,a] = size(x_all);    
     % approximate tangent with secant
     if a == 1
         if numel(Opt.direction)==1
@@ -15,11 +15,11 @@ function [residual,jacobian] = residual_corrector_orthogonal(x,xs,ds,Opt)
         else
             sec = Opt.direction * ds;
         end
-        xip1 = xs(:,end) + sec;
+        xip1 = x_all(:,end) + sec;
     else
-        sec = xs(:,end) - xs(:,end-1);
+        sec = x_all(:,end) - x_all(:,end-1);
         sec = ds*sec/sqrt(sum(sec.^2));
-        xi = xs(:,end);
+        xi = x_all(:,end);
         xip1 = xi + sec;
     end
     %
