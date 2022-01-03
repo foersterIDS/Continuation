@@ -17,8 +17,8 @@ function [residual] = residual_corrector(Opt)
         residual = @(x,x_all,ds) residual_corrector_ellipsoid2(x,x_all,ds);
     elseif Opt.corrector.unique
         residual = @(x,x_all,ds) residual_corrector_unique(x,x_all,ds,Opt);
-    elseif Opt.corrector.parabola
-        residual = @(x,x_all,ds) residual_corrector_parabola(x,x_all,ds,Opt);
+    elseif Opt.corrector.paraboloid
+        residual = @(x,x_all,ds) residual_corrector_paraboloid(x,x_all,ds,Opt);
     else
         error('No such corrector-method');
     end

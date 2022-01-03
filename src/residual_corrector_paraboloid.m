@@ -1,10 +1,10 @@
-%% path continuation - residual_corrector_parabola
+%% path continuation - residual_corrector_paraboloid
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   29.12.2021 - Alwin Förster
 %
-function [residual,jacobian] = residual_corrector_parabola(x,x_all,ds,Opt)
+function [residual,jacobian] = residual_corrector_paraboloid(x,x_all,ds,Opt)
     [b,a] = size(x_all);    
     %% approximate tangent with secant
     %

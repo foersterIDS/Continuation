@@ -3,4 +3,4 @@ orthogonal<>eval<>false<>#scalar#logical
 ellipsoid<>eval<>false<>#scalar#logical
 ellipsoid2<>eval<>false<>#scalar#logical
 unique<>eval<>false<>#scalar#logical
-parabola<>eval<>false<>#scalar#logical
+paraboloid<>eval<>false<>#scalar#logical
