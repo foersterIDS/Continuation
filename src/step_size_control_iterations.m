@@ -8,10 +8,16 @@
 %   DOI: 10.1007/978-1-4419-1740-9
 %
 function [dsn] = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt)
+    % correct number of iterations
+    if Opt.ds_max==inf
+        iter = max(solver_output.iterations,1);
+    else
+        iter = solver_output.iterations;
+    end
     % calculate step size
     if ison(Opt.step_size_iterations_type.polynomial)
-        dsn = ds*(Opt.n_iter_opt/solver_output.iterations)^Opt.step_size_iterations_beta;
+        dsn = ds*(Opt.n_iter_opt/iter)^Opt.step_size_iterations_beta;
     else
-        dsn = ds*2^((solver_output.iterations - Opt.n_iter_opt)/4);
+        dsn = ds*2^((iter - Opt.n_iter_opt)/4);
     end
 end
