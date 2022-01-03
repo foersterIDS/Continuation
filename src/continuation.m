@@ -140,7 +140,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                         [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
                     end
                 else
-                    [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
+                    if Do.suspend
+                        [v_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(@(v) residual([v;x_predictor(end)]),x_predictor(1:(end-1)),dscale(1:(end-1)));
+                        x_solution = [v_solution;x_predictor(end)];
+                    else
+                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
+                    end
                 end
                 Do.convergeToTarget = false;
             end
