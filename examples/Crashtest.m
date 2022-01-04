@@ -109,6 +109,10 @@ for i=1:2
     fprintf('\n### %d: ds_min: ds0/2 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','ds_min',ds0/2);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: ds_min: ds0/2 ###\n',i),probinfo,probcounter);
+    %% ds_tol:
+    fprintf('\n### %d: ds_tol: [0.5,1.5] ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','ds_tol',[0.5,1.5]);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: ds_tol: [0.5,1.5] ###\n',i),probinfo,probcounter);
     %% descale
     fprintf('\n### %d: scaling: staticdscale ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','scaling','staticdscale');

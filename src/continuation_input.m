@@ -26,6 +26,11 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     for ii=1:numel(eval_cell)
         Opt.(eval_cell{ii}) = eval(Opt.(eval_cell{ii}));
     end
+    Opt_fieldnames = fieldnames(Opt);
+    Opt_is_set = struct();
+    for ii=1:numel(Opt_fieldnames)
+        Opt_is_set.(lower(Opt_fieldnames{ii})) = false;
+    end
 	%
     %% read varargin_cell:
     %
@@ -95,6 +100,7 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                         err_msg = sprintf('invalid input');
                         error(err_msg);
                     end
+                    Opt_is_set.(lower(varargin_cell{i})) = true;
                 else
                     err_msg = sprintf('Option %s has no value.',varargin_cell{i});
                     error(err_msg);
@@ -102,6 +108,9 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
             elseif strcmpi(varargin_cell{i},'Opt')
                 %% set Opt-struct:
                 Opt = varargin_cell{i+1};
+                for ii=1:numel(Opt_fieldnames)
+                    Opt_is_set.(lower(Opt_fieldnames{ii})) = true;
+                end
                 break;
             else
                 %% check name_legacy for Opt-struct:
@@ -142,7 +151,6 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     %
     %% check Opt:
     %
-    Opt_fieldnames = fieldnames(Opt);
 	errmsg = '';
     for i=1:numel(Opt_fieldnames)
         if isfield(Opt_info,Opt_fieldnames{i})
@@ -170,6 +178,10 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                         case 'function_handle'
                             if ~isa(Opt.(Opt_fieldnames{i}),'function_handle')
                                 errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a function_handle',Opt_fieldnames{i})];
+                            end
+                        case 'increasing'
+                            if ~prod(diff(Opt.(Opt_fieldnames{i}))>0)
+                                errmsg_temp = [errmsg_temp,sprintf('\n%s must have increasing values',Opt_fieldnames{i})];
                             end
                         case 'integer'
                             if ~prod(floor(Opt.(Opt_fieldnames{i}))==Opt.(Opt_fieldnames{i}))
@@ -285,6 +297,27 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);
+    end
+    %
+    %% set dependent options
+    %
+    if ~Opt_is_set.ds_tol
+        %% set ds_tol dependent on corrector method:
+        if Opt.corrector.sphere
+            Opt.ds_tol = [0.99,1.01];
+        elseif Opt.corrector.orthogonal
+            Opt.ds_tol = [0.99,5];
+        elseif Opt.corrector.ellipsoid
+            Opt.ds_tol = [0.24,1.01];
+        elseif Opt.corrector.ellipsoid2
+            Opt.ds_tol = [0.000001,1.01];
+        elseif Opt.corrector.unique
+            Opt.ds_tol = [0.99,5];
+        elseif Opt.corrector.paraboloid
+            Opt.ds_tol = [0.09,1.01];
+        else
+            Opt.ds_tol = [0.5,1.5];
+        end
     end
     %
     %% check stepsize options
