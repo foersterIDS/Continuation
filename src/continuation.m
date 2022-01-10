@@ -15,7 +15,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     warning on;
     [Opt,ds0] = continuation_input(varargin,fun,var0,l_start,l_end,ds0);
-    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = initialize_structs(var0,l_start,l_end,Opt);
+    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver,Step_size_information] = initialize_structs(var0,l_start,l_end,Opt);
     res_corr = residual_corrector(Opt);
     ds = ds0;
     if Opt.display
@@ -25,6 +25,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     %% find initial solution
     %
+    global solver_stepsizes;
     residual_initial = @(v) residual_fixed_value(fun,v,Opt.l_0,Opt);
     [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = Solver.main(residual_initial,var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
@@ -72,6 +73,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
+        Step_size_information.previous = Step_size_information.current;
         %
         %% residual
         %
@@ -93,6 +95,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         end
         %
         %% predictor
+        %
+        tic;
         %
         try
             if Do.homotopy
@@ -303,8 +307,24 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         %% step size control
         %
+        % save latest stepsize
+        %
         dsim1 = ds;
-        ds = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,Opt);
+        %
+        % determine stepsize information
+        %
+        speed_of_continuation = ds / toc;
+        if length(solver_stepsizes) > 2
+            rate_of_convergence = (solver_stepsizes(3,2)/solver_stepsizes(2,2));
+        else
+            rate_of_convergence = 0.2;
+        end
+        Step_size_information.current = set_struct_fields(Step_size_information.current, 'rate_of_convergence', rate_of_convergence,...
+            'solver_output', solver_output, 'speed_of_continuation', speed_of_continuation, 'x_predictor', x_predictor);
+        %
+        % adjust stepsize
+        %
+        ds = step_size_control(ds,ds0,Counter,Step_size_information,Do,x_plus,Path,Opt);
         %
         %% end loop
         %

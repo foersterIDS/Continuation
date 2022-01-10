@@ -7,6 +7,8 @@
 %
 function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,Opt)
     max_step = Opt.solver_max_iterations;
+    global solver_stepsizes;
+    solver_stepsizes = [0, 0];
     n_steps = 0;
     exitflag = -1;
     xi = x0;
@@ -28,6 +30,7 @@ function [x,fval,exitflag,output,jacobian] = solver_basic_newton(fun,x0,dscale,O
         n_steps = n_steps+1;
         abs_fi = sqrt(fi'*fi);
         abs_dxi = norm(xi-xim1)/norm(xi);
+        solver_stepsizes = [solver_stepsizes; i, norm(xi-xim1)];
         if abs_fi<Opt.solver_tol
             exitflag = 2;
             break;

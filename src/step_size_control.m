@@ -6,24 +6,30 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = step_size_control(ds,ds0,Counter,solver_output,Do,x_plus,Path,Opt)
+function [dsn] = step_size_control(ds,ds0,Counter,Step_size_information,Do,x_plus,Path,Opt)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
                 if Opt.step_size_control.iterations
+                    solver_output = Step_size_information.current.solver_output;
                     dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                 elseif Opt.step_size_control.angle
+                    solver_output = Step_size_information.current.solver_output;
                     dsn = step_size_control_angle(ds,ds0,Counter,solver_output,Do,Path,Opt);
                 elseif Opt.step_size_control.curvature
                     if length(Path.l_all) > 3
+                        solver_output = Step_size_information.current.solver_output;
                         dsn = step_size_control_curvature(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     else
+                        solver_output = Step_size_information.current.solver_output;
                         dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     end
                 elseif Opt.step_size_control.pid
                     if length(Path.l_all) > 4
+                        solver_output = Step_size_information.current.solver_output;
                         dsn = step_size_control_pid(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     else
+                        solver_output = Step_size_information.current.solver_output;
                         dsn = step_size_control_iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
                     end
                 elseif Opt.step_size_control.fix

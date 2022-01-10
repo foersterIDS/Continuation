@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
 %
-function [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = initialize_structs(var0,l_start,l_end,Opt)
+function [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver,Step_size_information] = initialize_structs(var0,l_start,l_end,Opt)
     %% Bifurcation
     %
     Bifurcation = struct('bif',[],...
@@ -74,5 +74,15 @@ function [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = initialize_str
                     'main',solver,...
                     'num_jac',num_jac_solver,...
                     'predictor',predictor_solver);
+    %
+    %% Step size information
+    %
+    Step_size_information = struct('rate_of_convergence', [],...
+                                   'solver_output', [],...
+                                   'speed_of_continuation', [],...
+                                   'x_predictor', []);
+                               
+    Step_size_information = struct('current', Step_size_information,...
+                                   'previous', []);
     %
 end
