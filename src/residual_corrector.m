@@ -7,7 +7,7 @@
 %
 function [residual] = residual_corrector(Opt)
     if Opt.corrector.orthogonal
-        residual = @(x,x_all,ds) residual_corrector_orthogonal(x,x_all,ds,Opt);
+        residual = @(x,x_all,ds,Jac) residual_corrector_orthogonal(x,x_all,ds,Jac,Opt);
     elseif Opt.corrector.sphere
         residual = @(x,x_all,ds) residual_corrector_sphere(x,x_all,ds);
     elseif Opt.corrector.ellipsoid

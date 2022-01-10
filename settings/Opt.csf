@@ -8,6 +8,7 @@ check_step_size_options<>eval<>true<>#scalar#logical
 closed_counter<>double<>5<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>true<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
+corrector_orthogonal_method<>struct<>Opt_corrector_orthogonal_method<>#struct#ison:corrector_orthogonal_method
 correct_predictor<>eval<>true<>#scalar#logical
 deflation<>eval<>true<>#scalar#logical
 deflation_error_counter<>double<>5<>#scalar#integer#positive#nonzero

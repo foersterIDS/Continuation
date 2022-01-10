@@ -5,24 +5,39 @@
 %   17.09.2020 - Tido Kubatschek
 %   22.09.2020 - Alwin Förster
 %
-function [residual,jacobian] = residual_corrector_orthogonal(x,x_all,ds,Opt)
-    [b,a] = size(x_all);    
-    % approximate tangent with secant
-    if a == 1
-        if numel(Opt.direction)==1
-            sec = [zeros(b-1,1);1];
-            sec = Opt.direction * ds * sec;
+function [residual,jacobian] = residual_corrector_orthogonal(x,x_all,ds,Jac,Opt)
+    [nd,nl] = size(x_all);
+    if nl == 1
+        % determine method to calculate tangent
+        if Opt.corrector_orthogonal_method.secant
+            % approximate tangent with secant
+            if numel(Opt.direction)==1
+                tangent = [zeros(nd-1,1);1];
+                tangent = Opt.direction * ds * tangent;
+            else
+                tangent = Opt.direction * ds;
+            end
+            xip1 = x_all(:,end) + tangent;
         else
-            sec = Opt.direction * ds;
+            % calc tangent via jacobian
+            Path_help.var_all = x_all(1:end-1,:);
+            Path_help.l_all = x_all(end,:);
+            [xip1,tangent] = predictor_initial(Path_help,ds,Opt);
         end
-        xip1 = x_all(:,end) + sec;
     else
-        sec = x_all(:,end) - x_all(:,end-1);
-        sec = ds*sec/sqrt(sum(sec.^2));
-        xi = x_all(:,end);
-        xip1 = xi + sec;
+        if Opt.corrector_orthogonal_method.secant
+            % approximate tangent with secant
+            tangent = x_all(:,end) - x_all(:,end-1);
+            xi = x_all(:,end);
+            xip1 = xi + ds*tangent/norm(tangent);
+        else
+            % calc tangent via jacobian
+            Path_help.var_all = x_all(1:end-1,:);
+            Path_help.l_all = x_all(end,:);
+            [xip1,tangent] = predictor_ode(Path_help,ds,Jac,[]);
+        end       
     end
     %
-    residual = sec.' * (x - xip1);
-    jacobian = sec.';
+    residual = tangent.' * (x - xip1);
+    jacobian = tangent.';
 end

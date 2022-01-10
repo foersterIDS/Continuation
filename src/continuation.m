@@ -89,7 +89,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         elseif Do.suspend
             residual = @(x) residual_suspend_continuation(fun,x,Opt);
         else
-            residual = @(x) merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,Opt);
+            residual = @(x) merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,last_jacobian,Opt);
         end
         %
         %% predictor
