@@ -216,6 +216,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Do.deflate = false;
             end
             if (Counter.error==Opt.stepback_error_counter) && (numel(Path.l_all)>1)
+                %% stepback
                 if Counter.valid_stepback<Opt.stepback_error_counter
                     Do.stepback = true;
                     x_plus = [Path.var_all(:,end);Path.l_all(end)];
@@ -228,6 +229,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 plus_jacobian = last_jacobian;
                 last_jacobian = previous_jacobian;
             elseif (Counter.error==Opt.stepback_error_counter+1) && (numel(Path.l_all)>1)
+                %% undo stepback
                 if ~isempty(x_plus)
                     Path.var_all = [Path.var_all,x_plus(1:end-1)];
                     Path.l_all = [Path.l_all,x_plus(end)];
@@ -237,10 +239,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Do.stepback = false;
                 Do.suspend = false;
             elseif (Counter.error==Opt.suspend_continuation_error_counter) && (numel(Path.l_all)>1)
+                %% suspend
                 x_plus = [];
                 Do.stepback = false;
                 Do.suspend = true;
             elseif logical(Opt.remove_error_counter) && ((Counter.error==Opt.remove_error_counter) && (numel(Path.l_all)>1))
+                %% remove
                 n_path = numel(Path.l_all);
                 s_rmv = Path.s_all(n_path);
                 n_rmv = min([2*Opt.remove_error_counter,n_path-1]);
@@ -267,9 +271,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Do.remove = true;
                 Counter.remove = Counter.remove+1;
             else
+                %% else
                 x_plus = [];
                 Do.stepback = false;
                 Do.suspend = false;
+                Do.remove = false;
             end
             if Opt.include_reverse && is_reverse && solver_exitflag>0
                 Path = include_reverse(x_solution,Path);
