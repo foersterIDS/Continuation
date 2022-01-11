@@ -70,7 +70,7 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','corrector','ellipsoid','predictor','tangential');
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'ds_min',10^-4,'display','on','corrector','ellipsoid','predictor','tangential');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid2 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'n_step_max',1000,'display','off','corrector','ellipsoid2');
