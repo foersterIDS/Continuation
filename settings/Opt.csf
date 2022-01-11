@@ -42,7 +42,7 @@ predictor_polynomial_adaptive<>eval<>false<>#scalar#logical
 predictor_polynomial_fit<>double<>0<>#scalar#integer#positive
 predictor_polynomial_order<>double<>1<>#scalar#integer#positive#nonzero
 predictor_solver<>eval<>false<>#scalar#logical
-remove_error_counter<>double<>0<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter#neq:Opt.suspend_continuation_error_counter|#scalar#integer#equals:0
+remove_error_counter<>double<>6<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter#neq:Opt.suspend_continuation_error_counter|#scalar#integer#equals:0
 reverse<>struct<>Opt_reverse<>#struct
 scaling<>struct<>Opt_scaling<>#struct
 solver<>struct<>Opt_solver<>#struct#ison:solver
@@ -57,4 +57,4 @@ step_size_iterations_beta<>double<>0.5<>#scalar#double#positive#nonzero#smaller:
 step_size_iterations_type<><>struct<>Opt_step_size_iterations_type<>#struct
 step_size_pid_tol<>double<>0.3<>#scalar#double#positive
 stop_on_bifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
-suspend_continuation_error_counter<>double<>6<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter
+suspend_continuation_error_counter<>double<>10<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter
