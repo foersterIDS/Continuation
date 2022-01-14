@@ -28,6 +28,7 @@ jacobian<>eval<>false<>#scalar#logical
 l_0<>eval<>l_start<>#scalar#double
 l_target<>eval<>l_end<>#scalar#double
 live_plot_fig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
+max_continuation_steps<>double<>inf<>#scalar#integer#positive#nonzero
 max_error_counter<>double<>20<>#scalar#integer#positive#nonzero
 max_remove_counter<>double<>20<>#scalar#integer#positive#nonzero
 n_bif_search<>double<>10<>#scalar#integer#positive#nonzero

@@ -83,5 +83,12 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
         Info.exitflag = 5;
     end
     %
+    %% exit due to max_continuation_steps reached
+    %
+    if Opt.max_continuation_steps<=numel(Path.l_all)
+        Do.continuation = false;
+        Info.exitflag = 6;
+    end
+    %
 end
 
