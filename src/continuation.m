@@ -395,7 +395,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %% final disp
     %
     if Opt.display
-        fprintf('Time Elapsed: %.3f s\n',toc(t_display));
+        fprintf([Info.exit_msg,'\n']);
+        fprintf('--> time elapsed: %.3f s\n',toc(t_display));
     end
     %
 end

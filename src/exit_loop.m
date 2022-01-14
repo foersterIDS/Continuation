@@ -24,14 +24,15 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     if Counter.remove>Opt.max_remove_counter
         Do.continuation = false;
         Info.exitflag = -2;
+        Info.exit_msg = '--> continuation stoped: max_remove_counter reached';
     end
     %
     %% exit without complete results:
     %
     if Counter.error>=Opt.max_error_counter
         Info.exitflag = -1;
-        warning('No valid result could be found for the last %d attempts.',Opt.max_error_counter);
         Do.continuation = false;
+        Info.exit_msg = sprintf('--> continuation stoped: No valid result could be found for the last %d attempts.',Opt.max_error_counter);
     end
     %
     %% exit with l<l_start:
@@ -39,6 +40,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     if sign(l_end-l_start)*(Path.l_all(end)-l_start)<0
         Do.continuation = false;
         Info.exitflag = 0;
+        Info.exit_msg = '--> continuation stoped: l<l_start';
     end
     %
     %% exit with success:
@@ -46,6 +48,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     if sign(l_end-l_start)*(Path.l_all(end)-l_end)>=0
         Do.continuation = false;
         Info.exitflag = 1;
+        Info.exit_msg = '--> continuation completed: l_end reached';
     end
     %
     %% exit with n_step_max reached:
@@ -53,6 +56,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     if Counter.loop>=Opt.n_step_max
         Do.continuation = false;
         Info.exitflag = 2;
+        Info.exit_msg = '--> continuation completed: n_step_max reached';
     end
     %
     %% exit with bifurcation:
@@ -63,6 +67,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
         Path.var_all = Path.var_all(:,1:Bifurcation.bif(1,end));
         Path.l_all = Path.l_all(1:Bifurcation.bif(1,end));
         Path.s_all = Path.s_all(1:Bifurcation.bif(1,end));
+        Info.exit_msg = '--> continuation completed: bifurcation reached';
     end
     %
     %% exit on closed curve:
@@ -72,7 +77,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
         if is_closed
             Do.continuation = false;
             Info.exitflag = 4;
-            warning('closed curve detected. stopping continuation!');
+            Info.exit_msg = '--> continuation completed: closed curve detected';
         end
     end
     %
@@ -81,13 +86,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     if bfun
         Do.continuation = false;
         Info.exitflag = 5;
-    end
-    %
-    %% exit due to max_continuation_steps reached
-    %
-    if Opt.max_continuation_steps<=numel(Path.l_all)
-        Do.continuation = false;
-        Info.exitflag = 6;
+        Info.exit_msg = '--> continuation completed: user-defined break function';
     end
     %
 end
