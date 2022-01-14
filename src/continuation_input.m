@@ -6,15 +6,37 @@
 %   05.01.2021 - Tido Kubatschek
 %
 function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0)
+    %% determine purpose
+    %
+    Purpose = struct('continuation',false,...
+                     'homotopy',false);
+    switch nargin
+        case 6
+            %% continuation
+            % input: varargin_cell,fun,var0,l_start,l_end,ds0
+            Purpose.continuation = true;
+        case 3
+            %% homotopy
+            % input: varargin_cell,fun,var0
+            Purpose.homotopy = true;
+            l_start = 0;
+            l_end = 1;
+            ds0 = 0.1;
+        otherwise
+            error('Illegal use of the function continuation_input(...).');
+    end
+    %
     %% check mandatory input:
     %
-    if ~isa(var0,'double') || ~isa(l_start,'double') || ~isa(l_end,'double') || ~isa(ds0,'double')
-        error('var0, l_start, l_end and ds0 must be double!');
+    if Purpose.continuation
+        if ~isa(var0,'double') || ~isa(l_start,'double') || ~isa(l_end,'double') || ~isa(ds0,'double')
+            error('var0, l_start, l_end and ds0 must be double!');
+        end
+        if l_start==l_end
+            error('l_start and l_end must not be equal!');
+        end
+        ds0 = abs(ds0);
     end
-    if l_start==l_end
-        error('l_start and l_end must not be equal!');
-    end
-    ds0 = abs(ds0);
     %
     %% initialize Opt:
     %
@@ -137,16 +159,30 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
     %
     %% read fun:
     %
-    % out:
-    try
-        [R,J] = fun(var0,l_start);
-        Opt.jacobian = true;
-    catch
-        Opt.jacobian = false;
-    end
-    % in:
-    if abs(nargin(fun))~=2
-        error('%d is an invalid number of input arguments for fun(...).\nfun = fun(v,l)',abs(nargin(fun)))
+    if Purpose.continuation
+        % out:
+        try
+            [R,J] = fun(var0,l_start);
+            Opt.jacobian = true;
+        catch
+            Opt.jacobian = false;
+        end
+        % in:
+        if abs(nargin(fun))~=2
+            error('%d is an invalid number of input arguments for fun(...).\nfun = fun(v,l)',abs(nargin(fun)))
+        end
+    elseif Purpose.homotopy
+        % out:
+        try
+            [R,J] = fun(var0);
+            Opt.jacobian = true;
+        catch
+            Opt.jacobian = false;
+        end
+        % in:
+        if abs(nargin(fun))~=1
+            error('%d is an invalid number of input arguments for fun(...).\nfun = fun(v)',abs(nargin(fun)))
+        end
     end
     %
     %% check Opt:
