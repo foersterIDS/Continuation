@@ -91,7 +91,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                 end
                 [Plot, Opt] = live_plot(Opt, Info, Path, ds, ds, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
-                warning('The plot update for approval has failed.');
+                fprintf('--> The plot update for approval has failed.\n');
             end
         end
         prompt = sprintf('------> approve point at l = %.4e (y/n): ',Path.l_all(end));

@@ -474,7 +474,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
         end
     elseif Opt.plot.three_dim
         if num_pl+1 > 3
-            warning('3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.');
+            fprintf('--> 3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.\n');
             Opt.plot_vars_index = [1,2];
             num_pl = 1;
         elseif num_pl+1 < 3

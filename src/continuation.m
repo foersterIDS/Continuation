@@ -81,10 +81,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             try
                 residual = @(x) deflation(residual,x_deflation,x,Opt);
             catch
-                error('Error occured during deflation.');
+                fprintf('---> delation: catch!\n');
                 Counter.catch = Counter.catch + 1;
                 if Counter.catch >= 3
-                    warning('Error in input! catch was used too often!');
+                    fprintf('--> Error in input! catch was used too often!\n');
                     break;
                 end
             end
@@ -112,10 +112,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         catch
             [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = predictor(Path,ds,last_jacobian,fun,res_corr,Solver,Opt);
             x_predictor = [var_predictor;l_predictor];
-            warning('predictor: catch!');
+            fprintf('---> predictor: catch!\n');
             Counter.catch = Counter.catch + 1;
             if Counter.catch >= 3
-                    warning('Error in input! catch was used too often!');
+                    fprintf('--> Error in input! catch was used too often!\n');
                     break;
             end
         end
@@ -160,10 +160,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             solver_exitflag = -2;
             solver_output = Solver.default_output;
             Do.convergeToTarget = false;
-            warning('solve: catch!');
+            fprintf('---> solve: catch!\n');
             Counter.catch = Counter.catch + 1;
             if Counter.catch >= 3
-                    warning('Error in input! catch was used too often!');
+                    fprintf('--> Error in input! catch was used too often!\n');
                     break;
             end
         end
@@ -288,7 +288,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             if catch_flag
                 Counter.catch = Counter.catch + 1;
                 if Counter.catch >= 3
-                    warning('Error in input! catch was used too often!');
+                    fprintf('--> Error in input! catch was used too often!\n');
                     break;
                 end
             end
@@ -353,7 +353,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             try
                 [Plot, Opt] = live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
-                warning('The plot update has failed.');
+                fprintf('--> The plot update has failed.\n');
             end
         end
         %
@@ -373,7 +373,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             [Path,Bifurcation] = trace_bifurcations(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr);
             last_jacobian = [];
         catch
-            warning('Failed to trace bifurcations.');
+            fprintf('--> Failed to trace bifurcations.\n');
         end
     end
     %
@@ -388,7 +388,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 delete(Plot.pl_curr);
             end
         catch
-            warning('The plot update has failed.');
+            fprintf('--> The plot update has failed.\n');
         end
     end
     %

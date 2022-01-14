@@ -35,7 +35,7 @@ function [dsn] = step_size_control_angle(ds,ds0,Counter,solver_output,Do,Path,Op
         elseif ch > 1.5 && ch < 5 % high ratios are punished stronger (but ch_max = 5)
             ch = 5;
         elseif ch > 5
-            warning('Point of high curvature!');
+            fprintf('--> Point of high curvature!\n');
             ch = 10;
         end
     else

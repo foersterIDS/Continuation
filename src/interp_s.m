@@ -33,7 +33,7 @@ function [s_all_i] = interp_s(s_all, var_all, l_all, Opt)
         pp = @(s,x) makima(s, x);
         
     elseif Opt.interpolation_method.beziere
-        warning('method has not been implemented yet! Using spline instead');
+        fprintf('--> method has not been implemented yet! Using spline instead\n');
         pp = @(s,x) spline(s, x);
     else
         error('There is no such interpolation method.')

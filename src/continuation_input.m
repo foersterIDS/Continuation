@@ -241,10 +241,10 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
                                                 if isstruct(Opt.(fieldname))
                                                     Opt_sub_fieldnames = fieldnames(eval(['Opt.',fieldname]));
                                                     eval(['Opt.',fieldname,'.',Opt_sub_fieldnames{1},' = true;']);
-                                                    warning('%s has to be on when using %s. %s was set to option %s.',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
+                                                    fprintf('--> %s has to be on when using %s. %s was set to option %s.\n',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
                                                 elseif islogical(Opt.(fieldname))
                                                     Opt.(fieldname) = true;
-                                                    warning('%s has to be on when using %s. %s was set to option ''on''.',fieldname,Opt_fieldnames{i},fieldname);
+                                                    fprintf('--> %s has to be on when using %s. %s was set to option ''on''.\n',fieldname,Opt_fieldnames{i},fieldname);
                                                 end
                                             end
                                         catch
@@ -334,7 +334,7 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
         %
         if Opt.ds_min < 10*Opt.solver_tol % ds_min cannot be lower than tolerance of solver
             Opt.ds_min = 10*Opt.solver_tol;
-            warning('ds_min has to be at least 10*solver_tol = %.2e. ds_min has been adapted.',Opt.ds_min);
+            fprintf('--> ds_min has to be at least 10*solver_tol = %.2e. ds_min has been adapted.\n',Opt.ds_min);
         end
         %
         if ds0 > (sqrt(sum(var0.^2) + (l_end-l_start)^2)/10) % ds_max should not be larger than mag of points
@@ -343,7 +343,7 @@ function [Opt,ds0] = continuation_input(varargin_cell,fun,var0,l_start,l_end,ds0
             % adapt ds0
             ds0 = 10^(n_mag-1);
             % order of magnitude must be at least 1 lower
-            warning('ds0 is too large! It must not be greater than 1.00e%i. ds0 has been adapted.',n_mag-1);
+            fprintf('--> ds0 is too large! It must not be greater than 1.00e%i. ds0 has been adapted.\n',n_mag-1);
         end
         %
     end
