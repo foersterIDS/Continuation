@@ -140,8 +140,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                         % perturbate initial solution by tolerance of
                         % solver
                         pert = Opt.solver_tol * ones(numel(x_predictor),1) / numel(x_predictor);
-                        x_predictor = x_predictor + pert;
-                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
+                        [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor + pert,dscale);
                     end
                 else
                     if Do.suspend
