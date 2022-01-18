@@ -1,3 +1,9 @@
+%% path continuation - set_struct_fields
+%
+%   Institute of Dynamics and Vibration Research
+%   Leibniz University Hannover
+%   10.01.2022 - Tido Kubatschek
+%
 function [ s_struct ] = set_struct_fields(s_struct, varargin)
     var_len = length(varargin);
     
