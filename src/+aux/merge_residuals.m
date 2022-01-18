@@ -16,7 +16,7 @@ function [varargout] = merge_residuals(fun,res_corr,x,x_all,ds,last_jacobian,Opt
         
         [n11,n12] = size(J1);
         if n12<=n11
-            J1l = numeric_jacobian(@(x) fun(x(1:end-1),x(end)), x, 'derivative_dimensions', (n12+1):numel(x), 'diffquot', Opt.diffquot, 'central_value', R1);
+            J1l = aux.numeric_jacobian(@(x) fun(x(1:end-1),x(end)), x, 'derivative_dimensions', (n12+1):numel(x), 'diffquot', Opt.diffquot, 'central_value', R1);
         else
             J1l = [];
         end

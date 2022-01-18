@@ -9,30 +9,30 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_en
     nbif = numel(Bifurcation.bif(2,Bifurcation.bif(2,:) == 0));
     bif_trace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
     Opt_sphere = Opt;
-    Opt_sphere = seton(Opt_sphere,'corrector','sphere');
+    Opt_sphere = aux.seton(Opt_sphere,'corrector','sphere');
     Opt_trace = Opt;
     Opt_trace.stop_on_bifurcation = true;
-    Opt_trace = seton(Opt_trace,'bifurcation','determine');
+    Opt_trace = aux.seton(Opt_trace,'bifurcation','determine');
     for i=1:nbif
         ind_bif = bif_trace(1,i);
         xdirs_old = [];
         xdirs_trace = [];
         ds_bif = mean(diff(Path.s_all(bif_trace(1,i)+(-1:1))));
         x0 = [Path.var_all(:,bif_trace(1,i));Path.l_all(bif_trace(1,i))];
-        residual_bif_sphere = @(x) merge_residuals(fun,residual_corrector(Opt_sphere),x,x0,ds_bif,Opt_sphere);
+        residual_bif_sphere = @(x) aux.merge_residuals(fun,continuation.corrector(Opt_sphere),x,x0,ds_bif,[],Opt_sphere);
         %% find directions of known path
         for j=1:2
             Path_trace = Path;
             Path_trace.var_all = Path.var_all(:,1:bif_trace(1,i));
             Path_trace.l_all = Path.l_all(1:bif_trace(1,i));
             Path_trace.s_all = Path.s_all(1:bif_trace(1,i));
-            [var_bif_predictor,l_bif_predictor] = predictor(Path,(-1)^j*ds_bif,[],fun,res_corr,Solver,Opt_sphere);
+            [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,(-1)^j*ds_bif,[],fun,res_corr,Solver,Opt_sphere);
             x_bif_predictor = [var_bif_predictor;l_bif_predictor];
-            dscale = get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
+            dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
             [x_bif_ij,~,solver_bif_exitflag] = Solver.main(residual_bif_sphere,x_bif_predictor,dscale);
             if solver_bif_exitflag>0
                 xdirs_old = [xdirs_old,x_bif_ij-x0];
-                residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
+                residual_bif_sphere = @(x) aux.deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
             end
         end
         %% unknown paths
@@ -43,11 +43,11 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_en
                     dx_bif_predictor = randn(numel(x0),1);
                     for ki = 1:2
                         x_bif_predictor = x0+(-1)^ki*ds_bif*dx_bif_predictor/norm(dx_bif_predictor);
-                        dscale = get_dscale(Opt,struct('var_all',x_bif_predictor(1:end-1,:),'l_all',x_bif_predictor(end,:)));
+                        dscale = aux.get_dscale(Opt,struct('var_all',x_bif_predictor(1:end-1,:),'l_all',x_bif_predictor(end,:)));
                         [x_bif_ij,~,solver_bif_exitflag] = Solver.main(residual_bif_sphere,x_bif_predictor,dscale);
                         if solver_bif_exitflag>0 && norm(x_bif_ij-x0)>=ds_bif*0.99 && norm(x_bif_ij-x0)<=ds_bif*1.01
                             xdirs_trace = [xdirs_trace,x_bif_ij-x0];
-                            residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
+                            residual_bif_sphere = @(x) aux.deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
                         end
                     end              
                 end
@@ -59,11 +59,11 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_en
                     if ~isempty(bif_dir)
                         for ki = 1:2
                             x_bif_predictor = x0+(-1)^ki*ds_bif*bif_dir/norm(bif_dir);
-                            dscale = get_dscale(Opt,struct('var_all',x_bif_predictor(1:end-1,:),'l_all',x_bif_predictor(end,:)));
+                            dscale = aux.get_dscale(Opt,struct('var_all',x_bif_predictor(1:end-1,:),'l_all',x_bif_predictor(end,:)));
                             [x_bif_ij,~,solver_bif_exitflag] = Solver.main(residual_bif_sphere,x_bif_predictor,dscale);
                             if solver_bif_exitflag>0 && norm(x_bif_ij-x0)>=ds_bif*0.99 && norm(x_bif_ij-x0)<=ds_bif*1.01
                                 xdirs_trace = [xdirs_trace,x_bif_ij-x0];
-                                residual_bif_sphere = @(x) deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
+                                residual_bif_sphere = @(x) aux.deflation(residual_bif_sphere,x_bif_ij,x,Opt_sphere);
                             end
                         end
                     end
