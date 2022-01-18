@@ -21,7 +21,7 @@ function [Bifurcation,sign_det_jacobian,Path] = check(fun,solver_jacobian_red,Pa
         %% determine bifurcation-points:
         Opt_bif = Opt;
         Opt_bif.jacobian = false;
-        [bif_solver,default_bif_solver_output] = continuation.solver(Opt_bif);
+        [bif_solver,default_bif_solver_output] = continuation.solver(Opt_bif,0);
         det_solver_jacobian_red = det(solver_jacobian_red);
         residual_bif = @(x) bifurcation.residual(fun,x,Opt,1/det_solver_jacobian_red);
         full_rank = length(solver_jacobian_red(:,1));
