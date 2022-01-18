@@ -5,7 +5,7 @@
 %   10.01.2022 - Tido Kubatschek
 %
 function [ s_struct ] = set_struct_fields(s_struct, varargin)
-    var_len = length(varargin);
+    var_len = nargin-1;
     
     if mod(var_len,2) ~= 0
         error('There must be an even number of fieldnames and values!\n')
