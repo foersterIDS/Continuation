@@ -44,13 +44,13 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
                 %% polynomials
                 % centered polynomial to matching point
                 s0_f = Path.s_all(k_flags(i));
-                p_f = polyfitn(Path.s_all(k_flags(i)+(-np/2:np/2))-s0_f,x_all(:,k_flags(i)+(-np/2:np/2)),np);
+                p_f = poly.fitn(Path.s_all(k_flags(i)+(-np/2:np/2))-s0_f,x_all(:,k_flags(i)+(-np/2:np/2)),np);
                 % arclength correction
                 dsc = dist_x(k_flags(i)-nu+1);
                 % centered polynomials to last point
                 s0_c = Path.s_all(end);
-                p_c_p = polyfitn(Path.s_all(end+(-np:0))-s0_c+dsc,x_all(:,end+(-np:0)),np);
-                p_c_m = polyfitn(Path.s_all(end+(-np:0))-s0_c-dsc,x_all(:,end+(-np:0)),np);
+                p_c_p = poly.fitn(Path.s_all(end+(-np:0))-s0_c+dsc,x_all(:,end+(-np:0)),np);
+                p_c_m = poly.fitn(Path.s_all(end+(-np:0))-s0_c-dsc,x_all(:,end+(-np:0)),np);
                 % check polyinomials
                 if min([norm(p_f-p_c_p),norm(p_f-p_c_m)]/norm(p_f)) <= eps_pol
                     Opt.closed_counter = Opt.closed_counter - 1;
@@ -59,7 +59,7 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
                 %% angle
                 vec_f = x_all(:,k_flags(i)) - x_all(:,k_flags(i)-1);
                 vec_c = x_all(:,end) - x_all(:,end - 1);
-                angle = vector_angle(vec_f, vec_c);
+                angle = aux.vector_angle(vec_f, vec_c);
                 %% direction
                 r_f = vec_f / norm(vec_f);
                 r_c = vec_c / norm(vec_c);
