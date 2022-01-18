@@ -6,37 +6,124 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = control(ds,ds0,Counter,Step_size_information,Do,x_plus,Path,Opt)
+function [dsn] = control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
-                if Opt.step_size_control.iterations
-                    solver_output = Step_size_information.current.solver_output;
-                    dsn = step_size.iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
-                elseif Opt.step_size_control.angle
-                    solver_output = Step_size_information.current.solver_output;
-                    dsn = step_size.angle(ds,ds0,Counter,solver_output,Do,Path,Opt);
-                elseif Opt.step_size_control.curvature
+                %% Determine step size control method
+                %
+                %
+                % angle change based
+                %
+                if Opt.step_size_control.angle_change
+                    %
+                    % Check if there are enough solution points to use
+                    % method. Otherwise use iterations.
+                    %
                     if length(Path.l_all) > 3
-                        solver_output = Step_size_information.current.solver_output;
-                        dsn = step_size.curvature(ds,ds0,Counter,solver_output,Do,Path,Opt);
+                        xi = step_size.angle_change(solver_output,Path,Opt);
                     else
-                        solver_output = Step_size_information.current.solver_output;
-                        dsn = step_size.iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
                     end
-                elseif Opt.step_size_control.pid
-                    if length(Path.l_all) > 4
-                        solver_output = Step_size_information.current.solver_output;
-                        dsn = step_size.pid(ds,ds0,Counter,solver_output,Do,Path,Opt);
+                %
+                % angle custom
+                %
+                elseif Opt.step_size_control.angle_custom
+                    %
+                    % Check if there are enough solution points to use
+                    % method. Otherwise use iterations.
+                    %
+                    if length(Path.l_all) > 2
+                        xi = step_size.angle_custom(solver_output,Path,Opt);
                     else
-                        solver_output = Step_size_information.current.solver_output;
-                        dsn = step_size.iterations(ds,ds0,Counter,solver_output,Do,Path,Opt);
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
                     end
+                %
+                % fayezioghani
+                %
+                elseif Opt.step_size_control.fayezioghani
+                    %
+                    % Check if there are enough solution points to use
+                    % method. Otherwise use iterations.
+                    %
+                    if length(Path.l_all) > 2
+                        xi = step_size.fayezioghani(ds,solver_output,Path,last_jacobian,Opt);
+                    else
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                    end
+                %
+                % fixed step size
+                %
                 elseif Opt.step_size_control.fix
-                    dsn = ds0;
+                    xi = 1;
+                % 
+                % iterations based - exponential
+                %
+                elseif Opt.step_size_control.iterations_exponential
+                    xi = step_size.iterations_exponential(solver_output,Opt);
+                % 
+                % iterations based - polynomial
+                %
+                elseif Opt.step_size_control.iterations_polynomial
+                    xi = step_size.iterations_polynomial(solver_output,Opt);
+                % 
+                % multiplicative method
+                %
+                elseif Opt.step_size_control.multiplicative
+                    xi = step_size.multiplicative(solver_output,Path,Opt);
+                %
+                % pid control - custom
+                %
+                elseif Opt.step_size_control.pid_custom
+                    %
+                    % Check if there are enough solution points to use
+                    % method. Otherwise use iterations.
+                    %
+                    if length(Path.l_all) > 4
+                        xi = step_size.pid_custom(Path,Opt);
+                    else
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                    end
+                %
+                % pid control - valli
+                %
+                elseif Opt.step_size_control.pid_valli
+                    %
+                    % Check if there are enough solution points to use
+                    % method. Otherwise use iterations.
+                    %
+                    if length(Path.l_all) > 4
+                        xi = step_size.pid_valli(Path,Opt);
+                    else
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                    end
+                %
+                % szyszkowski
+                %
+                elseif Opt.step_size_control.szyszkowski
+                    if length(Path.l_all) > 3
+                        xi = step_size.szyszkowski(solver_output,Path,Opt);
+                    else
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                    end
+                %
+                % yoon
+                %
+                elseif Opt.step_size_control.yoon
+                    if length(Path.l_all) > 3
+                        xi = step_size.yoon(solver_output,Path,Opt);
+                    else
+                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                    end
+                %
+                % wrong method
+                %
                 else
                     error('Invalid settings for step size control!');
                 end
+                %
+                %% adapt step size
+                dsn = xi * ds;
             else
                 if Opt.step_size_control.fix
                     dsn = ds0;
@@ -47,11 +134,15 @@ function [dsn] = control(ds,ds0,Counter,Step_size_information,Do,x_plus,Path,Opt
         else
             dsn = ds;
         end
-        %% Limit to max./min. step size:
-        dsn = min([norm(Opt.ds_max),dsn]);
-        dsn = max([Opt.ds_min,dsn]);
+        %% Limit to max./min. step size, also limit to 2*ds/0.5*ds:
+        dsn = min([norm(Opt.ds_max),2*ds,dsn]);
+        dsn = max([Opt.ds_min,ds/2,dsn]);
     else
-        xe = [Path.var_all(:,end);Path.l_all(end)];
-        dsn = norm(x_plus-xe)/2;
+        if Opt.step_size_control.fix
+            dsn = ds0;
+        else
+            xe = [Path.var_all(:,end);Path.l_all(end)];
+            dsn = norm(x_plus-xe)/2;
+        end
     end
 end

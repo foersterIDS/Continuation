@@ -15,7 +15,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     warning on;
     [Opt,ds0] = continuation.input(varargin,fun,var0,l_start,l_end,ds0);
-    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver,Step_size_information] = aux.initialize_structs(var0,l_start,l_end,Opt);
+    [Opt,ds0,Stepsize_options] = step_size.initialize(Opt,ds0,var0,l_start,l_end);
+    if Stepsize_options.rate_of_contraction
+        global solver_stepsizes;
+    end
+    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = aux.initialize_structs(var0,l_start,l_end,Opt,Stepsize_options.rate_of_contraction);
     res_corr = continuation.corrector(Opt);
     ds = ds0;
     if Opt.display
@@ -25,11 +29,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %
     %% find initial solution
     %
-    global solver_stepsizes;
     residual_initial = @(v) aux.residual_fixed_value(fun,v,Opt.l_0,Opt);
     [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = Solver.main(residual_initial,var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
     x_plus = [];
+    if Stepsize_options.predictor
+        x_predictor_plus = [];
+    end
     last_jacobian = [];
     break_fun_out = [];
     if initial_exitflag>0
@@ -73,7 +79,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
-        Step_size_information.previous = Step_size_information.current;
         %
         %% residual
         %
@@ -96,7 +101,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         %% predictor
         %
-        tic;
+        if Stepsize_options.continuation_speed
+            tic;
+        end
         %
         try
             if Do.homotopy
@@ -176,6 +183,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Path.var_all = [Path.var_all,x_solution(1:end-1)];
                 Path.l_all = [Path.l_all,x_solution(end)];
                 Path.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-1);Path.l_all(end-1)])];
+                if Stepsize_options.predictor
+                    Path.x_predictor = [Path.x_predictor, x_predictor];
+                end
                 previous_jacobian = last_jacobian;
                 last_jacobian = solver_jacobian;
                 Counter.valid_stepback = 0;
@@ -183,6 +193,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Path.var_all = [Path.var_all,x_solution(1:end-1),x_plus(1:end-1)];
                 Path.l_all = [Path.l_all,x_solution(end),x_plus(end)];
                 Path.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
+                if Stepsize_options.predictor
+                    Path.x_predictor = [Path.x_predictor, x_predictor, x_predictor_plus];
+                    x_predictor_plus = [];
+                end
                 x_plus = [];
                 previous_jacobian = solver_jacobian;
                 last_jacobian = plus_jacobian;
@@ -219,12 +233,18 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 if Counter.valid_stepback<Opt.stepback_error_counter
                     Do.stepback = true;
                     x_plus = [Path.var_all(:,end);Path.l_all(end)];
+                    if Stepsize_options.predictor
+                        x_predictor_plus = x_predictor;
+                    end
                 else
                     Do.stepback = false;
                 end
                 Path.var_all(:,end) = [];
                 Path.l_all(end) = [];
                 Path.s_all(end) = [];
+                if Stepsize_options.predictor
+                    Path.x_predictor(:,end) = [];
+                end
                 plus_jacobian = last_jacobian;
                 last_jacobian = previous_jacobian;
             elseif (Counter.error==Opt.stepback_error_counter+1) && (numel(Path.l_all)>1)
@@ -233,6 +253,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                     Path.var_all = [Path.var_all,x_plus(1:end-1)];
                     Path.l_all = [Path.l_all,x_plus(end)];
                     Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
+                    if Stepsize_options.predictor
+                        Path.x_predictor = [Path.x_predictor, x_predictor_plus];
+                        x_predictor_plus = [];
+                    end
                     x_plus = [];
                 end
                 Do.stepback = false;
@@ -240,6 +264,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             elseif (Counter.error==Opt.suspend_continuation_error_counter) && (numel(Path.l_all)>1)
                 %% suspend
                 x_plus = [];
+                if Stepsize_options.predictor
+                    x_predictor_plus = [];
+                end
                 Do.stepback = false;
                 Do.suspend = true;
             elseif logical(Opt.remove_error_counter) && ((Counter.error==Opt.remove_error_counter) && (numel(Path.l_all)>1))
@@ -265,6 +292,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Path.var_all(:,end) = var_rmv;
                 last_jacobian = [rmv_jacobian,aux.numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
                 x_plus = [];
+                if Stepsize_options.predictor
+                    x_predictor_plus = [];
+                end
                 Do.stepback = false;
                 Do.suspend = false;
                 Do.remove = true;
@@ -272,6 +302,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             else
                 %% else
                 x_plus = [];
+                if Stepsize_options.predictor
+                    x_predictor_plus = [];
+                end
                 Do.stepback = false;
                 Do.suspend = false;
                 Do.remove = false;
@@ -316,20 +349,33 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         dsim1 = ds;
         %
-        % determine stepsize information
+        % measure speed
         %
-        speed_of_continuation = ds / toc;
-        if length(solver_stepsizes) > 2
-            rate_of_convergence = (solver_stepsizes(3,2)/solver_stepsizes(2,2));
-        else
-            rate_of_convergence = 0.2;
+        if Stepsize_options.continuation_speed
+            time_needed = toc;
+            Path.speed_of_continuation = [Path.speed_of_continuation, ds/time_needed];
         end
-        Step_size_information.current = aux.set_struct_fields(Step_size_information.current, 'rate_of_convergence', rate_of_convergence,...
-            'solver_output', solver_output, 'speed_of_continuation', speed_of_continuation, 'x_predictor', x_predictor);
+        %
+        % measure rate of contraction
+        if Stepsize_options.rate_of_contraction
+            if isfield(solver_output, 'rate_of_contraction')
+                if size(solver_stepsizes, 1) < 3
+                    solver_output.rate_of_contraction = [solver_output.rate_of_contraction, 0.25];
+                else
+                    solver_output.rate_of_contraction = [solver_output.rate_of_contraction,solver_stepsizes(3,2)/solver_stepsizes(2,2)];
+                end
+            else
+                if size(solver_stepsizes, 1) < 3
+                    solver_output.rate_of_contraction = 0.25;
+                else
+                    solver_output.rate_of_contraction = solver_stepsizes(3,2)/solver_stepsizes(2,2);
+                end
+            end
+        end
         %
         % adjust stepsize
         %
-        ds = step_size.control(ds,ds0,Counter,Step_size_information,Do,x_plus,Path,Opt);
+        ds = step_size.control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt);
         %
         %% end loop
         %

@@ -4,14 +4,19 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver(Opt)
+function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver(Opt,output_flag)
     predictor_solver = [];
+    if output_flag
+        outfun = @output_fun;
+    else
+        outfun = @do_nothing;
+    end
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', @outfun);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', @outfun);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
@@ -24,9 +29,9 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', @outfun);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
         else
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', @outfun);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fun_solver.s_lsqnonlin(fun,x0,optfun(dscale));
@@ -56,7 +61,7 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver
                                    'tolerance',inf);
 end
 
-function stop = outfun(x,optimValues,state)
+function stop = output_fun(x,optimValues,state)
     stop = false;
     global solver_stepsizes;
     switch state
@@ -67,4 +72,8 @@ function stop = outfun(x,optimValues,state)
             normd = optimValues.stepsize;               % Norm of step
             solver_stepsizes = [solver_stepsizes; iter normd];
     end
+end
+
+function stop = do_nothing(x,optimValues,state)
+    stop = false;
 end
