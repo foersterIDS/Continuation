@@ -176,15 +176,36 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor_solver','on');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_solver: on ###\n',i),probinfo,probcounter);
     %% step_size_control:
-    fprintf('\n### %d: step_size_control: angle ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','angle');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: angle ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: step_size_control: pid ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','pid');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: pid ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: step_size_control: curvature ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','curvature');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: curvature ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: angle_change ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','angle_change');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: angle_change ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: angle_custom ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','angle_custom');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: angle_custom ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: fayezioghani ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','fayezioghani');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: fayezioghani ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: iterations_exponential ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','iterations_exponential');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: iterations_exponential ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: iterations_polynomial ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','iterations_polynomial');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: iterations_polynomial ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: multiplicative ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','multiplicative');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: multiplicative ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: pid_custom ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','pid_custom');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: pid_custom ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: pid_valli ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','pid_valli');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: pid_valli ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: szyszkowski ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','szyszkowski');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: szyszkowski ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: step_size_control: yoon ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control','yoon');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: yoon ###\n',i),probinfo,probcounter);
 end
 clc;
 if isempty(probinfo)

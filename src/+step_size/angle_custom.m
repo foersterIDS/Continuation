@@ -19,7 +19,7 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     %
     % calculate angle
     %
-    angle = vector_angle(v1,v2);
+    angle = aux.vector_angle(v1,v2);
     %
     % calculate deviation of iterations
     %

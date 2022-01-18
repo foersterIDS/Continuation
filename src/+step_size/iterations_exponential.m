@@ -14,5 +14,5 @@ function [xi] = iterations_exponential(solver_output,Opt)
         iter = solver_output.iterations;
     end
     % calculate step size adaption factor
-    xi = 2^((iter - Opt.n_iter_opt)/4);
+    xi = 2^((Opt.n_iter_opt - iter)/4);
 end

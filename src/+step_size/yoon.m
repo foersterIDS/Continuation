@@ -21,8 +21,8 @@ function [xi] = yoon(solver_output,Path,Opt)
     %
     % calculate angles
     %
-    angle = vector_angle(v1,v2);
-    angle_m1 = vector_angle(v2,v3);
+    angle = aux.vector_angle(v1,v2);
+    angle_m1 = aux.vector_angle(v2,v3);
     %
     % adapt stepsize
     %

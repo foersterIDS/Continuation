@@ -20,8 +20,8 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     % calculate angles
     %
-    angle_1 = vector_angle(v1,v2);
-    angle_2 = vector_angle(v2,v3);
+    angle_1 = aux.vector_angle(v1,v2);
+    angle_2 = aux.vector_angle(v2,v3);
     %
     % calculate change of curvature
     %
