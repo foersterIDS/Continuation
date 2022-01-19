@@ -14,7 +14,9 @@ function [ var_h, exitflag, var_all, l_all ] = h_continuation( fun, var0, Opt )
     if Opt.homotopy.fix
         G = @(x) homotopy.fix(x,var0);
     elseif Opt.homotopy.newton
-        G = @(x) homotopy.newton(fun,x,fun(var0));
+        G = @(x) homotopy.newton(fun,x,fun(var0),Opt);
+    elseif Opt.homotopy.fixnt
+        G = @(x) homotopy.fixNt(fun,x,fun(var0),var0,Opt);
     elseif Opt.homotopy.f2
         % nothing
     else
@@ -23,26 +25,22 @@ function [ var_h, exitflag, var_all, l_all ] = h_continuation( fun, var0, Opt )
     %
     %% Residual
     %
-    if Opt.homotopy.fix || Opt.homotopy.newton
+    if Opt.homotopy.f2
+        fH = @(x,l) homotopy.f2(fun,x,l,Opt);
+        [var0,l0] = homotopy.f2_LM_init(fun,var0);
+        if l0>1
+            ls = 2*l0;
+        else
+            ls = 0;
+        end
+        le = 1;
+        ds0 = abs(le-l0)/100;
+    else
         fH = @(x,l) homotopy.merge(G,fun,x,l,Opt);
         l0 = 0;
         ls = -1;
         le = 1;
         ds0 = 0.01;
-    elseif Opt.homotopy.f2
-        fH = @(x,l) homotopy.f2(fun,x,l);
-        [var0,l0] = homotopy.f2_LM_init(fun,var0);
-        if l0>1
-            ls = 2*l0;
-            le = 1;
-            ds0 = abs(le-l0)/10;
-        else
-            ls = 0;
-            le = 1;
-            ds0 = 10^-3;
-        end
-    else
-        error('unknown homotopy-type');
     end
     lt = 1;
     %

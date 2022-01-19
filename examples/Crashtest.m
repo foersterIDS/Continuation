@@ -42,10 +42,13 @@ for i=1:2
     fprintf('\n### %d: homotopy: fix ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','fix');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fix ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: homotopy: fixnt ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','fixnt');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fixnt ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: newton ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','newton');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: homotopy: newton ###\n',i);
+    fprintf('\n### %d: homotopy: f2 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','f2');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
     %% solver:

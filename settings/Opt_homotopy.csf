@@ -1,3 +1,4 @@
-fix<>eval<>false<>#scalar#logical
-newton<>eval<>false<>#scalar#logical
 f2<>eval<>false<>#scalar#logical
+fix<>eval<>false<>#scalar#logical
+fixnt<>eval<>false<>#scalar#logical
+newton<>eval<>false<>#scalar#logical
