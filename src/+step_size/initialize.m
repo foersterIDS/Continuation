@@ -1,4 +1,4 @@
-%% path continuation - stepsize.initialize
+%% path continuation - step_size.initialize
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

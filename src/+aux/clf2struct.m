@@ -8,7 +8,7 @@ function [struct_out] = clf2struct(struct_name)
     %% set path
     %
     temp_path = mfilename('fullpath');
-    struct_path = [temp_path(1:(numel(temp_path)-14)),'settings\',struct_name,'.clf'];
+    struct_path = [temp_path(1:(numel(temp_path)-19)),'settings\',struct_name,'.clf'];
     clear temp_path;
     %
     %% initialize

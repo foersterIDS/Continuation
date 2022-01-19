@@ -104,7 +104,7 @@ function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
                         else
                             %% check name_legacy for Opt-sub-struct:
                             if isempty(name_legacy)
-                                name_legacy = clf2struct('name_legacy');
+                                name_legacy = aux.clf2struct('name_legacy');
                             end
                             if isfield(name_legacy.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
                                 varargin_cell{i+1} = name_legacy.(lower(varargin_cell{i})).(lower(varargin_cell{i+1}));
@@ -137,7 +137,7 @@ function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
             else
                 %% check name_legacy for Opt-struct:
                 if isempty(name_legacy)
-                    name_legacy = clf2struct('name_legacy');
+                    name_legacy = aux.clf2struct('name_legacy');
                 end
                 if isfield(name_legacy,lower(varargin_cell{i}))
                     varargin_cell{i} = name_legacy.(lower(varargin_cell{i}));
