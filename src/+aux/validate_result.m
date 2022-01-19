@@ -91,7 +91,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                 end
                 [Plot, Opt] = live_plot(Opt, Info, Path, ds, ds, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
-                fprintf('--> The plot update for approval has failed.\n');
+                aux.print_line(Opt,'--> The plot update for approval has failed.\n');
             end
         end
         prompt = sprintf('------> approve point at l = %.4e (y/n): ',Path.l_all(end));
@@ -116,7 +116,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                 correct_input = true;
                 Opt.approve_manually = str2double(input_string);
             else
-                fprintf('------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'', set double limit or leave using ''exit'')\n');
+                aux.print_line(Opt,'------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'', set double limit or leave using ''exit'')\n');
             end
         end
     end

@@ -35,7 +35,7 @@ function [dsn] = angle(ds,ds0,Counter,solver_output,Do,Path,Opt)
         elseif ch > 1.5 && ch < 5 % high ratios are punished stronger (but ch_max = 5)
             ch = 5;
         elseif ch > 5
-            fprintf('--> Point of high curvature!\n');
+            aux.print_line(Opt,'--> Point of high curvature!\n');
             ch = 10;
         end
     else

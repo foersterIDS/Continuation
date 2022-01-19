@@ -22,10 +22,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = aux.initialize_structs(var0,l_start,l_end,Opt,Stepsize_options.rate_of_contraction);
     res_corr = continuation.corrector(Opt);
     ds = ds0;
-    if Opt.display
-        fprintf('Starting path continuation...\n');
-        t_display = tic;
-    end
+    aux.print_line(Opt,'Starting path continuation...\n');
+    t_display = tic;
     %
     %% find initial solution
     %
@@ -47,9 +45,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         previous_jacobian = solver_jacobian;
         last_jacobian = solver_jacobian;
         [~,break_fun_out] = Opt.break_function(fun_initial,solver_jacobian,Path.var_all,Path.l_all,break_fun_out);
-        if Opt.display
-            fprintf('Initial solution at l = %.2e\n',Opt.l_0);
-        end
+        aux.print_line(Opt,'Initial solution at l = %.2e\n',Opt.l_0);
         if aux.ison(Opt.bifurcation)
             sign_det_jacobian = sign(det(initial_jacobian));
         end
@@ -66,9 +62,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         l_all = Path.l_all;
         s_all = Path.s_all;
         Do.continuation = false;
-        if Opt.display
-            fprintf('No initial solution found.\n');
-        end
+        aux.print_line(Opt,'No initial solution found.\n');
     end
     %
     %% continuation
@@ -86,14 +80,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             try
                 residual = @(x) deflation(residual,x_deflation,x,Opt);
             catch
-                if Opt.display
-                    fprintf('---> delation: catch!\n');
-                end
+                aux.print_line(Opt,'---> delation: catch!\n');
                 Counter.catch = Counter.catch + 1;
                 if Counter.catch >= 3
-                    if Opt.display
-                        fprintf('--> Error in input! catch was used too often!\n');
-                    end
+                    aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
                     break;
                 end
             end
@@ -123,14 +113,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         catch
             [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,last_jacobian,fun,res_corr,Solver,Opt);
             x_predictor = [var_predictor;l_predictor];
-            if Opt.display
-                fprintf('---> predictor: catch!\n');
-            end
+            aux.print_line(Opt,'---> predictor: catch!\n');
             Counter.catch = Counter.catch + 1;
             if Counter.catch >= 3
-                if Opt.display
-                    fprintf('--> Error in input! catch was used too often!\n');
-                end
+                aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
                 break;
             end
         end
@@ -174,14 +160,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             solver_exitflag = -2;
             solver_output = Solver.default_output;
             Do.convergeToTarget = false;
-            if Opt.display
-                fprintf('---> solve: catch!\n');
-            end
+            aux.print_line(Opt,'---> solve: catch!\n');
             Counter.catch = Counter.catch + 1;
             if Counter.catch >= 3
-                if Opt.display
-                    fprintf('--> Error in input! catch was used too often!\n');
-                end
+                aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
                 break;
             end
         end
@@ -332,9 +314,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             if catch_flag
                 Counter.catch = Counter.catch + 1;
                 if Counter.catch >= 3
-                    if Opt.display
-                        fprintf('--> Error in input! catch was used too often!\n');
-                    end
+                    aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
                     break;
                 end
             end
@@ -393,12 +373,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         %% end loop
         %
-        if Opt.display
-            if val
-                fprintf('-----> continued at l = %.4e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
-            else
-                fprintf('-----> invalid point %s |\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
-            end
+        if val
+            aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+        else
+            aux.print_line(Opt,'-----> invalid point %s |\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
         end
         [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,l_start,l_end,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
         exitflag = Info.exitflag;
@@ -412,9 +390,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             try
                 [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
-                if Opt.display
-                    fprintf('--> The plot update has failed.\n');
-                end
+                aux.print_line(Opt,'--> The plot update has failed.\n');
             end
         end
         %
@@ -434,9 +410,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr);
             last_jacobian = [];
         catch
-            if Opt.display
-                fprintf('--> Failed to trace bifurcations.\n');
-            end
+            aux.print_line(Opt,'--> Failed to trace bifurcations.\n');
         end
     end
     %
@@ -451,17 +425,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 delete(Plot.pl_curr);
             end
         catch
-            if Opt.display
-                fprintf('--> The plot update has failed.\n');
-            end
+            aux.print_line(Opt,'--> The plot update has failed.\n');
         end
     end
     %
     %% final disp
     %
-    if Opt.display
-        fprintf([Info.exit_msg,'\n']);
-        fprintf('--> time elapsed: %.3f s\n',toc(t_display));
-    end
+    aux.print_line(Opt,[Info.exit_msg,'\n']);
+    aux.print_line(Opt,'--> time elapsed: %.3f s\n',toc(t_display));
     %
 end

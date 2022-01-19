@@ -15,7 +15,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
             bfun = false;
         end
     catch
-        fprintf('--> Unable to evaluate user defined break function.\n');
+        aux.print_line(Opt,'--> Unable to evaluate user defined break function.\n');
         bfun = false;
     end
     %

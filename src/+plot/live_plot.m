@@ -474,7 +474,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
         end
     elseif Opt.plot.three_dim
         if num_pl+1 > 3
-            fprintf('--> 3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.\n');
+            aux.print_line(Opt,'--> 3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.\n');
             Opt.plot_vars_index = [1,2];
             num_pl = 1;
         elseif num_pl+1 < 3
@@ -608,13 +608,13 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
     %% Stop to show predictor and corrector
     %
     if islogical(Opt.plot_pause) && Opt.plot_pause
-        fprintf('Press any key to continue or press Ctrl+c to stop...');
+        aux.print_line(Opt,'Press any key to continue or press Ctrl+c to stop...');
         pause
-        fprintf(repmat('\b',1,52));
+        aux.print_line(Opt,repmat('\b',1,52));
     elseif numel(Path.l_all) >= Opt.plot_pause && ~islogical(Opt.plot_pause)
-        fprintf('Press any key to continue or press Ctrl+c to stop...');
+        aux.print_line(Opt,'Press any key to continue or press Ctrl+c to stop...');
         pause
-        fprintf(repmat('\b',1,52));
+        aux.print_line(Opt,repmat('\b',1,52));
     end
     %
 end

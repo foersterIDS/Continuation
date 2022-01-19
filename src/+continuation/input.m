@@ -277,10 +277,10 @@ function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
                                                 if isstruct(Opt.(fieldname))
                                                     Opt_sub_fieldnames = fieldnames(eval(['Opt.',fieldname]));
                                                     eval(['Opt.',fieldname,'.',Opt_sub_fieldnames{1},' = true;']);
-                                                    fprintf('--> %s has to be on when using %s. %s was set to option %s.\n',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
+                                                    aux.print_line(Opt,'--> %s has to be on when using %s. %s was set to option %s.\n',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
                                                 elseif islogical(Opt.(fieldname))
                                                     Opt.(fieldname) = true;
-                                                    fprintf('--> %s has to be on when using %s. %s was set to option ''on''.\n',fieldname,Opt_fieldnames{i},fieldname);
+                                                    aux.print_line(Opt,'--> %s has to be on when using %s. %s was set to option ''on''.\n',fieldname,Opt_fieldnames{i},fieldname);
                                                 end
                                             end
                                         catch

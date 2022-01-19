@@ -7,9 +7,7 @@
 function [ var_h, exitflag ] = h_continuation( fun, var0, Opt )
     %% Display:
     %
-    if Opt.display
-        fprintf('------> starting homotopy...');
-    end
+    aux.print_line(Opt,'------> starting homotopy...');
     %
     %% Homotopy-function
     %
@@ -59,12 +57,10 @@ function [ var_h, exitflag ] = h_continuation( fun, var0, Opt )
     %
     %% Display
     %
-    if Opt.display
-        if exitflag>=0
-            fprintf('success\n');
-        else
-            fprintf('failed\n');
-        end
+    if exitflag>=0
+        aux.print_line(Opt,'success\n');
+    else
+        aux.print_line(Opt,'failed\n');
     end
     %
 end

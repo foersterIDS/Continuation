@@ -19,7 +19,7 @@ function [Opt,ds0,Stepsize_options] = initialize(Opt,ds0,var0,l_start,l_end)
         %
         if Opt.ds_min < 10*Opt.solver_tol % ds_min cannot be lower than tolerance of solver
             Opt.ds_min = 10*Opt.solver_tol;
-            fprintf('--> ds_min has to be at least 10*solver_tol = %.2e. ds_min has been adapted.\n',Opt.ds_min);
+            aux.print_line(Opt,'--> ds_min has to be at least 10*solver_tol = %.2e. ds_min has been adapted.\n',Opt.ds_min);
         end
         %
         if ds0 > (sqrt(sum(var0.^2) + (l_end-l_start)^2)/10) % ds_max should not be larger than mag of points
@@ -28,7 +28,7 @@ function [Opt,ds0,Stepsize_options] = initialize(Opt,ds0,var0,l_start,l_end)
             % adapt ds0
             ds0 = 10^(n_mag-1);
             % order of magnitude must be at least 1 lower
-            fprintf('--> ds0 is too large! It must not be greater than 1.00e%i. ds0 has been adapted.\n',n_mag-1);
+            aux.print_line(Opt,'--> ds0 is too large! It must not be greater than 1.00e%i. ds0 has been adapted.\n',n_mag-1);
         end
         %
     end
