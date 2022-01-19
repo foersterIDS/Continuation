@@ -88,7 +88,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 end
             end
         elseif Do.suspend
-            residual = @(x) aux.residual_suspend_continuation(fun,x,Opt);
+            residual = @(v,l_fix) aux.residual_suspend_continuation(fun,v,l_fix,Opt);
         else
             residual = @(x) aux.merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,last_jacobian,Opt);
         end
@@ -145,7 +145,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                     end
                 else
                     if Do.suspend
-                        [v_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(@(v) residual([v;x_predictor(end)]),x_predictor(1:(end-1)),dscale(1:(end-1)));
+                        [v_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(@(v) residual(v,x_predictor(end)),x_predictor(1:(end-1)),dscale(1:(end-1)));
                         x_solution = [v_solution;x_predictor(end)];
                     else
                         [x_solution,fun_solution,solver_exitflag,solver_output,solver_jacobian] = Solver.main(residual,x_predictor,dscale);
