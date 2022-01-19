@@ -78,7 +78,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         if Do.deflate
             try
-                residual = @(x) deflation(residual,x_deflation,x,Opt);
+                residual = @(x) aux.deflation(residual,x_deflation,x,Opt);
             catch
                 aux.print_line(Opt,'---> delation: catch!\n');
                 Counter.catch = Counter.catch + 1;

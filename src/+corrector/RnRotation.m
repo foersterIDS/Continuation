@@ -1,4 +1,4 @@
-%% path continuation - aux.RnRotation
+%% path continuation - corrector.RnRotation
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

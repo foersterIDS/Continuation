@@ -7,7 +7,7 @@
 function [residual,jacobian] = residual_ellipsoid(x,x_all,ds,RnR)
     f = 0.25;%0.05;
     r = ds*[1;f*ones(length(x)-1,1)];
-    T = RnR.getTR(diff_xs(x_all));
+    T = RnR.getTR(corrector.diff_xs(x_all));
     residual = sum((T*(x-x_all(:,end))).^2./r.^2)-1;
     jacobian = (2*(T*(x-x_all(:,end)))./r.^2)'*T;
 end

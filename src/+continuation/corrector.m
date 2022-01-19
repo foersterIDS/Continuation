@@ -11,7 +11,7 @@ function [residual] = corrector(Opt)
     elseif Opt.corrector.sphere
         residual = @(x,x_all,ds) corrector.residual_sphere(x,x_all,ds);
     elseif Opt.corrector.ellipsoid
-        RnR = aux.RnRotation([1;0]);
+        RnR = corrector.RnRotation([1;0]);
         residual = @(x,x_all,ds) corrector.residual_ellipsoid(x,x_all,ds,RnR);
     elseif Opt.corrector.ellipsoid2
         residual = @(x,x_all,ds) corrector.residual_ellipsoid2(x,x_all,ds);

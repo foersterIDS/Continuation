@@ -21,7 +21,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun11; % basic test solver_force1it
 % testfun12; % parabola intersecting lines
 %% Prepare for homotopy:
-ll = mean([lams,lame]); % aimed value of lambda
+ll = abs(lame-lams)/2+min(lams,lame); % aimed value of lambda
 funh = @(var) fun(var,ll);
 %% Solve:
-[xr,exitflag] = homotopy(funh,v0,'bifurcation','mark','plot','on','homotopy','newton');
+[v_solution,exitflag] = homotopy(funh,v0,'bifurcation','mark','plot','on','homotopy','newton');

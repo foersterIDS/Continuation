@@ -6,5 +6,5 @@
 %
 function [f,J] = fix(x,x0)
     f = x-x0;
-    J = ones(size(x0));
+    J = eye(size(x0));
 end

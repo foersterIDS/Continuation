@@ -8,6 +8,8 @@ function [varargout] = merge(G,R,x,l,Opt)
     if Opt.jacobian
         [Gx,JGx] = G(x);
         [Rx,JRx] = R(x);
+        JGx = JGx(1:numel(Rx),1:numel(x));
+        JRx = JRx(1:numel(Rx),1:numel(x));
         varargout{1} = (1-l)*Gx+l*Rx;
         varargout{2} = [(1-l)*JGx+l*JRx,-Gx+Rx];
     else

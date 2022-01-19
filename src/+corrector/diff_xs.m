@@ -1,4 +1,4 @@
-%% path continuation - aux.diff_xs
+%% path continuation - corrector.diff_xs
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
