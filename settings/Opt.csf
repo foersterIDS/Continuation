@@ -1,3 +1,4 @@
+adapt_corrector<>struct<>Opt_adapt_corrector<>#struct
 alpha_reverse<>double<>pi/2<>#scalar#double#positive#nonzero
 approve_manually<>eval<>false<>#scalar#logical#ison:plot#ison:display|#scalar#double#ison:plot#ison:display
 bifurcation<>struct<>Opt_bifurcation<>#struct

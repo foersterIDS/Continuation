@@ -6,7 +6,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn] = control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt)
+function [dsn] = control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt,Info)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
@@ -126,7 +126,7 @@ function [dsn] = control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobi
                 dsn = xi * ds;
             else
                 if Opt.step_size_control.fix
-                    dsn = ds0;
+                    dsn = Info.ds0;
                 else
                     dsn = ds/2;
                 end
@@ -139,7 +139,7 @@ function [dsn] = control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobi
         dsn = max([Opt.ds_min,ds/2,dsn]);
     else
         if Opt.step_size_control.fix
-            dsn = ds0;
+            dsn = Info.ds0;
         else
             xe = [Path.var_all(:,end);Path.l_all(end)];
             dsn = norm(x_plus-xe)/2;

@@ -5,7 +5,7 @@
 %   28.10.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr)
+function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,fun,res_corr)
     bif_trace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
     nbif = numel(bif_trace(1,:));
     Opt_sphere = Opt;
@@ -80,7 +80,7 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_en
             for j=1:ntrace
                 Opt_trace.direction = xdirs_trace(:,j)/norm(xdirs_trace(:,j));
                 Opt_trace.l_0 = x0(end);
-                [var_j,l_j,exitflag_j,Bifurcation_j,s_j] = continuation(fun,x0(1:end-1),l_start,l_end,ds_bif,'opt',Opt_trace);
+                [var_j,l_j,exitflag_j,Bifurcation_j,s_j] = continuation(fun,x0(1:end-1),Info.l_start,Info.l_end,ds_bif,'opt',Opt_trace);
                 if exitflag_j>0
                     Path.var_all = [Path.var_all,NaN(numel(x0)-1,1),var_j];
                     Path.l_all = [Path.l_all,NaN,l_j];

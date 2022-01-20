@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_end, Path, Opt, Counter, Bifurcation, ds, fun_solution, solver_jacobian, break_fun_out, val)
+function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, Path, Opt, Counter, Bifurcation, ds, fun_solution, solver_jacobian, break_fun_out, val)
     %% eval. break function:
     %
     try
@@ -37,7 +37,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     %
     %% exit with l<l_start:
     %
-    if sign(l_end-l_start)*(Path.l_all(end)-l_start)<0
+    if sign(Info.l_end-Info.l_start)*(Path.l_all(end)-Info.l_start)<0
         Do.continuation = false;
         Info.exitflag = 0;
         Info.exit_msg = '--> continuation stoped: l<l_start';
@@ -45,10 +45,10 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
     %
     %% exit with success:
     %
-    if sign(l_end-l_start)*(Path.l_all(end)-l_end)>=0 || sign(Opt.l_target-l_start)*(Path.l_all(end)-Opt.l_target)>=0
+    if sign(Info.l_end-Info.l_start)*(Path.l_all(end)-Info.l_end)>=0 || sign(Opt.l_target-Info.l_start)*(Path.l_all(end)-Opt.l_target)>=0
         Do.continuation = false;
         Info.exitflag = 1;
-        if sign(l_end-l_start)*(Path.l_all(end)-l_end)>=0
+        if sign(Info.l_end-Info.l_start)*(Path.l_all(end)-Info.l_end)>=0
             Info.exit_msg = '--> continuation completed: l_end reached';
         else
             Info.exit_msg = '--> continuation completed: l_target reached';
@@ -91,6 +91,14 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, l_start, l_e
         Do.continuation = false;
         Info.exitflag = 5;
         Info.exit_msg = '--> continuation completed: user-defined break function';
+    end
+    %
+    %% exit due to break function:
+    %
+    if Do.stop_manually
+        Do.continuation = false;
+        Info.exitflag = 6;
+        Info.exit_msg = '--> continuation stoped by user';
     end
     %
 end

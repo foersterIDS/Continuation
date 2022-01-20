@@ -110,7 +110,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
             elseif strcmp(input_string,'exit')
                 correct_input = true;
                 val = false;
-                Do.continuation = false;
+                Do.stop_manually = true;
                 inv_poi_str(1:19) = '(rejected manually)';
             elseif ~isnan(str2double(input_string))
                 correct_input = true;

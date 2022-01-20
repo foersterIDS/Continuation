@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   18.01.2022 - Tido Kubatschek
 %
-function [Opt,ds0,Stepsize_options] = initialize(Opt,ds0,var0,l_start,l_end)
+function [Opt,ds0,Stepsize_options] = initialize(Opt,var0,l_start,l_end,ds0)
     %% check chosen stepsize options
     %
     if Opt.check_step_size_options

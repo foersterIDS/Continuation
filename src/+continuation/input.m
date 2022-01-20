@@ -5,7 +5,7 @@
 %   08.05.2020 - Alwin Förster
 %   05.01.2021 - Tido Kubatschek
 %
-function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
+function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %% determine purpose
     %
     Purpose = struct('continuation',false,...
@@ -336,37 +336,7 @@ function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %
     %% set dependent options
     %
-    if ~Opt_is_set.direction
-        %% set direction if l_0~=l_start || l_target~=l_end
-        if Opt_is_set.l_0
-            if Opt_is_set.l_target
-                Opt.direction = sign(Opt.l_target-Opt.l_0)*[zeros(size(var0));1];
-            else
-                Opt.direction = sign(l_end-Opt.l_0)*[zeros(size(var0));1];
-            end
-        else
-            if Opt_is_set.l_target
-                Opt.direction = sign(Opt.l_target-l_start)*[zeros(size(var0));1];
-            end
-        end
-    end
-    if ~Opt_is_set.ds_tol
-        %% set ds_tol dependent on corrector method:
-        if Opt.corrector.sphere
-            Opt.ds_tol = [0.99,1.01];
-        elseif Opt.corrector.orthogonal
-            Opt.ds_tol = [0.99,5];
-        elseif Opt.corrector.ellipsoid
-            Opt.ds_tol = [0.24,1.01];
-        elseif Opt.corrector.ellipsoid2
-            Opt.ds_tol = [0.000001,1.01];
-        elseif Opt.corrector.unique
-            Opt.ds_tol = [0.99,5];
-        elseif Opt.corrector.paraboloid
-            Opt.ds_tol = [0.09,1.01];
-        else
-            Opt.ds_tol = [0.5,1.5];
-        end
-    end
+    Info_temp = struct('ds0',ds0,'l_end',l_end,'l_start',l_start,'var0',var0);
+    Opt = aux.update_Opt(Opt,Opt_is_set,Info_temp);
     %
 end

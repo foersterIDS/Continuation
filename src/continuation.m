@@ -14,21 +14,22 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     %% initialize
     %
     warning on;
-    [Opt,ds0] = continuation.input(varargin,fun,var0,l_start,l_end,ds0);
-    [Opt,ds0,Stepsize_options] = step_size.initialize(Opt,ds0,var0,l_start,l_end);
+    [Opt,ds0,Opt_is_set] = continuation.input(varargin,fun,var0,l_start,l_end,ds0);
+    [Opt,ds0,Stepsize_options] = step_size.initialize(Opt,var0,l_start,l_end,ds0);
     if Stepsize_options.rate_of_contraction
         global solver_stepsizes;
     end
-    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = aux.initialize_structs(var0,l_start,l_end,Opt,Stepsize_options.rate_of_contraction);
+    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
+    clear('var0','l_start','l_end','ds0');
     res_corr = continuation.corrector(Opt);
-    ds = ds0;
+    ds = Info.ds0;
     aux.print_line(Opt,'Starting path continuation...\n');
     t_display = tic;
     %
     %% find initial solution
     %
     residual_initial = @(v) aux.residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = Solver.main(residual_initial,var0,Opt.dscale0(1:end-1));
+    [Path.var_all,fun_initial,initial_exitflag,solver_output,initial_jacobian] = Solver.main(residual_initial,Info.var0,Opt.dscale0(1:end-1));
     solver_jacobian = initial_jacobian;
     x_plus = [];
     if Stepsize_options.predictor
@@ -50,7 +51,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             sign_det_jacobian = sign(det(initial_jacobian));
         end
         if aux.ison(Opt.plot)
-            [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds0, ds0, solver_output.iterations, Counter);
+            [Plot, Opt] = plot.live_plot(Opt, Info, Path, Info.ds0, Info.ds0, solver_output.iterations, Counter);
         end
     else
         Path.var_all = [];
@@ -167,6 +168,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 break;
             end
         end
+        %
+        %% adaptive corrector
+        %
+        [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,solver_exitflag,solver_output,Solver,fun,x_predictor,dscale,last_jacobian,ds);
         %
         %% check result
         %
@@ -369,7 +374,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         % adjust stepsize
         %
-        ds = step_size.control(ds,ds0,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt);
+        ds = step_size.control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt);
         %
         %% end loop
         %
@@ -378,11 +383,17 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         else
             aux.print_line(Opt,'-----> invalid point %s |\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
         end
-        [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,l_start,l_end,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
+        [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
         exitflag = Info.exitflag;
         var_all = Path.var_all;
         l_all = Path.l_all;
         s_all = Path.s_all;
+        if Do.change_corrector
+            Opt = aux.seton(Opt,'corrector',corr_info);
+            res_corr = continuation.corrector(Opt);
+            Do.change_corrector = false;
+        end
+        Opt = aux.update_Opt(Opt,Opt_is_set,Info);
         %
         %% live plot
         %
@@ -407,7 +418,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     if Opt.bifurcation.trace
         try
             delete(Plot.pl_curr);
-            [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr);
+            [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,Info,fun,res_corr);
             last_jacobian = [];
         catch
             aux.print_line(Opt,'--> Failed to trace bifurcations.\n');
