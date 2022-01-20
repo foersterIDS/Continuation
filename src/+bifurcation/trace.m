@@ -6,8 +6,8 @@
 %   02.07.2021 - Tido Kubatschek
 %
 function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_end,res_corr)
-    nbif = numel(Bifurcation.bif(2,Bifurcation.bif(2,:) == 0));
     bif_trace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
+    nbif = numel(bif_trace(1,:));
     Opt_sphere = Opt;
     Opt_sphere = aux.seton(Opt_sphere,'corrector','sphere');
     Opt_trace = Opt;
@@ -23,10 +23,16 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,fun,l_start,l_en
         %% find directions of known path
         for j=1:2
             Path_trace = Path;
-            Path_trace.var_all = Path.var_all(:,1:bif_trace(1,i));
-            Path_trace.l_all = Path.l_all(1:bif_trace(1,i));
-            Path_trace.s_all = Path.s_all(1:bif_trace(1,i));
-            [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,(-1)^j*ds_bif,[],fun,res_corr,Solver,Opt_sphere);
+            if j==1
+                Path_trace.var_all = Path.var_all(:,1:bif_trace(1,i));
+                Path_trace.l_all = Path.l_all(1:bif_trace(1,i));
+                Path_trace.s_all = Path.s_all(1:bif_trace(1,i));
+            else
+                Path_trace.var_all = Path.var_all(:,end:-1:bif_trace(1,i));
+                Path_trace.l_all = Path.l_all(end:-1:bif_trace(1,i));
+                Path_trace.s_all = abs(Path.s_all(end:-1:bif_trace(1,i))-Path.s_all(end));
+            end
+            [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path_trace,ds_bif,[],fun,res_corr,Solver,Opt_sphere);
             x_bif_predictor = [var_bif_predictor;l_bif_predictor];
             dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
             [x_bif_ij,~,solver_bif_exitflag] = Solver.main(residual_bif_sphere,x_bif_predictor,dscale);

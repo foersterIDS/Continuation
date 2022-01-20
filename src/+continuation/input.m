@@ -336,17 +336,17 @@ function [Opt,ds0] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %
     %% set dependent options
     %
-    if Opt_is_set.direction
+    if ~Opt_is_set.direction
         %% set direction if l_0~=l_start || l_target~=l_end
         if Opt_is_set.l_0
             if Opt_is_set.l_target
                 Opt.direction = sign(Opt.l_target-Opt.l_0)*[zeros(size(var0));1];
             else
-                Opt.direction = sign(Opt.l_end-Opt.l_0)*[zeros(size(var0));1];
+                Opt.direction = sign(l_end-Opt.l_0)*[zeros(size(var0));1];
             end
         else
             if Opt_is_set.l_target
-                Opt.direction = sign(Opt.l_target-Opt.l_start)*[zeros(size(var0));1];
+                Opt.direction = sign(Opt.l_target-l_start)*[zeros(size(var0));1];
             end
         end
     end
