@@ -74,14 +74,39 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
-        if Stepsize_options.rate_of_contraction || Opt.step_size_control.multiplicative || Opt.step_size_control.error
+        %% save old values
+        %
+        if Stepsize_options.iterations
+            if isfield(solver_output, 'iterations')
+                iterations_tmp = solver_output.iterations(end);
+            else
+                iterations_tmp = [];
+            end
+        end
+        %
+        if Stepsize_options.continuation_speed
+            if isfield(Path, 'continuation_speed')
+                continuation_speed_tmp = Path.continuation_speed(end);
+            else
+                continuation_speed_tmp = [];
+            end
+        end
+        %
+        if Stepsize_options.predictor
+            if isfield(Path, 'predictor')
+                predictor_tmp = Path.predictor(:,end);
+            else
+                predictor_tmp = [];
+            end
+        end
+        %
+        if Stepsize_options.rate_of_contraction
             if isfield(solver_output, 'rate_of_contraction')
                 rate_of_contraction_tmp = solver_output.rate_of_contraction;
             else
                 rate_of_contraction_tmp = [];
             end
         end
-        
         %
         %% residual
         %
@@ -360,15 +385,48 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         if Stepsize_options.continuation_speed
             time_needed = toc;
-            Path.speed_of_continuation = [Path.speed_of_continuation, ds/time_needed];
+            if ~isempty(rate_of_contraction_tmp)
+                Path.speed_of_continuation = [Path.speed_of_continuation(end), ds/time_needed];
+            else
+                Path.speed_of_continuation = ds/time_needed;
+            end
+            
         end
         %
         % measure rate of contraction
         if Stepsize_options.rate_of_contraction
             if size(solver_stepsizes, 1) < 3
-                solver_output.rate_of_contraction = [rate_of_contraction_tmp, 0.25];
+                if ~isempty(rate_of_contraction_tmp)
+                    solver_output.rate_of_contraction = [rate_of_contraction_tmp(end), 0.25];
+                else
+                    solver_output.rate_of_contraction = 0.25;
+                end
             else
-                solver_output.rate_of_contraction = [rate_of_contraction_tmp,solver_stepsizes(3,2)/solver_stepsizes(2,2)];
+                if ~isempty(rate_of_contraction_tmp)
+                    solver_output.rate_of_contraction = [rate_of_contraction_tmp(end), solver_stepsizes(3,2)/solver_stepsizes(2,2)];
+                else
+                    solver_output.rate_of_contraction = solver_stepsizes(3,2)/solver_stepsizes(2,2);
+                end
+            end
+        end
+        %
+        if Stepsize_options.iterations
+            if ~isempty(iterations_tmp)
+                solver_output.iterations = [iterations_tmp, solver_output.iterations];
+            end
+        end
+        %
+        if Stepsize_options.continuation_speed
+            if ~isempty(continuation_speed_tmp)
+                Path.continuation_speed = [continuation_speed_tmp, ds/time_needed];
+            else
+                Path.continuation_speed = ds/time_needed;
+            end
+        end
+        %
+        if Stepsize_options.predictor
+            if ~isempty(predictor_tmp)
+                Path.predictor = [predictor_tmp, Path.predictor];
             end
         end
         %
@@ -379,9 +437,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %% end loop
         %
         if val
-            aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+            aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
         else
-            aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+            aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
         end
         [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
         exitflag = Info.exitflag;

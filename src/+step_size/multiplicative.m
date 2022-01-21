@@ -20,9 +20,9 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %% Factor by number of iterations
     % correct number of iterations
     if Opt.ds_max==inf
-        w_iter = max(solver_output.iterations,1);
+        w_iter = max(solver_output.iterations(end),1);
     else
-        w_iter = solver_output.iterations;
+        w_iter = solver_output.iterations(end);
     end    
     %% Factor by change of curvature
     %
@@ -77,7 +77,7 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     quods(quods < 1/max_quod) = 1/max_quod;
     %
     %% Weigths
-    W = [0.5, 0.3, 0.05, 0.05, 0.05];
+    W = [0.3, 0.3, 0.05, 0.05, 0.05];
     
     %% adjustment factor
     xi = prod(quods.^W);

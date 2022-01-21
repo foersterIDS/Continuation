@@ -6,17 +6,44 @@
 %
 %
 function [xi] = error(solver_output,Path,Opt)
-    E_i = calc_error(solver_output,Path,Opt);
-    
+    E_i = calc_error(solver_output,Path,Opt,0);
+    if length(Path.l_all) > 3
+        E_i_m1 = calc_error(solver_output,Path,Opt,1);
+    else
+        E_i_m1 = 0;
+    end
+    %%
+    K_P = 0.75;
+    K_D = 0.2;
+    %
+    %
+    %
+    E = K_P * E_i + K_D * (E_i - E_i_m1);
     %% adjustment factor
     E_max = 20;
-    xi = 2^(E_i/E_max);
+    xi = 2^(E/E_max);
 end
 
-function E_i = calc_error(solver_output,Path,Opt)
+function E_i = calc_error(solver_output,Path,Opt,previous)
+    %
+    % determine length
+    length_arrays = length(Path.l_all);
+    %
+    % determine state
+    if previous
+        end_of_array = 1;
+        length_arrays = length_arrays - 1;
+    else
+        if length_arrays < 3
+            end_of_array = 1;
+        else
+            end_of_array = 2;
+        end
+    end
+    
     % create vector with Path.var_all and Path.l_all
     %
-    x_all = [Path.var_all;Path.l_all];
+    x_all = [Path.var_all(:,1:length_arrays);Path.l_all(1:length_arrays)];
     %
     %% define target values
     %
@@ -29,15 +56,15 @@ function E_i = calc_error(solver_output,Path,Opt)
     %% Factor by number of iterations
     % correct number of iterations
     if Opt.ds_max==inf
-        w_iter = max(solver_output.iterations,1);
+        w_iter = max(solver_output.iterations(end_of_array),1);
     else
-        w_iter = solver_output.iterations;
+        w_iter = solver_output.iterations(end_of_array);
     end    
     %% Factor by change of curvature
     %
     % Check if there are enough solution points
     %
-    if length(Path.l_all) > 3
+    if length_arrays > 3
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
@@ -62,13 +89,13 @@ function E_i = calc_error(solver_output,Path,Opt)
         w_curv = 1;
     end    
     %% Factor by speed of continuation
-    w_speed = Path.speed_of_continuation(end);
+    w_speed = Path.speed_of_continuation(end_of_array);
     %
     %% Factor by contraction rate
-    w_contr = solver_output.rate_of_contraction(end);
+    w_contr = solver_output.rate_of_contraction(end_of_array);
     %
     %% Factor by distance of predictor
-    rel_distance_of_predictor = norm(Path.x_predictor(:,end) - x_all(:,end)) / norm(x_all(:,end));
+    rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
     w_dist = rel_distance_of_predictor;
     %
     %% values
