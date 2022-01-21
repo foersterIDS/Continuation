@@ -379,9 +379,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %% end loop
         %
         if val
-            aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+            aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
         else
-            aux.print_line(Opt,'-----> invalid point %s |\tnew arc-length: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+            aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
         end
         [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
         exitflag = Info.exitflag;
