@@ -39,6 +39,16 @@ function [dsn] = control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,O
                         xi = step_size.iterations_polynomial(solver_output,Opt);
                     end
                 %
+                % contraction
+                %
+                elseif Opt.step_size_control.contraction
+                    xi = step_size.contraction(solver_output);
+                %
+                % error
+                %
+                elseif Opt.step_size_control.error
+                    xi = step_size.error(solver_output,Path,Opt);
+                %
                 % fayezioghani
                 %
                 elseif Opt.step_size_control.fayezioghani

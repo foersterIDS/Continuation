@@ -74,6 +74,14 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
+        if Stepsize_options.rate_of_contraction || Opt.step_size_control.multiplicative || Opt.step_size_control.error
+            if isfield(solver_output, 'rate_of_contraction')
+                rate_of_contraction_tmp = solver_output.rate_of_contraction;
+            else
+                rate_of_contraction_tmp = [];
+            end
+        end
+        
         %
         %% residual
         %
@@ -357,18 +365,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         % measure rate of contraction
         if Stepsize_options.rate_of_contraction
-            if isfield(solver_output, 'rate_of_contraction')
-                if size(solver_stepsizes, 1) < 3
-                    solver_output.rate_of_contraction = [solver_output.rate_of_contraction, 0.25];
-                else
-                    solver_output.rate_of_contraction = [solver_output.rate_of_contraction,solver_stepsizes(3,2)/solver_stepsizes(2,2)];
-                end
+            if size(solver_stepsizes, 1) < 3
+                solver_output.rate_of_contraction = [rate_of_contraction_tmp, 0.25];
             else
-                if size(solver_stepsizes, 1) < 3
-                    solver_output.rate_of_contraction = 0.25;
-                else
-                    solver_output.rate_of_contraction = solver_stepsizes(3,2)/solver_stepsizes(2,2);
-                end
+                solver_output.rate_of_contraction = [rate_of_contraction_tmp,solver_stepsizes(3,2)/solver_stepsizes(2,2)];
             end
         end
         %

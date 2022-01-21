@@ -1,10 +1,19 @@
-%% path continuation - step_size.multiplicative
+%% path continuation - step_size.error
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
-%   17.01.2022 - Tido Kubatschek
+%   20.01.2022 - Tido Kubatschek
 %
-function [xi] = multiplicative(solver_output,Path,Opt)
+%
+function [xi] = error(solver_output,Path,Opt)
+    E_i = calc_error(solver_output,Path,Opt);
+    
+    %% adjustment factor
+    E_max = 20;
+    xi = 2^(E_i/E_max);
+end
+
+function E_i = calc_error(solver_output,Path,Opt)
     % create vector with Path.var_all and Path.l_all
     %
     x_all = [Path.var_all;Path.l_all];
@@ -39,8 +48,8 @@ function [xi] = multiplicative(solver_output,Path,Opt)
         %
         % calculate curvature as 2-norm
         %
-        kappa_current = norm(r_pp1);
-        kappa_previous = norm(r_pp2);
+        kappa_current = norm(r_pp1) / norm(x_all(:,end));
+        kappa_previous = norm(r_pp2) / norm(x_all(:,end-1));
         %
         % calculate change of curvature
         %
@@ -65,20 +74,12 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %% values
     w_i = [w_iter, w_curv, w_speed, w_contr, w_dist];
     %
-    %% Quotients
-    %
-    quods = w_target./w_i;
-    quods(2) = w_curv;
-    %
-    %% limit quotients
-    %
-    max_quod = 2;
-    quods(quods > max_quod) = max_quod;
-    quods(quods < 1/max_quod) = 1/max_quod;
+    %% errors
+    e_i = (w_target - w_i)./w_target;    
     %
     %% Weigths
-    W = [0.5, 0.3, 0.05, 0.05, 0.05];
-    
-    %% adjustment factor
-    xi = prod(quods.^W);
+    W = [0.7, 0.1, 0.1, 0.05, 0.05].';
+    %
+    %% weighted error
+    E_i = e_i * W;
 end

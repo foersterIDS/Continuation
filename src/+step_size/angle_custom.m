@@ -25,8 +25,15 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     %
     deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
     %
-    % calculate adaption factor
+    % calculate ratio
+    ratio = angle / Opt.step_size_angle;
     %
-    xi = (Opt.step_size_angle / angle) * deviation_of_iterations^0.5;
+    if ratio < 0.9 % if ratio < 0.9, set ch to 0.9
+        ratio = 0.9;
+    elseif ratio > 1.5 % high ratios are punished stronger (but ratio_max = 5)
+        ratio = 5;
+    end
+    %
+    xi = (1/ratio)^0.3 * deviation_of_iterations^0.5;
     %
 end
