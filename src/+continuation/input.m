@@ -129,9 +129,35 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
                 end
             elseif strcmpi(varargin_cell{i},'Opt')
                 %% set Opt-struct:
-                Opt = varargin_cell{i+1};
+                Opt_temp = varargin_cell{i+1};
+                Opt_fieldnames_temp = fieldnames(Opt_temp);
+                used_fields = zeros(numel(Opt_fieldnames_temp),1);
                 for ii=1:numel(Opt_fieldnames)
-                    Opt_is_set.(lower(Opt_fieldnames{ii})) = true;
+                    contains_field = contains(Opt_fieldnames_temp,Opt_fieldnames{ii});
+                    if sum(contains_field)
+                        used_fields(contains_field) = 1;
+                        Opt.(lower(Opt_fieldnames{ii})) = Opt_temp.(lower(Opt_fieldnames{ii}));
+                        Opt_is_set.(lower(Opt_fieldnames{ii})) = true;
+                    end
+                end
+                if ~prod(used_fields)
+                    ind_not_used = find(used_fields==0);
+                    if numel(ind_not_used)==1
+                        err_msg = 'Unknown option ';
+                    else
+                        err_msg = 'Unknown options ';
+                    end
+                    for ii=1:numel(ind_not_used)
+                        if ii==1
+                            err_msg = [err_msg,Opt_fieldnames_temp{ind_not_used(ii)}];
+                        elseif ii<numel(ind_not_used)
+                            err_msg = [err_msg,', ',Opt_fieldnames_temp{ind_not_used(ii)}];
+                        else
+                            err_msg = [err_msg,' and ',Opt_fieldnames_temp{ind_not_used(ii)}];
+                        end
+                    end
+                    err_msg = [err_msg,' in user defined Opt-struct.'];
+                    error(err_msg);
                 end
             else
                 %% check name_legacy for Opt-struct:
