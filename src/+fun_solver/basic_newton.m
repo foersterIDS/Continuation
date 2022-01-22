@@ -5,10 +5,12 @@
 %   19.05.2020 - Alwin Förster
 %   16.09.2020 - Tido Kubatschek 
 %
-function [x,fval,exitflag,output,jacobian] = basic_newton(fun,x0,dscale,Opt)
+function [x,fval,exitflag,output,jacobian] = basic_newton(fun,x0,dscale,output_flag,Opt)
     max_step = Opt.solver_max_iterations;
-    global solver_stepsizes;
-    solver_stepsizes = [0, 0];
+    if output_flag
+        global solver_stepsizes;
+        solver_stepsizes = [0, 0];
+    end
     n_steps = 0;
     exitflag = -1;
     xi = x0;
@@ -30,7 +32,9 @@ function [x,fval,exitflag,output,jacobian] = basic_newton(fun,x0,dscale,Opt)
         n_steps = n_steps+1;
         abs_fi = sqrt(fi'*fi);
         abs_dxi = norm(xi-xim1)/norm(xi);
-        solver_stepsizes = [solver_stepsizes; i, norm(xi-xim1)];
+        if output_flag
+            solver_stepsizes = [solver_stepsizes; i, norm(xi-xim1)];
+        end
         if abs_fi<Opt.solver_tol
             exitflag = 2;
             break;

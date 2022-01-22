@@ -43,7 +43,7 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver
         num_jac_solver = @(fun,x0) fun_solver.s_lsqnonline(fun,x0,opt_num_jac);
     elseif Opt.solver.newton
         %% basic newton solver
-        solver = @(fun,x0,dscale) fun_solver.basic_newton(fun,x0,dscale,Opt);
+        solver = @(fun,x0,dscale) fun_solver.basic_newton(fun,x0,dscale,output_flag,Opt);
         if Opt.predictor_solver
             predictor_Opt = Opt;
             predictor_Opt.jacobian = true;
