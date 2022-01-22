@@ -28,12 +28,15 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     % calculate ratio
     ratio = angle / Opt.step_size_angle;
     %
-    if ratio < 0.9 % if ratio < 0.9, set ch to 0.9
+    if ratio < 0.9 % if ratio < 0.9, set ratio to 0.9
         ratio = 0.9;
-    elseif ratio > 1.5 % high ratios are punished stronger (but ratio_max = 5)
+    elseif ratio > 1.2 % high ratios are punished stronger (but ratio_max = 5)
         ratio = 5;
     end
     %
-    xi = (1/ratio)^0.3 * deviation_of_iterations^0.5;
+    % get weigths
+    weigths = Opt.weigths_angle_custom;
+    %
+    xi = deviation_of_iterations^weigths(1) * (1/ratio)^weigths(2);
     %
 end

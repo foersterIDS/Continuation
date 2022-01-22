@@ -15,7 +15,8 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %           optimal speed of continuation, optimal rate of contraction,
     %           optimal distance of predictor
     %
-    w_target = [Opt.n_iter_opt, 1, 10, 0.25, 0.5];
+    w_target = [Opt.n_iter_opt, 1, Opt.speed_of_continuation,...
+        Opt.optimal_contraction_rate, Opt.predictor_distance];
     %
     %% Factor by number of iterations
     % correct number of iterations
@@ -77,8 +78,8 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     quods(quods < 1/max_quod) = 1/max_quod;
     %
     %% Weigths
-    W = [0.3, 0.3, 0.05, 0.05, 0.05];
+    weights = Opt.weigths_multiplicative;
     
     %% adjustment factor
-    xi = prod(quods.^W);
+    xi = prod(quods.^weights);
 end

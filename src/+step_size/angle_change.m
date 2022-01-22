@@ -31,8 +31,12 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
     %
+    % get weigth
+    %
+    weigths = Opt.weigth_angle_change;
+    %
     % calculate adaption factor
     %
-    xi = change_of_angle^0.5 * deviation_of_iterations^0.5;
+    xi = deviation_of_iterations^weigths(1) * change_of_angle^weigths(2);
     %
 end

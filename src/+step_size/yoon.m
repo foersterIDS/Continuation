@@ -36,6 +36,6 @@ function [xi] = yoon(solver_output,Path,Opt)
     %
     % correct stepsize by iterations
     %
-    xi = xi * deviation_of_iterations^0.5;
+    xi = xi * deviation_of_iterations^Opt.weigths_yoon;
     %
 end

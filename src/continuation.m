@@ -397,9 +397,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         if Stepsize_options.rate_of_contraction
             if size(solver_stepsizes, 1) < 3
                 if ~isempty(rate_of_contraction_tmp)
-                    solver_output.rate_of_contraction = [rate_of_contraction_tmp(end), 0.25];
+                    solver_output.rate_of_contraction = [rate_of_contraction_tmp(end), Opt.optimal_contraction_rate];
                 else
-                    solver_output.rate_of_contraction = 0.25;
+                    solver_output.rate_of_contraction = Opt.optimal_contraction_rate;
                 end
             else
                 if ~isempty(rate_of_contraction_tmp)

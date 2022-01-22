@@ -5,7 +5,7 @@
 %   20.01.2022 - Tido Kubatschek
 %
 %
-function [xi] = contraction(solver_output)
+function [xi] = contraction(solver_output,Opt)
     % get rates of contraction
     %
     % current rate
@@ -24,14 +24,14 @@ function [xi] = contraction(solver_output)
     % 
     % optimal rate
     %
-    q = 0.1;
+    q_opt = Opt.optimal_contraction_rate;
     %
-    if current_rate > q && rel_difference > 0.01 
+    if current_rate > q_opt && rel_difference > 0.01
         % only decrease if there was a difference
         xi = 0.5;
-    elseif current_rate <= q/4 || rel_difference < 0.01
+    elseif current_rate <= q_opt/4 || (current_rate <= q_opt/2 && rel_difference < 0.01)
         % increase if rate is small or there is just a small difference
-        xi = 1.5;
+        xi = 1.2;
     else
         xi = 1;
     end

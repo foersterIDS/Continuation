@@ -22,10 +22,12 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     %
     angle = aux.vector_angle(v,tangent);
     %
+    % get weigths
+    %
+    weigths = Opt.weigths_fayezioghani;
+    %
     % calculate new step size
     %
-    beta_1 = 0.5;
-    beta_2 = 0.1;
-    xi = (Opt.n_iter_opt/(solver_output.iterations))^beta_1 *...
-        ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^beta_2;
+    xi = (Opt.n_iter_opt/(solver_output.iterations))^weigths(1)*...
+        ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^weigths(2);
 end

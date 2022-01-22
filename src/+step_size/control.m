@@ -42,7 +42,7 @@ function [dsn] = control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,O
                 % contraction
                 %
                 elseif Opt.step_size_control.contraction
-                    xi = step_size.contraction(solver_output);
+                    xi = step_size.contraction(solver_output,Opt);
                 %
                 % error
                 %

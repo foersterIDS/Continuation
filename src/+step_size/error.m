@@ -6,22 +6,23 @@
 %
 %
 function [xi] = error(solver_output,Path,Opt)
+    %
     E_i = calc_error(solver_output,Path,Opt,0);
-    if length(Path.l_all) > 3
+    %
+    %
+    K = Opt.step_size_error_pd;
+    %
+    if length(Path.l_all) > 3 && K(2) > 0
         E_i_m1 = calc_error(solver_output,Path,Opt,1);
     else
         E_i_m1 = 0;
     end
-    %%
-    K_P = 0.75;
-    K_D = 0.2;
     %
+    E = K(1) * E_i + K(2) * (E_i - E_i_m1);
     %
-    %
-    E = K_P * E_i + K_D * (E_i - E_i_m1);
     %% adjustment factor
-    E_max = 20;
-    xi = 2^(E/E_max);
+    %
+    xi = 2^(E/Opt.step_size_error_max);
 end
 
 function E_i = calc_error(solver_output,Path,Opt,previous)
@@ -95,8 +96,15 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     w_contr = solver_output.rate_of_contraction(end_of_array);
     %
     %% Factor by distance of predictor
-    rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
-    w_dist = rel_distance_of_predictor;
+    if norm(x_all(:,end_of_array)) > 1e-6
+        rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
+        w_dist = rel_distance_of_predictor;
+    elseif norm(Path.x_predictor(:,end_of_array)) > 1e-6
+        rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(Path.x_predictor(:,end_of_array));
+        w_dist = rel_distance_of_predictor;
+    else
+        w_dist = 1;
+    end
     %
     %% values
     w_i = [w_iter, w_curv, w_speed, w_contr, w_dist];
@@ -105,7 +113,7 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     e_i = (w_target - w_i)./w_target;    
     %
     %% Weigths
-    W = [0.7, 0.1, 0.1, 0.05, 0.05].';
+    W = Opt.weigths_error.';
     %
     %% weighted error
     E_i = e_i * W;

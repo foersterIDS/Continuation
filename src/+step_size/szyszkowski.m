@@ -31,15 +31,19 @@ function [xi] = szyszkowski(solver_output,Path,Opt)
     % check if angle is too large
     %
     if angle > Opt.step_size_angle
-        xi = 1/2;
+        xi = 0.5;
     else
         % calculate deviation of iterations
         %
         deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
         %
+        % get weigths
+        weigths = Opt.weigths_szyszkowski;
+        %
         % calculate new step size
         %
-        xi = abs(angle/angle_p1) * deviation_of_iterations^0.5;
+        xi = deviation_of_iterations^weigths(1) *...
+            abs(angle/angle_p1)^weigths(2);
         %
     end
 end
