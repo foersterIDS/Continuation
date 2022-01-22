@@ -15,8 +15,8 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
     if ns > n+nu
         x_all = [Path.var_all; Path.l_all];
         eps_dist = min([norm(x_all(:,end)-x_all(:,end-1)),2*ds,Opt.ds_max]);
-        eps_ang = 1*(2*pi / 360);
-        eps_dir = 1e-1;
+        eps_ang = 0.5*(2*pi / 360);
+        eps_dir = 1e-3;
         
         %% exclude points before current points which are too close
         %
