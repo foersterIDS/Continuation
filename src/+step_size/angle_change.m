@@ -33,7 +33,7 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     % get weigth
     %
-    weigths = Opt.weigth_angle_change;
+    weigths = Opt.weigths_angle_change;
     %
     % calculate adaption factor
     %
