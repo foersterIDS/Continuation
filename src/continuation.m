@@ -74,7 +74,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         Counter.loop = Counter.loop+1;
         is_current_jacobian = false;
         Counter.catch_old = Counter.catch;
-        %% save old values
+        %% save old values of stepsize information
         %
         if Stepsize_options.iterations
             if isfield(solver_output, 'iterations')
@@ -84,17 +84,17 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             end
         end
         %
-        if Stepsize_options.continuation_speed
-            if isfield(Path, 'continuation_speed')
-                continuation_speed_tmp = Path.continuation_speed(end);
+        if Stepsize_options.speed_of_continuation
+            if isfield(Path, 'speed_of_continuation') && ~isempty(Path.speed_of_continuation)
+                speed_of_continuation_tmp = Path.speed_of_continuation(end);
             else
-                continuation_speed_tmp = [];
+                speed_of_continuation_tmp = [];
             end
         end
         %
         if Stepsize_options.predictor
-            if isfield(Path, 'predictor')
-                predictor_tmp = Path.predictor(:,end);
+            if isfield(Path, 'predictor') && ~isempty(Path.x_predictor)
+                predictor_tmp = Path.x_predictor(:,end);
             else
                 predictor_tmp = [];
             end
@@ -129,7 +129,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         %% predictor
         %
-        if Stepsize_options.continuation_speed
+        if Stepsize_options.speed_of_continuation
             tic;
         end
         %
@@ -381,11 +381,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         dsim1 = ds;
         %
+        % update stepsize information
         % measure speed
         %
-        if Stepsize_options.continuation_speed
+        if Stepsize_options.speed_of_continuation
             time_needed = toc;
-            if ~isempty(rate_of_contraction_tmp)
+            if ~isempty(speed_of_continuation_tmp)
                 Path.speed_of_continuation = [Path.speed_of_continuation(end), ds/time_needed];
             else
                 Path.speed_of_continuation = ds/time_needed;
@@ -416,17 +417,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             end
         end
         %
-        if Stepsize_options.continuation_speed
-            if ~isempty(continuation_speed_tmp)
-                Path.continuation_speed = [continuation_speed_tmp, ds/time_needed];
-            else
-                Path.continuation_speed = ds/time_needed;
-            end
-        end
-        %
         if Stepsize_options.predictor
             if ~isempty(predictor_tmp)
-                Path.predictor = [predictor_tmp, Path.predictor];
+                Path.predictor = [predictor_tmp, Path.x_predictor];
             end
         end
         %
