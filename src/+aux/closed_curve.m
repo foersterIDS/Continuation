@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   09.11.2020 - Alwin Förster
 %
-function [is_closed, Opt] = closed_curve(Opt, Path, ds)
+function [is_closed, Opt, Counter] = closed_curve(Opt, Path,ds,Counter)
     is_closed = 0;
     n = 5;
     np = 4; % polynomial order (np = 2*k with k in N)
@@ -39,6 +39,7 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
             end
         end       
         %% check wether the found point is crossed under the same angle
+        count_flag = 0;
         if flag == 1
             for i=1:numel(k_flags)
                 %% polynomials
@@ -53,7 +54,7 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
                 p_c_m = poly.fitn(Path.s_all(end+(-np:0))-s0_c-dsc,x_all(:,end+(-np:0)),np);
                 % check polyinomials
                 if min([norm(p_f-p_c_p),norm(p_f-p_c_m)]/norm(p_f)) <= eps_pol
-                    Opt.closed_counter = Opt.closed_counter - 1;
+                    count_flag = 1;
                     break;
                 end
                 %% angle
@@ -66,12 +67,16 @@ function [is_closed, Opt] = closed_curve(Opt, Path, ds)
                 dir = norm(r_f - r_c);
                 %% check
                 if angle <= eps_ang && dir <= eps_dir % check angle and direction
-                    Opt.closed_counter = Opt.closed_counter - 1 ;
+                    count_flag = 1;
                 end
             end
         end
-
-        if Opt.closed_counter == 0
+        if count_flag
+            Counter.closed_counter = Counter.closed_counter + 1;
+        elseif Counter.closed_counter > 0
+            Counter.closed_counter = Counter.closed_counter - 1;
+        end
+        if Counter.closed_counter == Opt.closed_counter
             is_closed = 1;
         end
     end

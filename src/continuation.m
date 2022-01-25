@@ -425,7 +425,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         % adjust stepsize
         %
-        ds = step_size.control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt);
+        ds = step_size.control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt,Info);
         %
         %% end loop
         %
@@ -434,7 +434,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         else
             aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
         end
-        [Do,Info,Path,break_fun_out,Opt] = aux.exit_loop(Do,Info,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
+        [Do,Info,Path,break_fun_out,Opt,Counter] = aux.exit_loop(Do,Info,Path,Opt,Counter,Bifurcation,ds,fun_solution,solver_jacobian,break_fun_out,val);
         exitflag = Info.exitflag;
         var_all = Path.var_all;
         l_all = Path.l_all;

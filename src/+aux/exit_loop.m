@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, Path, Opt, Counter, Bifurcation, ds, fun_solution, solver_jacobian, break_fun_out, val)
+function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Path, Opt, Counter, Bifurcation, ds, fun_solution, solver_jacobian, break_fun_out, val)
     %% eval. break function:
     %
     try
@@ -77,7 +77,7 @@ function [Do, Info, Path, break_fun_out, Opt] = exit_loop(Do, Info, Path, Opt, C
     %% exit on closed curve:
     %
     if Opt.closed_curve_detection
-        [is_closed, Opt] = aux.closed_curve(Opt,Path, ds);
+        [is_closed, Opt, Counter] = aux.closed_curve(Opt,Path,ds,Counter);
         if is_closed
             Do.continuation = false;
             Info.exitflag = 4;
