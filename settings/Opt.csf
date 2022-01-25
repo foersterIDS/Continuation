@@ -34,7 +34,7 @@ max_remove_counter<>double<>20<>#scalar#integer#positive#nonzero
 n_bif_search<>double<>10<>#scalar#integer#positive#nonzero
 n_iter_opt<>double<>3<>#scalar#integer#positive#nonzero
 n_step_max<>eval<>inf<>#scalar#integer#positive#nonzero
-optimal_contraction_rate<>double<>0.05<>#scalar#double#positive#nonzero#max:1
+optimal_contraction_rate<>double<>0.1<>#scalar#double#positive#nonzero#max:1
 plot<>struct<>Opt_plot<>#struct
 plot_pause<>eval<>false<>#scalar#positive#nonzero#integer|#scalar#logical
 plot_var_of_interest<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
