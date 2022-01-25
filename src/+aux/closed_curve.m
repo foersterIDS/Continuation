@@ -72,11 +72,11 @@ function [is_closed, Opt, Counter] = closed_curve(Opt, Path,ds,Counter)
             end
         end
         if count_flag
-            Counter.closed_counter = Counter.closed_counter + 1;
-        elseif Counter.closed_counter > 0
-            Counter.closed_counter = Counter.closed_counter - 1;
+            Counter.closed_curve = Counter.closed_curve + 1;
+        elseif Counter.closed_curve > 0
+            Counter.closed_curve = Counter.closed_curve - 1;
         end
-        if Counter.closed_counter == Opt.closed_counter
+        if Counter.closed_curve == Opt.max_closed_counter
             is_closed = 1;
         end
     end

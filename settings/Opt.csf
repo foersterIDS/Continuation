@@ -6,7 +6,6 @@ bif_rand_dir<>eval<>true<>#scalar#logical
 break_function<>eval<>@(f,J,v,l,break_fun_out)aux.initial_break_function(f,J,v,l,break_fun_out)<>#function_handle
 check_residual<>eval<>false<>#scalar#logical
 check_step_size_options<>eval<>true<>#scalar#logical
-closed_counter<>double<>5<>#scalar#integer#positive#nonzero
 closed_curve_detection<>eval<>true<>#scalar#logical
 corrector<>struct<>Opt_corrector<>#struct#ison:corrector
 corrector_orthogonal_method<>struct<>Opt_corrector_orthogonal_method<>#struct#ison:corrector_orthogonal_method
@@ -29,6 +28,7 @@ jacobian<>eval<>false<>#scalar#logical
 l_0<>eval<>l_start<>#scalar#double
 l_target<>eval<>l_end<>#scalar#double
 live_plot_fig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
+max_closed_counter<>double<>5<>#scalar#integer#positive#nonzero
 max_error_counter<>double<>20<>#scalar#integer#positive#nonzero
 max_remove_counter<>double<>20<>#scalar#integer#positive#nonzero
 n_bif_search<>double<>10<>#scalar#integer#positive#nonzero

@@ -4,3 +4,4 @@ corrector>parabola>paraboloid
 step_size_control>pid>pid_valli
 step_size_control>iterations>iterations_polynomial
 step_size_control>angle>angle_change
+closed_counter>>max_closed_counter
