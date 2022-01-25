@@ -24,10 +24,10 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     %
     % get weigths
     %
-    weigths = Opt.weigths_fayezioghani;
+    weights = Opt.weights_fayezioghani;
     %
     % calculate new step size
     %
-    xi = (Opt.n_iter_opt/(solver_output.iterations))^weigths(1)*...
-        ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^weigths(2);
+    xi = (Opt.n_iter_opt/(solver_output.iterations))^weights(1)*...
+        ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^weights(2);
 end

@@ -18,18 +18,27 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     w_target = [Opt.n_iter_opt, 1, Opt.speed_of_continuation,...
         Opt.optimal_contraction_rate, Opt.predictor_distance];
     %
+    %% Weigths
+    %
+    weights = Opt.weights_multiplicative;
+    %
     %% Factor by number of iterations
     % correct number of iterations
-    if Opt.ds_max==inf
-        w_iter = max(solver_output.iterations(end),1);
+    if weights(1) ~= 0
+        if Opt.ds_max==inf
+            w_iter = max(solver_output.iterations(end),1);
+        else
+            w_iter = solver_output.iterations(end);
+        end
     else
-        w_iter = solver_output.iterations(end);
-    end    
+        w_iter = w_target(1);
+    end
+    %
     %% Factor by change of curvature
     %
     % Check if there are enough solution points
     %
-    if length(Path.l_all) > 3
+    if weights(2) ~= 0 && length(Path.l_all) > 3 
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
@@ -51,19 +60,42 @@ function [xi] = multiplicative(solver_output,Path,Opt)
             w_curv = kappa_previous/kappa_current;
         end
     else
-        w_curv = 1;
-    end    
+        w_curv = w_target(2);
+    end
     %% Factor by speed of continuation
-    w_speed = Path.speed_of_continuation(end);
+    %
+    if weights(3) ~= 0
+        w_speed = Path.speed_of_continuation(end);
+    else
+        w_speed = w_target(3);
+    end
     %
     %% Factor by contraction rate
-    w_contr = solver_output.rate_of_contraction(end);
+    %
+    if weights(4) ~= 0
+        w_contr = solver_output.rate_of_contraction(end);
+    else
+        w_contr = w_target(4);
+    end
     %
     %% Factor by distance of predictor
-    rel_distance_of_predictor = norm(Path.x_predictor(:,end) - x_all(:,end)) / norm(x_all(:,end));
-    w_dist = rel_distance_of_predictor;
+    %
+    if weights(5) ~= 0
+        if norm(x_all(:,end)) > 1e-6
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end) - x_all(:,end)) / norm(x_all(:,end));
+            w_dist = rel_distance_of_predictor;
+        elseif norm(Path.x_predictor(:,end)) > 1e-6
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end) - x_all(:,end)) / norm(Path.x_predictor(:,end));
+            w_dist = rel_distance_of_predictor;
+        else
+            w_dist = 1;
+        end
+    else
+        w_dist = w_target(5);
+    end
     %
     %% values
+    %
     w_i = [w_iter, w_curv, w_speed, w_contr, w_dist];
     %
     %% Quotients
@@ -76,10 +108,8 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     max_quod = 2;
     quods(quods > max_quod) = max_quod;
     quods(quods < 1/max_quod) = 1/max_quod;
-    %
-    %% Weigths
-    weights = Opt.weigths_multiplicative;
-    
+    %    
     %% adjustment factor
+    %
     xi = prod(quods.^weights);
 end

@@ -33,10 +33,10 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     % get weigth
     %
-    weigths = Opt.weigths_angle_change;
+    weights = Opt.weights_angle_change;
     %
     % calculate adaption factor
     %
-    xi = deviation_of_iterations^weigths(1) * change_of_angle^weigths(2);
+    xi = deviation_of_iterations^weights(1) * change_of_angle^weights(2);
     %
 end

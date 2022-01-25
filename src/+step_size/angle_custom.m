@@ -35,8 +35,8 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     end
     %
     % get weigths
-    weigths = Opt.weigths_angle_custom;
+    weights = Opt.weights_angle_custom;
     %
-    xi = deviation_of_iterations^weigths(1) * (1/ratio)^weigths(2);
+    xi = deviation_of_iterations^weights(1) * (1/ratio)^weights(2);
     %
 end

@@ -38,12 +38,12 @@ function [xi] = szyszkowski(solver_output,Path,Opt)
         deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
         %
         % get weigths
-        weigths = Opt.weigths_szyszkowski;
+        weights = Opt.weights_szyszkowski;
         %
         % calculate new step size
         %
-        xi = deviation_of_iterations^weigths(1) *...
-            abs(angle/angle_p1)^weigths(2);
+        xi = deviation_of_iterations^weights(1) *...
+            abs(angle/angle_p1)^weights(2);
         %
     end
 end

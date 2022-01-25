@@ -52,20 +52,28 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %           optimal speed of continuation, optimal rate of contraction,
     %           optimal distance of predictor
     %
-    w_target = [Opt.n_iter_opt, 1, 10, 0.25, 0.5];
+    w_target = [Opt.n_iter_opt, 1, Opt.speed_of_continuation,...
+        Opt.optimal_contraction_rate, Opt.predictor_distance];
+    %
+    %% Weights
+    weights = Opt.weights_error.';
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if Opt.ds_max==inf
-        w_iter = max(solver_output.iterations(end_of_array),1);
+    if weights(1) ~= 0
+        if Opt.ds_max==inf
+            w_iter = max(solver_output.iterations(end_of_array),1);
+        else
+            w_iter = solver_output.iterations(end_of_array);
+        end
     else
-        w_iter = solver_output.iterations(end_of_array);
-    end    
+        w_iter = w_target(1);
+    end
     %% Factor by change of curvature
     %
     % Check if there are enough solution points
     %
-    if length_arrays > 3
+    if weights(2) ~= 0 && length_arrays > 3
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
@@ -90,20 +98,32 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
         w_curv = 1;
     end    
     %% Factor by speed of continuation
-    w_speed = Path.speed_of_continuation(end_of_array);
+    if weights(3) ~= 0
+        w_speed = Path.speed_of_continuation(end_of_array);
+    else
+        w_speed = w_target(3);
+    end
     %
     %% Factor by contraction rate
-    w_contr = solver_output.rate_of_contraction(end_of_array);
+    if weights(4) ~= 0
+        w_contr = solver_output.rate_of_contraction(end_of_array);
+    else
+        w_contr = w_target(4);
+    end
     %
     %% Factor by distance of predictor
-    if norm(x_all(:,end_of_array)) > 1e-6
-        rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
-        w_dist = rel_distance_of_predictor;
-    elseif norm(Path.x_predictor(:,end_of_array)) > 1e-6
-        rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(Path.x_predictor(:,end_of_array));
-        w_dist = rel_distance_of_predictor;
+    if weights(5) ~= 0
+        if norm(x_all(:,end_of_array)) > 1e-6
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
+            w_dist = rel_distance_of_predictor;
+        elseif norm(Path.x_predictor(:,end_of_array)) > 1e-6
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(Path.x_predictor(:,end_of_array));
+            w_dist = rel_distance_of_predictor;
+        else
+            w_dist = 1;
+        end
     else
-        w_dist = 1;
+        w_dist = w_target(5);
     end
     %
     %% values
@@ -112,9 +132,6 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %% errors
     e_i = (w_target - w_i)./w_target;    
     %
-    %% Weigths
-    W = Opt.weigths_error.';
-    %
     %% weighted error
-    E_i = e_i * W;
+    E_i = (e_i * weights)/sum(weights);
 end
