@@ -16,7 +16,11 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     % calculate connecting vector and tangent
     %
     v = z_needed(:,end) - z_needed(:,end-1);
-    [~,tangent] = predictor.ode(Path,ds,Jac,[]);
+    if diff(size(Jac)) == 0 && size(Jac,1) == (size(v_needed,1) + 1)
+        [~,tangent] = predictor.ode(Path,ds,Jac,[],Opt);
+    else
+        tangent = v;
+    end
     %
     % calculate angle
     %

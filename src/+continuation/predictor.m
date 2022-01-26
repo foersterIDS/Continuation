@@ -18,7 +18,7 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res
         if length(Path.l_all)==1
             fun_predictor = @(s) predictor.initial(Path,s,Opt);
         else
-            fun_predictor = @(s) predictor.ode(Path,s,solver_jacobian,fun);
+            fun_predictor = @(s) predictor.ode(Path,s,solver_jacobian,fun,Opt);
         end
     else
         error('predictor not set or of unknown type');

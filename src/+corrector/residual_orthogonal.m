@@ -34,7 +34,7 @@ function [residual,jacobian] = residual_orthogonal(x,x_all,ds,Jac,Opt)
             % calc tangent via jacobian
             Path_help.var_all = x_all(1:end-1,:);
             Path_help.l_all = x_all(end,:);
-            [xip1,tangent] = predictor_ode(Path_help,ds,Jac,[]);
+            [xip1,tangent] = predictor_ode(Path_help,ds,Jac,[],Opt);
         end       
     end
     %

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   12.11.2020 - Alwin Förster
 %
-function [fun_predictor,Jac_predictor] = ode(Path,s,solver_jacobian,fun)
+function [fun_predictor,Jac_predictor] = ode(Path,s,solver_jacobian,fun,Opt)
     x_all = [Path.var_all;Path.l_all];
     xi = x_all(:,end);
     nd = length(xi);
@@ -17,7 +17,7 @@ function [fun_predictor,Jac_predictor] = ode(Path,s,solver_jacobian,fun)
             jac = [solver_jacobian(1:nd-1,1:nj2),numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivative_dimensions',(nj2+1):nd,'diffquot',Opt.diffquot)];
         end
     else
-        jac = numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',Opt.diffquot);
+        jac = aux.numeric_jacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',Opt.diffquot);
     end
     %% build system of equations:
     [~,m] = max(abs(diff(x_all(:,end+(-1:0)),1,2)));

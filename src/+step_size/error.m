@@ -27,18 +27,35 @@ end
 
 function E_i = calc_error(solver_output,Path,Opt,previous)
     %
+    %% Weights
+    weights = Opt.weights_error.';
+    %
+    %
     % determine length
     length_path = length(Path.l_all);
-    length_arrays = length(solver_output.iterations);
+    length_iterations = length(solver_output.iterations);
+    if weights(3) ~= 0
+        length_arrays = length(Path.speed_of_continuation);
+    elseif weights(4) ~= 0
+        length_arrays = length(solver_output.rate_of_convergence);
+    elseif weights(5) ~= 0
+        length_arrays = length(Path.x_predictor(1,:));
+    else
+        length_arrays = 1;
+    end
+    
     %
     % determine state
     if previous
+        end_of_iterations = length_iterations - 1;
         end_of_array = length_arrays - 1;
         length_path = length_path - 1;
     else
         if length_path < 3
+            end_of_iterations = length_iterations - 1;
             end_of_array = length_arrays - 1;
         else
+            end_of_iterations = length_iterations;
             end_of_array = length_arrays;
         end
     end
@@ -56,16 +73,14 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     w_target = [Opt.n_iter_opt, 1, Opt.speed_of_continuation,...
         Opt.optimal_contraction_rate, Opt.predictor_distance];
     %
-    %% Weights
-    weights = Opt.weights_error.';
     %
     %% Factor by number of iterations
     % correct number of iterations
     if weights(1) ~= 0
         if Opt.ds_max==inf
-            w_iter = max(solver_output.iterations(end_of_array),1);
+            w_iter = max(solver_output.iterations(end_of_iterations),1);
         else
-            w_iter = solver_output.iterations(end_of_array);
+            w_iter = solver_output.iterations(end_of_iterations);
         end
     else
         w_iter = w_target(1);
@@ -78,15 +93,15 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
-        delta_s = Path.s_all(end:-1:end-2) - Path.s_all(end-1:-1:end-3);
+        delta_s = Path.s_all(length_path:-1:length_path-2) - Path.s_all(length_path-1:-1:length_path-3);
         %
-        r_pp1 = 1/(delta_s(1))^2 * (x_all(:,end) - (1 + delta_s(1)/delta_s(2))*x_all(:,end-1) + delta_s(1)/delta_s(2) * x_all(:,end-2));
-        r_pp2 = 1/(delta_s(2))^2 * (x_all(:,end-1) - (1 + delta_s(2)/delta_s(3))*x_all(:,end-2) + delta_s(2)/delta_s(3) * x_all(:,end-3));
+        r_pp1 = 1/(delta_s(1))^2 * (x_all(:,length_path) - (1 + delta_s(1)/delta_s(2))*x_all(:,length_path-1) + delta_s(1)/delta_s(2) * x_all(:,length_path-2));
+        r_pp2 = 1/(delta_s(2))^2 * (x_all(:,length_path-1) - (1 + delta_s(2)/delta_s(3))*x_all(:,length_path-2) + delta_s(2)/delta_s(3) * x_all(:,length_path-3));
         %
         % calculate curvature as 2-norm
         %
-        kappa_current = norm(r_pp1) / norm(x_all(:,end));
-        kappa_previous = norm(r_pp2) / norm(x_all(:,end-1));
+        kappa_current = norm(r_pp1) / norm(x_all(:,length_path));
+        kappa_previous = norm(r_pp2) / norm(x_all(:,length_path-1));
         %
         % calculate change of curvature
         %
@@ -114,14 +129,14 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     %% Factor by distance of predictor
     if weights(5) ~= 0
-        if norm(x_all(:,end_of_array)) > 1e-6
-            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(x_all(:,end_of_array));
+        if norm(x_all(:,length_path)) > 1e-6
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,length_path)) / norm(x_all(:,length_path));
             w_dist = rel_distance_of_predictor;
         elseif norm(Path.x_predictor(:,end_of_array)) > 1e-6
-            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,end_of_array)) / norm(Path.x_predictor(:,end_of_array));
+            rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,length_path)) / norm(Path.x_predictor(:,end_of_array));
             w_dist = rel_distance_of_predictor;
         else
-            w_dist = 1;
+            w_dist = w_target(5);
         end
     else
         w_dist = w_target(5);
