@@ -5,16 +5,12 @@
 %   27.10.2020 - Tido Kubatschek
 %
 function [s_all_i] = interp_s(s_all, var_all, l_all, Opt)
-%     var_all = vs;
-%     l_all = ls;
-%     s_all = 0;
-%     for k = 2:length(x_all)
-%         s_all = [s_all,s_all(end) + norm(x_all(:,k) - x_all(:,k-1))];
-%     end
-
-    n = length(l_all);
+    %%
+    Opt.interpolation_method.spline = true;
+    Opt.number_interp_s = 100;
+    number_of_points = length(l_all);
     
-    if n < 2
+    if number_of_points < 2
         error('for interpolation at least 2 data points are needed.')
     end
     
@@ -32,24 +28,41 @@ function [s_all_i] = interp_s(s_all, var_all, l_all, Opt)
         % use MATLAB intern function makima
         pp = @(s,x) makima(s, x);
         
-    elseif Opt.interpolation_method.beziere
-        aux.print_line(Opt,'--> method has not been implemented yet! Using spline instead\n');
-        pp = @(s,x) spline(s, x);
     else
         error('There is no such interpolation method.')
     end
     
     % calc new s with finer inc
     
-    n_points = max([n, 4]);
-    
-    s_i= linspace(s_all(end-n_points), s_all(end), Opt.interp_s_inc);
-    x_all_i = ppval(pp(s_all, x_all), s_i);
-    
-    s_all_n = 0;
-    
-    for k = 2:length(x_all_i)
-        s_all_n = [s_all_n,s_all_n(end) + norm(x_all_i(:,k) - x_all_i(:,k-1))];
+    number_of_points = min([number_of_points, 4]);
+    s_old = 0;
+    s_start = s_all(end-number_of_points);
+    %%
+    s_all_tmp = s_all;
+    while true
+        s_i = linspace(s_all_tmp(end-number_of_points), s_all_tmp(end), Opt.number_interp_s);
+        x_all_i = ppval(pp(s_all_tmp, x_all), s_i);
+
+        s_all_n = s_start;
+
+        for k = 2:length(x_all_i)
+            s_all_n = [s_all_n,s_all_n(end) + norm(x_all_i(:,k) - x_all_i(:,k-1))];
+        end
+        
+        if abs(s_all_n(end) - s_old) <= 0.1
+            break;
+        end
+        
+        s_old = s_all_n(end);
+        x_all = x_all(:,1:end);
+        s_all_tmp = s_all_tmp(1:end);
+        
+        x_all = [x_all, x_all_i(:,2:end)];
+        s_all_tmp = [s_all_tmp, s_all_n(2:end)];
     end
+    s_all_tmp = s_all_tmp(1:end);
+    s_all_tmp = [s_all_tmp, s_all_n(2:end)];
+    s_all_i = s_all_tmp;
     
+    %%
 end

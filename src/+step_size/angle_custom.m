@@ -23,7 +23,7 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     %
     % calculate deviation of iterations
     %
-    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
+    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations(end);
     %
     % calculate ratio
     ratio = angle / Opt.step_size_angle;

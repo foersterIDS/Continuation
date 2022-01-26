@@ -32,7 +32,7 @@ function [xi] = yoon(solver_output,Path,Opt)
     %
     % calculate deviation of iterations
     %
-    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
+    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations(end);
     %
     % correct stepsize by iterations
     %

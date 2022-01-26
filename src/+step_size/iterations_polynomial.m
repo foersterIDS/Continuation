@@ -11,9 +11,9 @@
 function [xi] = iterations_polynomial(solver_output,Opt)
     % correct number of iterations
     if Opt.ds_max==inf
-        iter = max(solver_output.iterations,1);
+        iter = max(solver_output.iterations(end),1);
     else
-        iter = solver_output.iterations;
+        iter = solver_output.iterations(end);
     end
     % calculate step size adaption factor
     xi = (Opt.n_iter_opt/iter)^Opt.step_size_iterations_beta;

@@ -12,7 +12,7 @@ function [xi] = error(solver_output,Path,Opt)
     %
     K = Opt.step_size_error_pd;
     %
-    if length(Path.l_all) > 3 && K(2) > 0
+    if length(Path.l_all) > 3 && ~isempty(Path.speed_of_continuation) && K(2) > 0
         E_i_m1 = calc_error(solver_output,Path,Opt,1);
     else
         E_i_m1 = 0;
@@ -28,23 +28,24 @@ end
 function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     % determine length
-    length_arrays = length(Path.l_all);
+    length_path = length(Path.l_all);
+    length_arrays = length(solver_output.iterations);
     %
     % determine state
     if previous
-        end_of_array = 1;
-        length_arrays = length_arrays - 1;
+        end_of_array = length_arrays - 1;
+        length_path = length_path - 1;
     else
-        if length_arrays < 3
-            end_of_array = 1;
+        if length_path < 3
+            end_of_array = length_arrays - 1;
         else
-            end_of_array = 2;
+            end_of_array = length_arrays;
         end
     end
     
     % create vector with Path.var_all and Path.l_all
     %
-    x_all = [Path.var_all(:,1:length_arrays);Path.l_all(1:length_arrays)];
+    x_all = [Path.var_all(:,1:length_path);Path.l_all(1:length_path)];
     %
     %% define target values
     %
@@ -73,7 +74,7 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     % Check if there are enough solution points
     %
-    if weights(2) ~= 0 && length_arrays > 3
+    if weights(2) ~= 0 && length_path > 3
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %

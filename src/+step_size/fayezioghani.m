@@ -28,6 +28,6 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     %
     % calculate new step size
     %
-    xi = (Opt.n_iter_opt/(solver_output.iterations))^weights(1)*...
+    xi = (Opt.n_iter_opt/(solver_output.iterations(end)))^weights(1)*...
         ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^weights(2);
 end

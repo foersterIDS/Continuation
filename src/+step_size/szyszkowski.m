@@ -35,7 +35,7 @@ function [xi] = szyszkowski(solver_output,Path,Opt)
     else
         % calculate deviation of iterations
         %
-        deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations;
+        deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations(end);
         %
         % get weigths
         weights = Opt.weights_szyszkowski;
