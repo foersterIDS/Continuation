@@ -106,9 +106,14 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
                             if isempty(name_legacy)
                                 name_legacy = aux.clf2struct('name_legacy');
                             end
-                            if isfield(name_legacy.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
-                                varargin_cell{i+1} = name_legacy.(lower(varargin_cell{i})).(lower(varargin_cell{i+1}));
-                                i = i-2;
+                            if isfield(name_legacy,lower(varargin_cell{i}))
+                                if isfield(name_legacy.(lower(varargin_cell{i})),lower(varargin_cell{i+1}))
+                                    varargin_cell{i+1} = name_legacy.(lower(varargin_cell{i})).(lower(varargin_cell{i+1}));
+                                    i = i-2;
+                                else
+                                    err_msg = sprintf('Unknown parameter %s for option %s.',varargin_cell{i+1},varargin_cell{i});
+                                    error(err_msg);
+                                end
                             else
                                 err_msg = sprintf('Unknown parameter %s for option %s.',varargin_cell{i+1},varargin_cell{i});
                                 error(err_msg);
