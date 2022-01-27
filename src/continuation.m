@@ -470,7 +470,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 last_jacobian = [rmv_jacobian,aux.numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
                 if Stepsize_options.predictor
                     if n_rmv >= 3
-                        predictor_tmp = [];
+                        predictor_tmp = x_predictor;
                     else
                         predictor_tmp = predictor_tmp(1:end-n_rmv);
                     end
@@ -587,7 +587,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
             end
         else
             if ~isempty(solver_output.iterations)
-                aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations,Opt.n_iter_opt);
+                aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
             else
                 aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
             end
