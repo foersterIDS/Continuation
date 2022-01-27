@@ -35,9 +35,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     if Stepsize_options.predictor
         x_predictor_plus = [];
     end
-    if Stepsize_options.iterations
-        iterations_plus = [];
-    end
     if Stepsize_options.speed_of_continuation
         speed_of_continuation_plus = [];
     end
@@ -46,6 +43,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     end
     last_jacobian = [];
     break_fun_out = [];
+    event_out = false;
     if initial_exitflag>0
         Path.l_all = Opt.l_0;
         Path.s_all = 0;
@@ -55,6 +53,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         previous_jacobian = solver_jacobian;
         last_jacobian = solver_jacobian;
         [~,break_fun_out] = Opt.break_function(fun_initial,solver_jacobian,Path.var_all,Path.l_all,break_fun_out);
+        if Opt.step_size_event
+            [ds,Counter,event_out,~] = step_size.event(ds,Path,Counter,Opt,event_out);
+        end
         aux.print_line(Opt,'Initial solution at l = %.2e\n',Opt.l_0);
         if aux.ison(Opt.bifurcation)
             sign_det_jacobian = sign(det(initial_jacobian));
@@ -503,9 +504,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 if Stepsize_options.predictor
                     x_predictor_plus = [];
                 end
-                if Stepsize_options.iterations
-                    iterations_plus = [];
-                end
                 if Stepsize_options.speed_of_continuation
                     speed_of_continuation_plus = [];
                 end
@@ -575,7 +573,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         % adjust stepsize
         %
-        ds = step_size.control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt,Info);
+        [ds,Counter,event_out] = step_size.control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt,Info,event_out);
         %
         %% end loop
         %
