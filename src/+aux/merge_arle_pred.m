@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   24.11.2020 - Alwin Förster
 %
-function [fs,Js] = merge_arle_pred(fun_predictor,res_corr,s,xi,ds)
+function [fs,Js] = merge_arle_pred(fun_predictor,res_corr,s,xi,ds,Jac)
     [xp,dxpds] = fun_predictor(s);
-    [ra,dradxp] = res_corr(xp,xi,ds);
+    [ra,dradxp] = res_corr(xp,xi,ds,Jac);
     fs = ra;
     Js = dradxp*dxpds;
 end

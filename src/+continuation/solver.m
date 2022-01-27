@@ -21,7 +21,7 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
         if Opt.predictor_solver
-            predictor_options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true);
+            predictor_options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations);
             predictor_solver = @(fun_predictor,s0) fsolve(fun_predictor,s0,predictor_options);
         end
         opt_num_jac = optimoptions(options,'SpecifyObjectiveGradient',false);
@@ -36,7 +36,7 @@ function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fun_solver.s_lsqnonlin(fun,x0,optfun(dscale));
         if Opt.predictor_solver
-            predictor_options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true);
+            predictor_options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations);
             predictor_solver = @(fun_predictor,s0) fun_solver.s_lsqnonline(fun_predictor,s0,predictor_options);
         end
         opt_num_jac = optimoptions(options,'SpecifyObjectiveGradient',false);

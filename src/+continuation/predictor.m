@@ -29,7 +29,7 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res
         if Opt.enforce_ds_max
             %% enforce_ds_max:
             p = 0.95;
-            fun_pred = @(s,ds) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds);
+            fun_pred = @(s,ds) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds,solver_jacobian);
             fun_ds_max = @(s,ds) heaviside(-min(Opt.ds_max*p-(fun_predictor(s)-xi)))*min(Opt.ds_max*p-(fun_predictor(s)-xi));
             fun_solve = @(spds) [fun_pred(spds(1),spds(2));fun_ds_max(spds(1),spds(2))];
             [spds,~,exitflag] = Solver.num_jac(fun_solve,[ds;ds]);
@@ -41,7 +41,7 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res
             end
         else
             %% solve arc-length
-            fun_solve = @(s) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds);
+            fun_solve = @(s) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds,solver_jacobian);
             [sp,~,exitflag] = Solver.predictor(fun_solve,ds);
             if exitflag<=0
                 sp = ds;
