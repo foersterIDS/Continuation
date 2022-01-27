@@ -54,7 +54,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         last_jacobian = solver_jacobian;
         [~,break_fun_out] = Opt.break_function(fun_initial,solver_jacobian,Path.var_all,Path.l_all,break_fun_out);
         if Opt.step_size_event
-            [ds,Counter,event_out,~] = step_size.event(ds,Path,Counter,Opt,event_out);
+            [ds,Counter,event_out,~] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out);
         end
         aux.print_line(Opt,'Initial solution at l = %.2e\n',Opt.l_0);
         if aux.ison(Opt.bifurcation)

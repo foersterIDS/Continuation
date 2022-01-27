@@ -11,7 +11,7 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
         if ~Do.deflate
             if Counter.error == 0
                 if Opt.step_size_event
-                    [dsn,Counter,event_out,changed] = step_size.event(ds,Path,Counter,Opt,event_out);
+                    [dsn,Counter,event_out,changed] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out);
                 else
                     changed = false;
                 end

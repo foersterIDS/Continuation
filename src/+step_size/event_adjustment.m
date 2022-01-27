@@ -1,8 +1,12 @@
-%% path continuation - step_size.event
+%% path continuation - step_size.event_adjustment
+%  Adjusts stepsize if a specified event occurs.
+%  Event can be specified in 'event_condition' and must be a function
+%  handle as follows:
 %
-%   Institute of Dynamics and Vibration Research
-%   Leibniz University Hannover
-%   21.01.2022 - Tido Kubatschek
+%                   @(ds,Path) ...
+%  Must return true or false!
+%  Sets stepsize to the value specified in 'ds_event' (default 1e-4).
+%  Stepsize can be adapted 'event_counter' times (default 1).
 %
 %   Inputs:
 %       ds          -- latest stepsize
@@ -23,7 +27,11 @@
 %       event_out   -- ...
 %       changed     -- tells if the stepsize has been changed
 %
-function [ds,Counter,event_out,changed] = event(ds,Path,Counter,Opt,event_out)
+%   Institute of Dynamics and Vibration Research
+%   Leibniz University Hannover
+%   21.01.2022 - Tido Kubatschek
+%
+function [ds,Counter,event_out,changed] = event_adjustment(ds,Path,Counter,Opt,event_out)
     %
     % To-Do: identify relevant variables for event checking
     %        --> Path, ds, Jacobian?, fun?
