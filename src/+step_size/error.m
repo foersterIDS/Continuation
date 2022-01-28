@@ -1,9 +1,43 @@
-%% path continuation - step_size.error
+%% path continuation - step_size.multiplicative
+%  Adjusts stepsize due to the relative differences of multiple values:
+%  -- needed number of iterations and optimal number of iterations
+%  -- change of curvature of path and optimal change of curvature (1)
+%  -- speed of continuation and optimal speed
+%  -- rate of contraction and optimal rate
+%  -- distance of predictor to solution point and optimal distance
+%  The optimal values are specified by:
+%  -- optimal number of iterations: 'n_iter_opt'
+%  -- optimal speed: 'speed_of_continuation'
+%  -- rate of contraction: 'optimal_contraction_rate'
+%  -- distance of predictor: 'predictor_distance'
+%  The differences are then devided by the optimal values, weighted by 
+%  weights specified in 'weights_multiplicative' and then added togehter.
+%  The sum is then used as an exponent and can be weighted by
+%  'step_size_error_max'. Also it is possible to consider the tendency of
+%  the adaption in the last step by a PD controller which constants are 
+% specified in 'step_size_error_pd'.
+%
+%
+%   Inputs:
+%       solver_output -- contains information of solver, such as the 
+%                        needed number of iterations and rate of contraction.
+%       Path          -- contains the solution points of the path and the
+%                        predictors.
+%       Opt           -- contains user inputs, such as optimal values, the
+%                        weights, accessible by 'weights_multiplicative',
+%                        the sum weight ('step_size_error_max') and the 
+%                        PD constants ('step_size_error_pd').
+%                        
+%   Outputs:
+%       xi            -- stepsize adaption factor
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a>. See <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
-%
 %
 function [xi] = error(solver_output,Path,Opt)
     %

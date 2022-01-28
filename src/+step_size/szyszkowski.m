@@ -1,4 +1,27 @@
 %% path continuation - step_size.szyszkowski
+%  Adjusts stepsize by the ratio of the angles of the lines connecting the
+%  last four consecutive solution points. Also adapts due to needed number 
+%  of iterations (see <a href="matlab:doc('step_size.iterations_polynomial')">step_size.iterations_polynomial</a>).
+%  Both adaption factors are weighted by the weights specified in 
+%  'weights_szyszkowski' and then multiplied.
+%
+%
+%   Inputs:
+%       solver_output -- contains information of solver, such as the 
+%                        needed number of iterations.
+%       Path          -- contains the solution points of the path
+%       Opt           -- contains user inputs, such as optimal number of
+%                        iterations, accessible by 'n_iter_opt' and the
+%                        weights, accessible by 'weights_szyszkowski'.
+%                        
+%   Outputs:
+%       xi            -- stepsize adaption factor
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a>. See <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
+%
+%   DOI: https://doi.org/10.1007/s004660050513  (adapted version)
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

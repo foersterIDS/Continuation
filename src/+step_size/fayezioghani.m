@@ -1,4 +1,30 @@
 %% path continuation - step_size.fayezioghani
+%  Adjusts stepsize by the ratio of the angle of the lines connecting the
+%  last three consecutive solution points and the tangent in the current 
+%  point. Also adapts due to needed number of iterations (see 
+%  <a href="matlab:doc('step_size.iterations_polynomial')">step_size.iterations_polynomial</a>).
+%  Both adaption factors are weighted by the weights specified in 
+%  'weights_fayezioghani' and then multiplied.
+%
+%
+%   Inputs:
+%       ds            -- latest used stepsize
+%       solver_output -- contains information of solver, such as the 
+%                        needed number of iterations.
+%       Path          -- contains the solution points of the path
+%       Jac           -- current Jacobian to calculate tangent
+%       Opt           -- contains user inputs, such as optimal number of
+%                        iterations, accessible by 'n_iter_opt' and the
+%                        weights, accessible by 'weights_fayezioghani'.
+%                        
+%   Outputs:
+%       xi            -- stepsize adaption factor
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a>. See <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
+%
+%   DOI: https://doi.org/10.1016/j.compstruc.2019.07.009 (adapted version)
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

@@ -1,4 +1,34 @@
 %% path continuation - step_size.multiplicative
+%  Adjusts stepsize due to the ratios of multiple values:
+%  -- needed number of iterations and optimal number of iterations
+%  -- change of curvature of path and optimal change of curvature (1)
+%  -- speed of continuation and optimal speed
+%  -- rate of contraction and optimal rate
+%  -- distance of predictor to solution point and optimal distance
+%
+%  The quotiens are weighted by weights specified in 'weights_multiplicative'
+%  and then multiplied.
+%  The optimal values are specified by:
+%  -- optimal number of iterations: 'n_iter_opt'
+%  -- optimal speed: 'speed_of_continuation'
+%  -- rate of contraction: 'optimal_contraction_rate'
+%  -- distance of predictor: 'predictor_distance'
+%
+%
+%   Inputs:
+%       solver_output -- contains information of solver, such as the 
+%                        needed number of iterations and rate of contraction.
+%       Path          -- contains the solution points of the path and the
+%                        predictors.
+%       Opt           -- contains user inputs, such as values and the
+%                        weights, accessible by 'weights_multiplicative'.
+%                        
+%   Outputs:
+%       xi            -- stepsize adaption factor
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a>. See <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

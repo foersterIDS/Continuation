@@ -1,9 +1,24 @@
 %% path continuation - step_size.contraction
+%  Adjusts stepsize by the rate of contraction of the solver which is
+%  compared to an optimale rate.
+%
+%
+%   Inputs:
+%       solver_output -- contains information of solver, such as the 
+%                        rate of contraction.
+%       Opt           -- contains user inputs, such as the optimal contraction
+%                        rate specified in 'optimal_contraction_rate'.
+%                        
+%   Outputs:
+%       xi            -- stepsize adaption factor
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a>. See <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
-%
 %
 function [xi] = contraction(solver_output,Opt)
     % get rates of contraction

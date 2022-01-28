@@ -1,4 +1,24 @@
 %% path continuation - step_size.control
+%  Adjusts stepsize by choosing an adaption method. 
+%
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a> or
+%  see the control methods:
+%  -- <a href="matlab:doc('step_size.angle_change')">step_size.angle_change</a>
+%  -- <a href="matlab:doc('step_size.angle_custom')">step_size.angle_custom</a>
+%  -- <a href="matlab:doc('step_size.contraction')">step_size.contraction</a>
+%  -- <a href="matlab:doc('step_size.error')">step_size.error</a>
+%  -- <a href="matlab:doc('step_size.event_adjustment')">step_size.event_adjustment</a>
+%  -- <a href="matlab:doc('step_size.fayezioghani')">step_size.fayezioghani</a>
+%  -- <a href="matlab:doc('step_size.iterations_exponential')">step_size.iterations_exponential</a>
+%  -- <a href="matlab:doc('step_size.iterations_polynomial')">step_size.iterations_polynomial</a>
+%  -- <a href="matlab:doc('step_size.multiplicative')">step_size.multiplicative</a>
+%  -- <a href="matlab:doc('step_size.pid_custom')">step_size.pid_custom</a>
+%  -- <a href="matlab:doc('step_size.pid_valli')">step_size.pid_valli</a>
+%  -- <a href="matlab:doc('step_size.szyszkowski')">step_size.szyszkowski</a>
+%  -- <a href="matlab:doc('step_size.yoon')">step_size.yoon</a>
+%
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover

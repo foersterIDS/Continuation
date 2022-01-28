@@ -27,6 +27,10 @@
 %       event_out   -- ...
 %       changed     -- tells if the stepsize has been changed
 %
+%
+%
+%  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a> or see <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
+%
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   21.01.2022 - Tido Kubatschek
