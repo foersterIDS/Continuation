@@ -35,14 +35,14 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     %
     % collect needed data of Path
     %
-    v_needed = Path.var_all(:,end-2:end);
-    l_needed = Path.l_all(end-2:end);
-    z_needed = [v_needed; l_needed];
+    var_needed = Path.var_all(:,end-1:end);
+    l_needed = Path.l_all(end-1:end);
+    z_needed = [var_needed; l_needed];
     %
     % calculate connecting vector and tangent
     %
     v = z_needed(:,end) - z_needed(:,end-1);
-    if diff(size(Jac)) == 0 && size(Jac,1) == (size(v_needed,1) + 1)
+    if diff(size(Jac)) == 0 && size(Jac,1) == (size(var_needed,1) + 1)
         [~,tangent] = predictor.ode(Path,ds,Jac,[],Opt);
     else
         tangent = v;
@@ -56,8 +56,16 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     %
     weights = Opt.weights_fayezioghani;
     %
+    % correct number of iterations
+    %
+    if Opt.ds_max==inf
+        iter = max(solver_output.iterations(end),1);
+    else
+        iter = solver_output.iterations(end);
+    end
+    %
     % calculate new step size
     %
-    xi = (Opt.n_iter_opt/(solver_output.iterations(end)))^weights(1)*...
-        ((cos(angle) +1)/(cos(Opt.step_size_angle) +1))^weights(2);
+    xi = (Opt.n_iter_opt / iter)^weights(1)*...
+        ((cos(angle) + 1) / (cos(Opt.step_size_angle) + 1))^weights(2);
 end

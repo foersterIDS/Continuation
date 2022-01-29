@@ -29,9 +29,9 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     % collect needed data of Path
     %
-    v_needed = Path.var_all(:,end-3:end);
+    var_needed = Path.var_all(:,end-3:end);
     l_needed = Path.l_all(end-3:end);
-    z_needed = [v_needed; l_needed];
+    z_needed = [var_needed; l_needed];
     %
     % calculate connecting vectors
     %
@@ -48,11 +48,19 @@ function [xi] = angle_change(solver_output,Path,Opt)
     %
     change_of_angle = angle_2/angle_1;
     %
+    % correct number of iterations
+    %
+    if Opt.ds_max==inf
+        iter = max(solver_output.iterations(end),1);
+    else
+        iter = solver_output.iterations(end);
+    end
+    %
     % calculate deviation of iterations
     %
-    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations(end);
+    deviation_of_iterations = Opt.n_iter_opt/iter;
     %
-    % get weigth
+    % get weigths
     %
     weights = Opt.weights_angle_change;
     %

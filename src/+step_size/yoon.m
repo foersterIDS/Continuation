@@ -32,9 +32,9 @@ function [xi] = yoon(solver_output,Path,Opt)
     %
     % collect needed data of Path
     %
-    v_needed = Path.var_all(:,end-3:end);
+    var_needed = Path.var_all(:,end-3:end);
     l_needed = Path.l_all(end-3:end);
-    z_needed = [v_needed; l_needed];
+    z_needed = [var_needed; l_needed];
     %
     % calculate connecting vectors
     %
@@ -53,9 +53,17 @@ function [xi] = yoon(solver_output,Path,Opt)
     a = (xi_u - 1) / (1 - xi_l);
     xi = (xi_u - ((xi_u - xi_l) * a) / ((angle_m1/angle) + a));
     %
+    % correct number of iterations
+    %
+    if Opt.ds_max==inf
+        iter = max(solver_output.iterations(end),1);
+    else
+        iter = solver_output.iterations(end);
+    end
+    %
     % calculate deviation of iterations
     %
-    deviation_of_iterations = Opt.n_iter_opt/solver_output.iterations(end);
+    deviation_of_iterations = Opt.n_iter_opt/iter;
     %
     % correct stepsize by iterations
     %
