@@ -57,7 +57,6 @@ solver_max_iterations<>double<>50<>#scalar#integer#positive#nonzero
 solver_tol<>double<>10^-10<>#scalar#double#positive#nonzero
 speed_of_continuation<>double<>10<>#scalar#double#positive#nonzero
 stepback_error_counter<>double<>3<>#scalar#integer#positive#nonzero#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter
-step_size_alpha_max<>double<>0.45<>#scalar#double#positive#nonzero
 step_size_angle<>eval<>(2/360)*(2*pi)<>#scalar#double#positive
 step_size_control<>struct<>Opt_stepsize<>#struct#ison:step_size_control
 step_size_error_max<>double<>0.6<>#scalar#double#positive#nonzero
