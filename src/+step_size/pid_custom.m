@@ -30,9 +30,17 @@
 %   17.01.2022 - Tido Kubatschek
 %
 function [xi] = pid_custom(Path,Opt)
+    % solution points
+    %
     z_all = [Path.var_all; Path.l_all];
+    %
+    % define function handle for finite difference calculation
+    %
     dzds = @(k) (z_all(:,end+k) - z_all(:,end+k-1)) / (Path.s_all(end+k) - Path.s_all(end+k-1));
-    e_star = @(k) norm(dzds(k) - dzds(k-1)) / norm(dzds(k));
+    %
+    % define function handle for e_tilde
+    %
+    e_tilde = @(k) norm(dzds(k) - dzds(k-1)) / norm(dzds(k));
     %
     % parameters of pid control 
     %
@@ -41,10 +49,10 @@ function [xi] = pid_custom(Path,Opt)
     %
     % relative change
     %
-    e = [e_star(0), e_star(-1), e_star(-2)];
+    e = [e_tilde(0), e_tilde(-1), e_tilde(-2)];
     e = e / pid_tol;
     %
-    % calculate step size
+    % calculate stepsize adaption factor
     %
     xi = (e(2) / e(1))^PID(1) * (1 / e(1))^PID(2) * (e(2)^2 / (e(1) * e(3)) )^PID(3);
     %

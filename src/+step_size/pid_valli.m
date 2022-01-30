@@ -29,21 +29,28 @@
 %   21.10.2020 - Tido Kubatschek
 % 
 function [xi] = pid_valli(Path,Opt)
+    % define function handle for finite difference calculation
+    %
     dvarsdl = @(k) (Path.var_all(:,end+k) - Path.var_all(:,end+k-1)) / (Path.l_all(end+k) - Path.l_all(end+k-1));
-    e_star = @(k) norm(dvarsdl(k) - dvarsdl(k-1)) / norm(dvarsdl(k));
+    %
+    % define function handle for e_tilde
+    %
+    e_tilde= @(k) norm(dvarsdl(k) - dvarsdl(k-1)) / norm(dvarsdl(k));
     %
     % parameters of pid control 
     %
     PID = Opt.step_size_pid_params;
     pid_tol = Opt.step_size_pid_tol;
     %
-    % relative change
+    % calculate needed relative changes
     %
-    e = [e_star(0), e_star(-1), e_star(-2)];
+    e = [e_tilde(0), e_tilde(-1), e_tilde(-2)];
     e = e / pid_tol;
     %
-    % calculate step size
+    % calculate step size adaption factor
     %
-    xi = (e(2) / e(1))^PID(1) * (1 / e(1))^PID(2) * (e(2)^2 / (e(1) * e(3)) )^PID(3);
+    xi = (e(2) / e(1)) ^ PID(1) *...
+        (1 / e(1)) ^ PID(2) *...
+        (e(2)^2 / (e(1) * e(3)) ) ^ PID(3);
     %
 end
