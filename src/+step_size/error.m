@@ -144,13 +144,13 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
         %
         delta_s = Path.s_all(length_path:-1:length_path-2) - Path.s_all(length_path-1:-1:length_path-3);
         %
-        r_pp1 = 1/(delta_s(1))^2 * (x_all(:,length_path) - (1 + delta_s(1)/delta_s(2))*x_all(:,length_path-1) + delta_s(1)/delta_s(2) * x_all(:,length_path-2));
-        r_pp2 = 1/(delta_s(2))^2 * (x_all(:,length_path-1) - (1 + delta_s(2)/delta_s(3))*x_all(:,length_path-2) + delta_s(2)/delta_s(3) * x_all(:,length_path-3));
+        r_pp1 = 1/(delta_s(1))^2 * (x_all(:,end) - (1 + delta_s(1)/delta_s(2))*x_all(:,end-1) + delta_s(1)/delta_s(2) * x_all(:,end-2));
+        r_pp2 = 1/(delta_s(2))^2 * (x_all(:,end-1) - (1 + delta_s(2)/delta_s(3))*x_all(:,end-2) + delta_s(2)/delta_s(3) * x_all(:,end-3));
         %
         % calculate curvature as 2-norm
         %
-        kappa_current = norm(r_pp1) / norm(x_all(:,length_path));
-        kappa_previous = norm(r_pp2) / norm(x_all(:,length_path-1));
+        kappa_current = norm(r_pp1) / norm(x_all(:,end));
+        kappa_previous = norm(r_pp2) / norm(x_all(:,end-1));
         %
         % calculate change of curvature
         %

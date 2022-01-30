@@ -85,15 +85,12 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     % Check if there are enough solution points
     %
     if weights(4) ~= 0 && length(Path.l_all) > 3 
-        var_needed = Path.var_all(:,end-3:end);
-        l_needed = Path.l_all(end-3:end);
-        z_needed = [var_needed; l_needed];
         %
         % calculate connecting vectors
         %
-        v1 = z_needed(:,end) - z_needed(:,end-1);
-        v2 = z_needed(:,end-1) - z_needed(:,end-2);
-        v3 = z_needed(:,end-2) - z_needed(:,end-3);
+        v1 = x_all(:,end) - x_all(:,end-1);
+        v2 = x_all(:,end-1) - x_all(:,end-2);
+        v3 = x_all(:,end-2) - x_all(:,end-3);
         %
         % calculate angles
         %
