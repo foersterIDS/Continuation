@@ -2,11 +2,13 @@ angle_change<>eval<>false<>#scalar#logical
 angle_custom<>eval<>false<>#scalar#logical
 contraction<>eval<>false<>#scalar#logical
 error<>eval<>false<>#scalar#logical
+error_alt<>eval<>false<>#scalar#logical
 fayezioghani<>eval<>false<>#scalar#logical
 fix<>eval<>false<>#scalar#logical
 iterations_exponential<>eval<>false<>#scalar#logical
 iterations_polynomial<>eval<>true<>#scalar#logical
 multiplicative<>eval<>false<>#scalar#logical
+multiplicative_alt<>eval<>false<>#scalar#logical
 pid_custom<>eval<>false<>#scalar#logical
 pid_valli<>eval<>false<>#scalar#logical
 szyszkowski<>eval<>false<>#scalar#logical

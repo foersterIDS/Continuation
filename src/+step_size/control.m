@@ -37,8 +37,6 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
                 end
                 if ~changed
                     %
-                    
-                    %
                     %% Determine step size control method
                     %
                     %
@@ -78,6 +76,11 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
                     elseif Opt.step_size_control.error
                         xi = step_size.error(solver_output,Path,Opt);
                     %
+                    % error_alt
+                    %
+                    elseif Opt.step_size_control.error_alt
+                        xi = step_size.error_alt(solver_output,Path,Opt);
+                    %
                     % fayezioghani
                     %
                     elseif Opt.step_size_control.fayezioghani
@@ -110,6 +113,11 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
                     %
                     elseif Opt.step_size_control.multiplicative
                         xi = step_size.multiplicative(solver_output,Path,Opt);
+                    % 
+                    % multiplicative_alt method
+                    %
+                    elseif Opt.step_size_control.multiplicative_alt
+                        xi = step_size.multiplicative_alt(solver_output,Path,Opt);
                     %
                     % pid control - custom
                     %
@@ -172,10 +180,10 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
                     dsn = Info.ds0;
                 else
                     dsn = ds/2;
+                    %% Limit to max./min. step size, also limit to 2*ds/0.5*ds:
+                    dsn = min([norm(Opt.ds_max),dsn]);
+                    dsn = max([Opt.ds_min,dsn]);
                 end
-                %% Limit to max./min. step size, also limit to 2*ds/0.5*ds:
-                dsn = min([norm(Opt.ds_max),2*ds,dsn]);
-                dsn = max([Opt.ds_min,ds/2,dsn]);
             end
         else
             dsn = ds;

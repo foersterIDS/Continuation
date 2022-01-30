@@ -35,7 +35,7 @@ function [Opt,ds0,Stepsize_options] = initialize(Opt,var0,l_start,l_end,ds0)
     %
     %% Tell Stepsize_options which values must be calculated
     
-    if Opt.step_size_control.multiplicative
+    if Opt.step_size_control.multiplicative || Opt.step_size_control.multiplicative_alt
         %% check weigths
         %
         weights = Opt.weights_multiplicative;
@@ -43,7 +43,7 @@ function [Opt,ds0,Stepsize_options] = initialize(Opt,var0,l_start,l_end,ds0)
                                   'predictor', weights(5) ~= 0,...
                                   'rate_of_contraction',weights(4) ~= 0,...
                                   'iterations', true);
-    elseif Opt.step_size_control.error
+    elseif Opt.step_size_control.error || Opt.step_size_control.error_alt
         %% check weigths
         %
         weights = Opt.weights_error;

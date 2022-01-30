@@ -70,8 +70,8 @@ stop_on_bifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
 suspend_continuation_error_counter<>double<>10<>#scalar#integer#positive#nonzero#larger:Opt.stepback_error_counter+1#neq:Opt.homotopy_error_counter#neq:Opt.deflation_error_counter
 weights_angle_custom<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
 weights_angle_change<>eval<>[0.5,0.3]<>#array#positive#double#size:[1,2]
-weights_error<>eval<>[0.5,0.3,0.1,0.05,0.05]<>#array#positive#double#size:[1,5]
+weights_error<>eval<>[0.5,0.05,0.1,0.3,0.05]<>#array#positive#double#size:[1,5]
 weights_fayezioghani<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
-weights_multiplicative<>eval<>[0.3,0.3,0.05,0.05,0.05]<>#array#positive#double#size:[1,5]
+weights_multiplicative<>eval<>[0.3,0.05,0.05,0.3,0.05]<>#array#positive#double#size:[1,5]
 weights_szyszkowski<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
 weights_yoon<>double<>0.5<>#scalar#double#positive

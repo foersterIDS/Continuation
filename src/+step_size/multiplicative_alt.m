@@ -1,4 +1,4 @@
-%% path continuation - step_size.multiplicative
+%% path continuation - step_size.multiplicative_alt
 %  Adjusts stepsize due to the ratios of multiple values:
 %  -- needed number of iterations and optimal number of iterations
 %  -- change of curvature of path and optimal change of curvature (1)
@@ -34,7 +34,7 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = multiplicative(solver_output,Path,Opt)
+function [xi] = multiplicative_alt(solver_output,Path,Opt)
     % create vector with Path.var_all and Path.l_all
     %
     x_all = [Path.var_all;Path.l_all];
@@ -42,7 +42,7 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %% define target values
     %
     % w_target: optimal number of iterations, optimal rate of contraction,
-    %           optimal speed of continuation, optimal change of curvature,
+    %           optimal speed of continuation, optimal change of angle,
     %           optimal distance of predictor
     %
     w_target = [Opt.n_iter_opt, Opt.optimal_contraction_rate,...
@@ -80,30 +80,32 @@ function [xi] = multiplicative(solver_output,Path,Opt)
         w_speed = w_target(3);
     end
     %
-    %% Factor by change of curvature
+    %% Factor by change of angle
     %
     % Check if there are enough solution points
     %
     if weights(4) ~= 0 && length(Path.l_all) > 3 
-        % calc second order derivatives of current and last step with 
-        % respect to arclength
+        var_needed = Path.var_all(:,end-3:end);
+        l_needed = Path.l_all(end-3:end);
+        z_needed = [var_needed; l_needed];
         %
-        delta_s = Path.s_all(end:-1:end-2) - Path.s_all(end-1:-1:end-3);
+        % calculate connecting vectors
         %
-        r_pp1 = 1/(delta_s(1))^2 * (x_all(:,end) - (1 + delta_s(1)/delta_s(2))*x_all(:,end-1) + delta_s(1)/delta_s(2) * x_all(:,end-2));
-        r_pp2 = 1/(delta_s(2))^2 * (x_all(:,end-1) - (1 + delta_s(2)/delta_s(3))*x_all(:,end-2) + delta_s(2)/delta_s(3) * x_all(:,end-3));
+        v1 = z_needed(:,end) - z_needed(:,end-1);
+        v2 = z_needed(:,end-1) - z_needed(:,end-2);
+        v3 = z_needed(:,end-2) - z_needed(:,end-3);
         %
-        % calculate curvature as 2-norm
+        % calculate angles
         %
-        kappa_current = norm(r_pp1);
-        kappa_previous = norm(r_pp2);
+        angle_1 = aux.vector_angle(v1,v2);
+        angle_2 = aux.vector_angle(v2,v3);
         %
-        % calculate change of curvature
+        % calculate change of angle
         %
-        if kappa_previous <= Opt.solver_tol || kappa_current <= Opt.solver_tol
+        if angle_1 <= Opt.solver_tol || angle_2 <= Opt.solver_tol
             w_curv = 1;
         else
-            w_curv = kappa_current/kappa_previous;
+            w_curv = angle_1/angle_2;
         end
     else
         w_curv = w_target(4);
