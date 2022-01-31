@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   09.11.2020 - Alwin Förster
 %
-function [is_closed, Opt, Counter] = closed_curve(Opt, Path,ds,Counter)
+function [is_closed, Opt, Counter] = closed_curve(Opt,Path,ds,Counter)
     is_closed = 0;
     n = 5;
     np = 4; % polynomial order (np = 2*k with k in N)

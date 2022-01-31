@@ -20,6 +20,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun10; % NB-excitation gap-oszillator
 % testfun11; % basic test solver_force1it
 % testfun12; % parabola intersecting lines
+% testfun13; % y = sin(1/x)
 %% Prepare for homotopy:
 ll = abs(lame-lams)/2+min(lams,lame); % aimed value of lambda
 funh = @(var) fun(var,ll);

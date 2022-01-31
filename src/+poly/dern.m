@@ -12,7 +12,7 @@ function dp = dern(p,nd)
         error('nd does not match size of p');
     end
     if no>=1
-        dP = P(:,1:no).*kron(ones(nd,1),no:-1:1);
+        dP = P(:,1:no).*(ones(nd,1)*(no:-1:1));
     else
         dP = zeros(nd,1);
     end
