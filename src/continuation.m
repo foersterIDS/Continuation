@@ -290,7 +290,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %% adaptive corrector
         %
         [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,solver_exitflag,solver_output,Solver,fun,x_predictor,dscale,last_jacobian,ds);
-        %           
+        %
         %% check result
         %
         [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = aux.validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt);
@@ -319,7 +319,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                         rate_of_contraction_tmp = rate_of_contraction;
                     end
                 end
-                % 
+                %
                 if Stepsize_options.predictor
                     if ~isempty(predictor_tmp)
                         predictor_tmp = [predictor_tmp, x_predictor];
