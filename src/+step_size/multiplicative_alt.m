@@ -140,9 +140,5 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %    
     %% adjustment factor
     %
-%     xi = prod(quods.^weights);
-    xi = min(quods)^0.5;
-    if xi >= 1
-        xi = 1.5;
-    end
+    xi = prod(quods.^weights);
 end
