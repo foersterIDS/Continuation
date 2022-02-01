@@ -554,21 +554,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         dsim1 = ds;
         %
         % save step size data
-        if Stepsize_options.iterations
-            solver_output.iterations = iterations_tmp;
-        end
         %
-        if Stepsize_options.speed_of_continuation
-            Path.speed_of_continuation = speed_of_continuation_tmp;
-        end
-        %
-        if Stepsize_options.predictor
-            Path.x_predictor = predictor_tmp;
-        end
-        %
-        if Stepsize_options.rate_of_contraction
-            solver_output.rate_of_contraction = rate_of_contraction_tmp;
-        end
+        Tmp_struct = struct('iterations_tmp', iterations_tmp, 'speed_of_continuation_tmp', speed_of_continuation_tmp,'predictor_tmp',predictor_tmp,'rate_of_contraction_tmp',rate_of_contraction_tmp);
+        [solver_output,Path] = aux.update_stepsize_data(Stepsize_options,Tmp_struct,solver_output,Path);
         %
         % adjust stepsize
         %
