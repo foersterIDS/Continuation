@@ -1,3 +1,9 @@
+%% path continuation - aux.update_stepsize_data
+%
+%   Institute of Dynamics and Vibration Research
+%   Leibniz University Hannover
+%   01.02.2022 - Tido Kubatschek
+%
 function [solver_output,Path] = update_stepsize_data(Stepsize_options,Tmp_struct,solver_output,Path)
     if Stepsize_options.iterations
         solver_output.iterations = Tmp_struct.iterations_tmp;
