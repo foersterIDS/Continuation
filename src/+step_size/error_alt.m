@@ -109,7 +109,7 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0
+    if weights(1) ~= 0 && ~isempty(solver_output.iterations)
         if Opt.ds_max==inf
             w_iter = max(solver_output.iterations(end_of_iterations),1);
         else
@@ -120,14 +120,14 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     end
     %
     %% Factor by contraction rate
-    if weights(2) ~= 0
+    if weights(2) ~= 0 && ~isempty(solver_output.rate_of_contraction)
         w_contr = solver_output.rate_of_contraction(end_of_array);
     else
         w_contr = w_target(2);
     end
     %
     %% Factor by speed of continuation
-    if weights(3) ~= 0
+    if weights(3) ~= 0 && ~isempty(Path.speed_of_continuation)
         w_speed = Path.speed_of_continuation(end_of_array);
     else
         w_speed = w_target(3);
@@ -163,7 +163,7 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0
+    if weights(5) ~= 0 && ~isempty(Path.x_predictor)
         if norm(x_all(:,length_path)) > 1e-6
             rel_distance_of_predictor = norm(Path.x_predictor(:,end_of_array) - x_all(:,length_path)) / norm(x_all(:,length_path));
             w_dist = rel_distance_of_predictor;

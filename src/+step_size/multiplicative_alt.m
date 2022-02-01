@@ -54,7 +54,7 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0
+    if weights(1) ~= 0 && ~isempty(solver_output.iterations)
         if Opt.ds_max==inf
             w_iter = max(solver_output.iterations(end),1);
         else
@@ -66,7 +66,7 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %
     %% Factor by contraction rate
     %
-    if weights(2) ~= 0
+    if weights(2) ~= 0 && ~isempty(solver_output.rate_of_contraction)
         w_contr = solver_output.rate_of_contraction(end);
     else
         w_contr = w_target(2);
@@ -74,7 +74,7 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %
     %% Factor by speed of continuation
     %
-    if weights(3) ~= 0
+    if weights(3) ~= 0 && ~isempty(Path.speed_of_continuation)
         w_speed = Path.speed_of_continuation(end);
     else
         w_speed = w_target(3);
@@ -110,7 +110,7 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0
+    if weights(5) ~= 0 && ~isempty(Path.x_predictor)
         if norm(x_all(:,end)) > 1e-6
             rel_distance_of_predictor = norm(Path.x_predictor(:,end) - x_all(:,end)) / norm(x_all(:,end));
             w_dist = rel_distance_of_predictor;
@@ -140,5 +140,9 @@ function [xi] = multiplicative_alt(solver_output,Path,Opt)
     %    
     %% adjustment factor
     %
-    xi = prod(quods.^weights);
+%     xi = prod(quods.^weights);
+    xi = min(quods)^0.5;
+    if xi >= 1
+        xi = 1.5;
+    end
 end

@@ -395,8 +395,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                 Path.var_all(:,end) = [];
                 Path.l_all(end) = [];
                 Path.s_all(end) = [];
-                if Stepsize_options.predictor
-                    predictor_tmp(:,end) = [];
+                if Stepsize_options.predictor 
+                    if ~isempty(predictor_tmp)
+                        predictor_tmp(:,end) = [];
+                    else
+                        predictor_tmp = [];
+                    end
                 end
                 if Stepsize_options.speed_of_continuation
                     speed_of_continuation_tmp(end) = [];
@@ -416,10 +420,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
                         predictor_tmp = [predictor_tmp, x_predictor_plus];
                         x_predictor_plus = [];
                     end
-%                     if Stepsize_options.iterations
-%                         iterations_tmp = [iterations_tmp, iterations_plus];
-%                         iterations_plus = [];
-%                     end
                     if Stepsize_options.speed_of_continuation
                         speed_of_continuation_tmp = [speed_of_continuation_tmp, speed_of_continuation_plus];
                         speed_of_continuation_plus = [];
