@@ -10,7 +10,7 @@
 %   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
-function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,Info_out] = continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     warning on;
@@ -190,7 +190,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %% predictor
         %
         if Stepsize_options.speed_of_continuation
-            tic;
+            time_needed = tic;
         end
         %
         try
@@ -266,7 +266,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         % measure speed
         %
         if Stepsize_options.speed_of_continuation
-            time_needed = toc;
+            time_needed = toc(time_needed);
             speed_of_continuation = ds/time_needed; 
         end
         %
@@ -555,7 +555,21 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
         %
         % save step size data
         %
-        Tmp_struct = struct('iterations_tmp', iterations_tmp, 'speed_of_continuation_tmp', speed_of_continuation_tmp,'predictor_tmp',predictor_tmp,'rate_of_contraction_tmp',rate_of_contraction_tmp);
+        if Stepsize_options.iterations
+            Tmp_struct.iterations_tmp = iterations_tmp;
+        end
+        %
+        if Stepsize_options.speed_of_continuation
+            Tmp_struct.speed_of_continuation_tmp = speed_of_continuation_tmp;
+        end
+        %
+        if Stepsize_options.predictor
+            Tmp_struct.predictor_tmp = predictor_tmp;
+        end
+        %
+        if Stepsize_options.rate_of_contraction
+            Tmp_struct.rate_of_contraction_tmp = rate_of_contraction_tmp;
+        end
         [solver_output,Path] = aux.update_stepsize_data(Stepsize_options,Tmp_struct,solver_output,Path);
         %
         % adjust stepsize
@@ -640,4 +654,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out] 
     aux.print_line(Opt,[Info.exit_msg,'\n']);
     aux.print_line(Opt,'--> time elapsed: %.3f s\n',toc(t_display));
     %
+    %% Info_out
+    %
+    Info_out = struct('number_of_steps', Counter.step,...
+                      'number_of_invalid_points', Counter.loop - Counter.step);
 end
