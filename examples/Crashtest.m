@@ -10,8 +10,8 @@ probcounter = 0;
 %% Testfunktion #04
 % Point of intersection of circle and sin(radius)-scaled exponential function with radius as parameter
 % testfun04;
-%% Testfunktion #05
-% function with bifurcation
+%% Testfunktion #08
+% Pitchfork-Bifurkation
 testfun08;
 %% Crashtest:
 for i=1:2

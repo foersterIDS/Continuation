@@ -21,6 +21,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun11; % basic test solver_force1it
 % testfun12; % parabola intersecting lines
 % testfun13; % y = sin(1/x)
+% testfun14; % Infinity ('plot','three_dim')
 %% Solve:
 [var_all,l_all,exitflag,bifs,s_all,last_jacobian,break_fun_out] = ...
     continuation(fun,v0,lams,lame,ds0,'bifurcation','mark','ds_max',ds_max,'plot','on');
