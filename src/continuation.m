@@ -10,7 +10,8 @@
 %   l_start <= l <= l_end
 %   ds0: initial stepsize
 %
-function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,Info_out] = continuation(fun,var0,l_start,l_end,ds0,varargin)
+function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,Info_out] = ...
+    continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
     %
     warning on;
@@ -19,7 +20,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
     if Stepsize_options.rate_of_contraction
         global solver_stepsizes;
     end
-    [Bifurcation,Counter,Do,Info,Initial,Path,Plot,Solver] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
+    [Bifurcation,Counter,Do,Info,Info_out,Initial,Path,Plot,Solver,Temp] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
     clear('var0','l_start','l_end','ds0');
     res_corr = continuation.corrector(Opt);
     ds = Info.ds0;
@@ -101,16 +102,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
         %% save old values of stepsize information
         %
         if Stepsize_options.iterations
-            tmp_length = length(solver_output.iterations);
-            tmp_flag = 0;
-            if tmp_length < 3 && tmp_length > 0
-                to_take = 1:tmp_length;
-            elseif tmp_length == 0
-                tmp_flag = 1;
+            Temp.length = length(solver_output.iterations);
+            Temp.flag = 0;
+            if Temp.length < 3 && Temp.length > 0
+                to_take = 1:Temp.length;
+            elseif Temp.length == 0
+                Temp.flag = 1;
             else
-                to_take = tmp_length-1:tmp_length;
+                to_take = Temp.length-1:Temp.length;
             end
-            if isfield(solver_output, 'iterations') && ~isempty(solver_output.iterations) && ~tmp_flag
+            if isfield(solver_output, 'iterations') && ~isempty(solver_output.iterations) && ~Temp.flag
                 iterations_tmp = solver_output.iterations(to_take);
             else
                 iterations_tmp = [];
@@ -118,16 +119,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
         end
         %
         if Stepsize_options.speed_of_continuation
-            tmp_length = length(Path.speed_of_continuation);
-            tmp_flag = 0;
-            if tmp_length < 3 && tmp_length > 0
-                to_take = 1:tmp_length;
-            elseif tmp_length == 0
-                tmp_flag = 1;
+            Temp.length = length(Path.speed_of_continuation);
+            Temp.flag = 0;
+            if Temp.length < 3 && Temp.length > 0
+                to_take = 1:Temp.length;
+            elseif Temp.length == 0
+                Temp.flag = 1;
             else
-                to_take = tmp_length-1:tmp_length;
+                to_take = Temp.length-1:Temp.length;
             end
-            if isfield(Path, 'speed_of_continuation') && ~isempty(Path.speed_of_continuation) && ~tmp_flag
+            if isfield(Path, 'speed_of_continuation') && ~isempty(Path.speed_of_continuation) && ~Temp.flag
                 speed_of_continuation_tmp = Path.speed_of_continuation(to_take);
             else
                 speed_of_continuation_tmp = [];
@@ -135,16 +136,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
         end
         %
         if Stepsize_options.predictor
-            tmp_length = size(Path.x_predictor,2);
-            tmp_flag = 0;
-            if tmp_length < 3 && tmp_length > 0
-                to_take = 1:tmp_length;
-            elseif tmp_length == 0
-                tmp_flag = 1;
+            Temp.length = size(Path.x_predictor,2);
+            Temp.flag = 0;
+            if Temp.length < 3 && Temp.length > 0
+                to_take = 1:Temp.length;
+            elseif Temp.length == 0
+                Temp.flag = 1;
             else
-                to_take = tmp_length-1:tmp_length;
+                to_take = Temp.length-1:Temp.length;
             end
-            if isfield(Path, 'x_predictor') && ~isempty(Path.x_predictor) && ~tmp_flag
+            if isfield(Path, 'x_predictor') && ~isempty(Path.x_predictor) && ~Temp.flag
                 predictor_tmp = Path.x_predictor(:,to_take);
             else
                 predictor_tmp = [];
@@ -152,16 +153,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
         end
         %
         if Stepsize_options.rate_of_contraction
-            tmp_length = length(solver_output.rate_of_contraction);
-            tmp_flag = 0;
-            if tmp_length < 3 && tmp_length > 0
-                to_take = 1:tmp_length;
-            elseif tmp_length == 0
-                tmp_flag = 1;
+            Temp.length = length(solver_output.rate_of_contraction);
+            Temp.flag = 0;
+            if Temp.length < 3 && Temp.length > 0
+                to_take = 1:Temp.length;
+            elseif Temp.length == 0
+                Temp.flag = 1;
             else
-                to_take = tmp_length-1:tmp_length;
+                to_take = Temp.length-1:Temp.length;
             end
-            if isfield(solver_output, 'rate_of_contraction') && ~isempty(solver_output.rate_of_contraction) && ~tmp_flag
+            if isfield(solver_output, 'rate_of_contraction') && ~isempty(solver_output.rate_of_contraction) && ~Temp.flag
                 rate_of_contraction_tmp = solver_output.rate_of_contraction(to_take);
             else
                 rate_of_contraction_tmp = [];
@@ -556,21 +557,21 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
         % save step size data
         %
         if Stepsize_options.iterations
-            Tmp_struct.iterations_tmp = iterations_tmp;
+            Temp.iterations = iterations_tmp;
         end
         %
         if Stepsize_options.speed_of_continuation
-            Tmp_struct.speed_of_continuation_tmp = speed_of_continuation_tmp;
+            Temp.speed_of_continuation = speed_of_continuation_tmp;
         end
         %
         if Stepsize_options.predictor
-            Tmp_struct.predictor_tmp = predictor_tmp;
+            Temp.predictor = predictor_tmp;
         end
         %
         if Stepsize_options.rate_of_contraction
-            Tmp_struct.rate_of_contraction_tmp = rate_of_contraction_tmp;
+            Temp.rate_of_contraction = rate_of_contraction_tmp;
         end
-        [solver_output,Path] = aux.update_stepsize_data(Stepsize_options,Tmp_struct,solver_output,Path);
+        [solver_output,Path] = aux.update_stepsize_data(Stepsize_options,Temp,solver_output,Path);
         %
         % adjust stepsize
         %
@@ -656,6 +657,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,last_jacobian,break_fun_out,I
     %
     %% Info_out
     %
-    Info_out = struct('number_of_steps', Counter.step,...
-                      'number_of_invalid_points', Counter.loop - Counter.step);
+    Info_out.number_of_steps = Counter.step;
+    Info_out.number_of_invalid_points = Counter.loop - Counter.step;
+	%
 end
