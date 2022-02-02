@@ -26,4 +26,4 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 ll = abs(lame-lams)/2+min(lams,lame); % aimed value of lambda
 funh = @(var) fun(var,ll);
 %% Solve:
-[v_solution,exitflag] = homotopy(funh,v0,'bifurcation','mark','plot','on','homotopy','newton');
+[v_solution,exitflag] = homotopy(funh,v0,'plot','on','homotopy','newton');

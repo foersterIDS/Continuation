@@ -24,7 +24,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun14; % Infinity ('plot','three_dim')
 %% Solve:
 [var_all,l_all,exitflag,bifs,s_all,last_jacobian,break_fun_out] = ...
-    continuation(fun,v0,lams,lame,ds0,'bifurcation','mark','ds_max',ds_max,'plot','on');
+    continuation(fun,v0,lams,lame,ds0,'ds_max',ds_max,'plot','on');
 
 %% Smoothen path
 % [X_interp] = aux.smoothen_path([var_all; l_all], s_all);
