@@ -7,7 +7,7 @@ if(~isdeployed)
 end
 addpath('..\src');
 addpath('test_cases');
-%% Testfunctions:
+%% Test functions:
 % testfun01; % 0=!v.^2+5-exp((1/l)*v)
 testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( Om * t )
 % testfun03; % Stochastic Duffing

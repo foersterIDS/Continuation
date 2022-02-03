@@ -7,10 +7,10 @@ addpath('test_cases');
 addpath('crashtest_aux');
 probinfo = [];
 probcounter = 0;
-%% Testfunktion #04
+%% Test function #04
 % Point of intersection of circle and sin(radius)-scaled exponential function with radius as parameter
 % testfun04;
-%% Testfunktion #08
+%% Test function #08
 % Pitchfork-Bifurkation
 testfun08;
 %% Crashtest:

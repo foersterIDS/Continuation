@@ -19,7 +19,7 @@
 %
 %
 %   Inputs:
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        needed number of iterations and rate of contraction.
 %       Path          -- contains the solution points of the path and the
 %                        predictors.
@@ -39,15 +39,15 @@
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
 %
-function [xi] = error_alt(solver_output,Path,Opt)
+function [xi] = error_alt(Solver,Path,Opt)
     %
-    E_i = calc_error(solver_output,Path,Opt,0);
+    E_i = calc_error(Solver,Path,Opt,0);
     %
     %
     K = Opt.step_size_error_pd;
     %
     if length(Path.l_all) > 1 && ~isempty(Path.speed_of_continuation) && K(2) > 0
-        E_i_m1 = calc_error(solver_output,Path,Opt,1);
+        E_i_m1 = calc_error(Solver,Path,Opt,1);
     else
         E_i_m1 = 0;
     end
@@ -59,7 +59,7 @@ function [xi] = error_alt(solver_output,Path,Opt)
     xi = 2^(E/Opt.step_size_error_max);
 end
 
-function E_i = calc_error(solver_output,Path,Opt,previous)
+function E_i = calc_error(Solver,Path,Opt,previous)
     %
     %% Weights
     weights = Opt.weights_error.';
@@ -67,11 +67,11 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     % determine length
     length_path = length(Path.l_all);
-    length_iterations = length(solver_output.iterations);
+    length_iterations = length(Solver.output.iterations);
     if weights(3) ~= 0
         length_arrays = length(Path.speed_of_continuation);
     elseif weights(4) ~= 0
-        length_arrays = length(solver_output.rate_of_convergence);
+        length_arrays = length(Solver.output.rate_of_convergence);
     elseif weights(5) ~= 0
         length_arrays = length(Path.x_predictor(1,:));
     else
@@ -109,19 +109,19 @@ function E_i = calc_error(solver_output,Path,Opt,previous)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(solver_output.iterations)
+    if weights(1) ~= 0 && ~isempty(Solver.output.iterations)
         if Opt.ds_max==inf
-            w_iter = max(solver_output.iterations(end_of_iterations),1);
+            w_iter = max(Solver.output.iterations(end_of_iterations),1);
         else
-            w_iter = solver_output.iterations(end_of_iterations);
+            w_iter = Solver.output.iterations(end_of_iterations);
         end
     else
         w_iter = w_target(1);
     end
     %
     %% Factor by contraction rate
-    if weights(2) ~= 0 && ~isempty(solver_output.rate_of_contraction)
-        w_contr = solver_output.rate_of_contraction(end_of_array);
+    if weights(2) ~= 0 && ~isempty(Solver.output.rate_of_contraction)
+        w_contr = Solver.output.rate_of_contraction(end_of_array);
     else
         w_contr = w_target(2);
     end

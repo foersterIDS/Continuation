@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   01.02.2022 - Tido Kubatschek
 %
-function [solver_output,Path] = update_stepsize_data(Stepsize_options,Temp,solver_output,Path)
+function [Solver,Path] = update_stepsize_data(Stepsize_options,Temp,Solver,Path)
     if Stepsize_options.iterations
-        solver_output.iterations = Temp.iterations;
+        Solver.output.iterations = Temp.iterations;
     end
     %
     if Stepsize_options.speed_of_continuation
@@ -18,6 +18,6 @@ function [solver_output,Path] = update_stepsize_data(Stepsize_options,Temp,solve
     end
     %
     if Stepsize_options.rate_of_contraction
-        solver_output.rate_of_contraction = Temp.rate_of_contraction;
+        Solver.output.rate_of_contraction = Temp.rate_of_contraction;
     end
 end

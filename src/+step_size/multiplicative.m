@@ -16,7 +16,7 @@
 %
 %
 %   Inputs:
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        needed number of iterations and rate of contraction.
 %       Path          -- contains the solution points of the path and the
 %                        predictors.
@@ -34,7 +34,7 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = multiplicative(solver_output,Path,Opt)
+function [xi] = multiplicative(Solver,Path,Opt)
     % create vector with Path.var_all and Path.l_all
     %
     x_all = [Path.var_all;Path.l_all];
@@ -54,11 +54,11 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(solver_output.iterations)
+    if weights(1) ~= 0 && ~isempty(Solver.output.iterations)
         if Opt.ds_max==inf
-            w_iter = max(solver_output.iterations(end),1);
+            w_iter = max(Solver.output.iterations(end),1);
         else
-            w_iter = solver_output.iterations(end);
+            w_iter = Solver.output.iterations(end);
         end
     else
         w_iter = w_target(1);
@@ -66,8 +66,8 @@ function [xi] = multiplicative(solver_output,Path,Opt)
     %
     %% Factor by contraction rate
     %
-    if weights(2) ~= 0 && ~isempty(solver_output.rate_of_contraction)
-        w_contr = solver_output.rate_of_contraction(end);
+    if weights(2) ~= 0 && ~isempty(Solver.output.rate_of_contraction)
+        w_contr = Solver.output.rate_of_contraction(end);
     else
         w_contr = w_target(2);
     end

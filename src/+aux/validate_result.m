@@ -4,13 +4,13 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,solver_output,solver_exitflag,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
+function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
     %% automated validation
     %
     is_reverse = false;
     catch_flag = 0;
     inv_poi_str = '                          ';
-    if solver_exitflag>0
+    if Solver.exitflag>0
         try
             if ~Opt.check_residual || (norm(fun_solution)<=Opt.solver_tol*10)
                 xi = [Path.var_all(:,end);Path.l_all(end)];
@@ -89,7 +89,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                     Path_app.l_all = [Path.l_all,x_solution(end),Plus.x(end)];
                     Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(Plus.x-x_solution)*[0,1]];
                 end
-                [Plot, Opt] = live_plot(Opt, Info, Path, ds, ds, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
+                [Plot, Opt] = live_plot(Opt, Info, Path, ds, ds, Solver.output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
                 aux.print_line(Opt,'--> The plot update for approval has failed.\n');
             end

@@ -30,7 +30,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     %% find initial solution
     %
     residual_initial = @(v) aux.residual_fixed_value(fun,v,Opt.l_0,Opt);
-    [Path.var_all,fun_initial,initial_exitflag,solver_output,Jacobian.initial] = Solver.main(residual_initial,Info.var0,Opt.dscale0(1:end-1));
+    [Path.var_all,fun_initial,initial_exitflag,Solver.output,Jacobian.initial] = Solver.main(residual_initial,Info.var0,Opt.dscale0(1:end-1));
     Jacobian.solver = Jacobian.initial;
     break_fun_out = [];
     event_out = false;
@@ -48,16 +48,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         end
         aux.print_line(Opt,'Initial solution at l = %.2e\n',Opt.l_0);
         if aux.ison(Opt.bifurcation)
-            sign_det_jacobian = sign(det(Jacobian.initial));
+            Jacobian.sign_det = sign(det(Jacobian.initial));
         end
         if aux.ison(Opt.plot)
-            [Plot, Opt] = plot.live_plot(Opt, Info, Path, Info.ds0, Info.ds0, solver_output.iterations(end), Counter);
+            [Plot, Opt] = plot.live_plot(Opt, Info, Path, Info.ds0, Info.ds0, Solver.output.iterations(end), Counter);
         end
         if Stepsize_options.rate_of_contraction
             if size(solver_stepsizes, 1) < 3
-                solver_output.rate_of_contraction = Opt.optimal_contraction_rate;
+                Solver.output.rate_of_contraction = Opt.optimal_contraction_rate;
             else
-                solver_output.rate_of_contraction = solver_stepsizes(3,2)/solver_stepsizes(2,2);
+                Solver.output.rate_of_contraction = solver_stepsizes(3,2)/solver_stepsizes(2,2);
             end
         end
         if Stepsize_options.speed_of_continuation
@@ -87,7 +87,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %% save old values of stepsize information
         %
         if Stepsize_options.iterations
-            Temp.length = length(solver_output.iterations);
+            Temp.length = length(Solver.output.iterations);
             Temp.flag = 0;
             if Temp.length < 3 && Temp.length > 0
                 to_take = 1:Temp.length;
@@ -96,8 +96,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             else
                 to_take = Temp.length-1:Temp.length;
             end
-            if isfield(solver_output, 'iterations') && ~isempty(solver_output.iterations) && ~Temp.flag
-                Temp.iterations = solver_output.iterations(to_take);
+            if isfield(Solver.output, 'iterations') && ~isempty(Solver.output.iterations) && ~Temp.flag
+                Temp.iterations = Solver.output.iterations(to_take);
             else
                 Temp.iterations = [];
             end
@@ -138,7 +138,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         end
         %
         if Stepsize_options.rate_of_contraction
-            Temp.length = length(solver_output.rate_of_contraction);
+            Temp.length = length(Solver.output.rate_of_contraction);
             Temp.flag = 0;
             if Temp.length < 3 && Temp.length > 0
                 to_take = 1:Temp.length;
@@ -147,8 +147,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             else
                 to_take = Temp.length-1:Temp.length;
             end
-            if isfield(solver_output, 'rate_of_contraction') && ~isempty(solver_output.rate_of_contraction) && ~Temp.flag
-                Temp.rate_of_contraction = solver_output.rate_of_contraction(to_take);
+            if isfield(Solver.output, 'rate_of_contraction') && ~isempty(Solver.output.rate_of_contraction) && ~Temp.flag
+                Temp.rate_of_contraction = Solver.output.rate_of_contraction(to_take);
             else
                 Temp.rate_of_contraction = [];
             end
@@ -209,26 +209,26 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 %% try to converge to target
                 residual_target = @(v) aux.residual_fixed_value(fun,v,Opt.l_target,Opt);
                 var_predictor_ctt = (var_predictor - Path.var_all(:,end))*(abs(Opt.l_target-Path.l_all(end))/abs(l_predictor-Path.l_all(end)))+Path.var_all(:,end);
-                [var_solution,fun_solution,solver_exitflag,solver_output,Jacobian.solver] = Solver.main(residual_target,var_predictor_ctt,dscale(1:end-1));
+                [var_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residual_target,var_predictor_ctt,dscale(1:end-1));
                 x_solution = [var_solution;Opt.l_target];
                 Do.convergeToTarget = true;
             else
                 %% regular solver
                 %            
                 if Opt.solver.fsolve && Opt.solver_force1it
-                    [x_solution,fun_solution,solver_exitflag,solver_output,Jacobian.solver] = Solver.main(residual,x_predictor,dscale);
-                    if solver_output.iterations(end) < 1
+                    [x_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residual,x_predictor,dscale);
+                    if Solver.output.iterations(end) < 1
                         % perturbate initial solution by tolerance of
                         % solver
                         pert = Opt.solver_tol * ones(numel(x_predictor),1) / numel(x_predictor);
-                        [x_solution,fun_solution,solver_exitflag,solver_output,Jacobian.solver] = Solver.main(residual,x_predictor + pert,dscale);
+                        [x_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residual,x_predictor + pert,dscale);
                     end
                 else
                     if Do.suspend
-                        [v_solution,fun_solution,solver_exitflag,solver_output,Jacobian.solver] = Solver.main(@(v) residual(v,x_predictor(end)),x_predictor(1:(end-1)),dscale(1:(end-1)));
+                        [v_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(@(v) residual(v,x_predictor(end)),x_predictor(1:(end-1)),dscale(1:(end-1)));
                         x_solution = [v_solution;x_predictor(end)];
                     else
-                        [x_solution,fun_solution,solver_exitflag,solver_output,Jacobian.solver] = Solver.main(residual,x_predictor,dscale);
+                        [x_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residual,x_predictor,dscale);
                     end
                 end
                 Do.convergeToTarget = false;
@@ -237,8 +237,8 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         catch
             x_solution = NaN(size(x_predictor));
             fun_solution = inf(size(x_predictor));
-            solver_exitflag = -2;
-            solver_output = Solver.default_output;
+            Solver.exitflag = -2;
+            Solver.output = Solver.default_output;
             Do.convergeToTarget = false;
             aux.print_line(Opt,'---> solve: catch!\n');
             Counter.catch = Counter.catch + 1;
@@ -266,20 +266,19 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         end
         %
         if Stepsize_options.iterations
-            iterations = solver_output.iterations;
             if ~isempty(Temp.iterations)
-                Temp.iterations = [Temp.iterations, iterations];
+                Temp.iterations = [Temp.iterations, Solver.output.iterations];
             else
-                Temp.iterations = iterations;
+                Temp.iterations = Solver.output.iterations;
             end
         end
         %% adaptive corrector
         %
-        [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,solver_exitflag,solver_output,Solver,fun,x_predictor,dscale,Jacobian.last,ds);
+        [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,Solver,fun,x_predictor,dscale,Jacobian.last,ds);
         %
         %% check result
         %
-        [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = aux.validate_result(x_solution,Plus,fun_solution,Path,ds,solver_output,solver_exitflag,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt);
+        [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt);
         if val
             %% valid result
             if isempty(Plus.x)
@@ -437,7 +436,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                     n_bifs_rmv = sum(sum(Bifurcation.bif(1,:)'==(n_path+((-n_rmv+1):0))));
                     if n_bifs_rmv>0
                         Bifurcation.bif(:,end+((1-n_bifs_rmv):0)) = [];
-                        sign_det_jacobian = sign_det_jacobian*(-1)^(n_bifs_rmv);
+                        Jacobian.sign_det = Jacobian.sign_det*(-1)^(n_bifs_rmv);
                     end
                 end
                 Path.var_all(:,end) = var_rmv;
@@ -475,7 +474,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 Do.suspend = false;
                 Do.remove = false;
             end
-            if Opt.include_reverse && is_reverse && solver_exitflag>0
+            if Opt.include_reverse && is_reverse && Solver.exitflag>0
                 Path = aux.include_reverse(x_solution,Path);
             end
             if aux.ison(Opt.homotopy) && Counter.error>=Opt.homotopy_error_counter
@@ -500,13 +499,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            [Bifurcation,sign_det_jacobian,Path] = bifurcation.check(fun,Jacobian.solver(1:Info.nv,1:Info.nv),Path,Bifurcation,sign_det_jacobian,res_corr,Solver,Opt);
+            [Bifurcation,Jacobian,Path] = bifurcation.check(fun,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt);
         elseif aux.ison(Opt.bifurcation) && val && numel(Path.l_all)<=2
             if ~is_current_jacobian
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            sign_det_jacobian = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
+            Jacobian.sign_det = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
         end
         %
         %% step size control
@@ -517,23 +516,23 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         % save step size data
         %
-        [solver_output,Path] = aux.update_stepsize_data(Stepsize_options,Temp,solver_output,Path);
+        [Solver,Path] = aux.update_stepsize_data(Stepsize_options,Temp,Solver,Path);
         %
         % adjust stepsize
         %
-        [ds,Counter,event_out] = step_size.control(ds,Counter,solver_output,Do,Plus,Path,Jacobian,Opt,Info,event_out);
+        [ds,Counter,event_out] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out);
         %
         %% end loop
         %
         if val
-            if ~isempty(solver_output.iterations)
-                aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
+            if ~isempty(Solver.output.iterations)
+                aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.n_iter_opt);
             else
                 aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
             end
         else
-            if ~isempty(solver_output.iterations)
-                aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,solver_output.iterations(end),Opt.n_iter_opt);
+            if ~isempty(Solver.output.iterations)
+                aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.n_iter_opt);
             else
                 aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
             end
@@ -551,7 +550,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         if aux.ison(Opt.plot) && val
             try
-                [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation);
+                [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
                 aux.print_line(Opt,'--> The plot update has failed.\n');
             end
@@ -583,7 +582,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         try
             Bifurcation_last_plot = Bifurcation;
             Bifurcation_last_plot.flag = -1;
-            plot.live_plot(Opt, Info, Path, ds, dsim1, solver_output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
+            plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
             if isfield(Plot,'pl_curr')
                 delete(Plot.pl_curr);
             end

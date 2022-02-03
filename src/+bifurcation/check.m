@@ -5,16 +5,17 @@
 %   26.05.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Bifurcation,sign_det_jacobian,Path] = check(fun,solver_jacobian_red,Path,Bifurcation,sign_det_jacobian,res_corr,Solver,Opt)
+function [Bifurcation,Jacobian,Path] = check(fun,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt)
     Bifurcation.flag = 0;
+    solver_jacobian_red = Jacobian.solver(1:Info.nv,1:Info.nv);
     solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
         %% mark bifurcations:
         sign_det_current_jacobian = sign(det(solver_jacobian_red));
-        if sign_det_current_jacobian*sign_det_jacobian<=0
+        if sign_det_current_jacobian*Jacobian.sign_det<=0
             bif_type = NaN; % 1: fold bif.; 0: branch point bif; NaN: unknown
             Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
-            sign_det_jacobian = sign_det_current_jacobian;
+            Jacobian.sign_det = sign_det_current_jacobian;
             Bifurcation.flag = 1;
         end
     elseif Opt.bifurcation.determine || Opt.bifurcation.trace
@@ -27,7 +28,7 @@ function [Bifurcation,sign_det_jacobian,Path] = check(fun,solver_jacobian_red,Pa
         full_rank = length(solver_jacobian_red(:,1));
         rank_tol = Opt_bif.solver_tol * 10000; % TODO!!!
         sign_det_current_jacobian = sign(det_solver_jacobian_red);
-        if sign_det_current_jacobian*sign_det_jacobian<=0
+        if sign_det_current_jacobian*Jacobian.sign_det<=0
             %% find exact point:
             nds = 5;
             dss = linspace(Path.s_all(end-1)-Path.s_all(end),0,nds);
@@ -69,7 +70,7 @@ function [Bifurcation,sign_det_jacobian,Path] = check(fun,solver_jacobian_red,Pa
                 end
             end
             Bifurcation.bif = [Bifurcation.bif,[ind_bif;bif_type]];
-            sign_det_jacobian = sign_det_current_jacobian;
+            Jacobian.sign_det = sign_det_current_jacobian;
             Bifurcation.flag = 1;
         end
     else

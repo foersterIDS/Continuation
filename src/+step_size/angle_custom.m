@@ -8,7 +8,7 @@
 %
 %
 %   Inputs:
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        needed number of iterations.
 %       Path          -- contains the solution points of the path
 %       Opt           -- contains user inputs, such as optimal number of
@@ -26,7 +26,7 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = angle_custom(solver_output,Path,Opt)
+function [xi] = angle_custom(Solver,Path,Opt)
     %
     % collect needed data of Path
     %
@@ -46,9 +46,9 @@ function [xi] = angle_custom(solver_output,Path,Opt)
     % correct number of iterations
     %
     if Opt.ds_max==inf
-        iter = max(solver_output.iterations(end),1);
+        iter = max(Solver.output.iterations(end),1);
     else
-        iter = solver_output.iterations(end);
+        iter = Solver.output.iterations(end);
     end
     %
     % calculate deviation of iterations

@@ -4,7 +4,7 @@
 %
 %
 %   Inputs:
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        rate of contraction.
 %       Opt           -- contains user inputs, such as the optimal contraction
 %                        rate specified in 'optimal_contraction_rate'.
@@ -20,19 +20,19 @@
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
 %
-function [xi] = contraction(solver_output,Opt)
-    if ~isempty(solver_output.rate_of_contraction)
+function [xi] = contraction(Solver,Opt)
+    if ~isempty(Solver.output.rate_of_contraction)
         % get rates of contraction
         %
         % current rate
         %
-        current_rate = solver_output.rate_of_contraction(end);
+        current_rate = Solver.output.rate_of_contraction(end);
         %
         % if there is more than one rate accessible also get previous rate
         % and calculate relative difference
         %
-        if length(solver_output.rate_of_contraction) > 1
-            previous_rate = solver_output.rate_of_contraction(end-1);
+        if length(Solver.output.rate_of_contraction) > 1
+            previous_rate = Solver.output.rate_of_contraction(end-1);
             rel_difference = abs(current_rate - previous_rate) / abs(previous_rate);
         else
             rel_difference = inf;

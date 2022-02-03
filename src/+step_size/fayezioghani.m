@@ -9,7 +9,7 @@
 %
 %   Inputs:
 %       ds            -- latest used stepsize
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        needed number of iterations.
 %       Path          -- contains the solution points of the path
 %       Jac           -- current Jacobian to calculate tangent
@@ -30,7 +30,7 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
+function [xi] = fayezioghani(ds,Solver,Path,Jac,Opt)
     %% Method of Fayezioghani et al.
     %
     % collect needed data of Path
@@ -59,9 +59,9 @@ function [xi] = fayezioghani(ds,solver_output,Path,Jac,Opt)
     % correct number of iterations
     %
     if Opt.ds_max==inf
-        iter = max(solver_output.iterations(end),1);
+        iter = max(Solver.output.iterations(end),1);
     else
-        iter = solver_output.iterations(end);
+        iter = Solver.output.iterations(end);
     end
     %
     % calculate new step size

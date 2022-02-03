@@ -6,7 +6,7 @@
 %
 %
 %   Inputs:
-%       solver_output -- contains information of solver, such as the 
+%       Solver.output -- contains information of solver, such as the 
 %                        needed number of iterations.
 %       Opt           -- contains user inputs, such as optimal number of
 %                        iterations, accessible by 'n_iter_opt' and the
@@ -26,12 +26,12 @@
 %   08.10.2020 - Alwin Förster
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = iterations_exponential(solver_output,Opt)
+function [xi] = iterations_exponential(Solver,Opt)
     % correct number of iterations
     if Opt.ds_max==inf
-        iter = max(solver_output.iterations(end),1);
+        iter = max(Solver.output.iterations(end),1);
     else
-        iter = solver_output.iterations(end);
+        iter = Solver.output.iterations(end);
     end
     % calculate step size adaption factor
     xi = 2^((Opt.n_iter_opt - iter)/Opt.step_size_exponential_weight);

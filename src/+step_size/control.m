@@ -26,7 +26,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path,Jacobian,Opt,Info,event_out)
+function [dsn,Counter,event_out] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
@@ -48,9 +48,9 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                         % method. Otherwise use iterations.
                         %
                         if length(Path.l_all) > 3
-                            xi = step_size.angle_change(solver_output,Path,Opt);
+                            xi = step_size.angle_change(Solver,Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % angle custom
@@ -61,25 +61,25 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                         % method. Otherwise use iterations.
                         %
                         if length(Path.l_all) > 2
-                            xi = step_size.angle_custom(solver_output,Path,Opt);
+                            xi = step_size.angle_custom(Solver,Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % contraction
                     %
                     elseif Opt.step_size_control.contraction
-                        xi = step_size.contraction(solver_output,Opt);
+                        xi = step_size.contraction(Solver,Opt);
                     %
                     % error
                     %
                     elseif Opt.step_size_control.error
-                        xi = step_size.error(solver_output,Path,Opt);
+                        xi = step_size.error(Solver,Path,Opt);
                     %
                     % error_alt
                     %
                     elseif Opt.step_size_control.error_alt
-                        xi = step_size.error_alt(solver_output,Path,Opt);
+                        xi = step_size.error_alt(Solver,Path,Opt);
                     %
                     % fayezioghani
                     %
@@ -89,9 +89,9 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                         % method. Otherwise use iterations.
                         %
                         if length(Path.l_all) > 2
-                            xi = step_size.fayezioghani(ds,solver_output,Path,Jacobian.last,Opt);
+                            xi = step_size.fayezioghani(ds,Solver,Path,Jacobian.last,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % fixed step size
@@ -102,22 +102,22 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                     % iterations based - exponential
                     %
                     elseif Opt.step_size_control.iterations_exponential
-                        xi = step_size.iterations_exponential(solver_output,Opt);
+                        xi = step_size.iterations_exponential(Solver,Opt);
                     % 
                     % iterations based - polynomial
                     %
                     elseif Opt.step_size_control.iterations_polynomial
-                        xi = step_size.iterations_polynomial(solver_output,Opt);
+                        xi = step_size.iterations_polynomial(Solver,Opt);
                     % 
                     % multiplicative method
                     %
                     elseif Opt.step_size_control.multiplicative
-                        xi = step_size.multiplicative(solver_output,Path,Opt);
+                        xi = step_size.multiplicative(Solver,Path,Opt);
                     % 
                     % multiplicative_alt method
                     %
                     elseif Opt.step_size_control.multiplicative_alt
-                        xi = step_size.multiplicative_alt(solver_output,Path,Opt);
+                        xi = step_size.multiplicative_alt(Solver,Path,Opt);
                     %
                     % pid control - custom
                     %
@@ -129,7 +129,7 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                         if length(Path.l_all) > 4
                             xi = step_size.pid_custom(Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % pid control - valli
@@ -142,25 +142,25 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path
                         if length(Path.l_all) > 4
                             xi = step_size.pid_valli(Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % szyszkowski
                     %
                     elseif Opt.step_size_control.szyszkowski
                         if length(Path.l_all) > 3
-                            xi = step_size.szyszkowski(solver_output,Path,Opt);
+                            xi = step_size.szyszkowski(Solver,Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % yoon
                     %
                     elseif Opt.step_size_control.yoon
                         if length(Path.l_all) > 3
-                            xi = step_size.yoon(solver_output,Path,Opt);
+                            xi = step_size.yoon(Solver,Path,Opt);
                         else
-                            xi = step_size.iterations_polynomial(solver_output,Opt);
+                            xi = step_size.iterations_polynomial(Solver,Opt);
                         end
                     %
                     % wrong method
