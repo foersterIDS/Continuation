@@ -26,7 +26,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Path,last_jacobian,Opt,Info,event_out)
+function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,Plus,Path,Jacobian,Opt,Info,event_out)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
@@ -89,7 +89,7 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
                         % method. Otherwise use iterations.
                         %
                         if length(Path.l_all) > 2
-                            xi = step_size.fayezioghani(ds,solver_output,Path,last_jacobian,Opt);
+                            xi = step_size.fayezioghani(ds,solver_output,Path,Jacobian.last,Opt);
                         else
                             xi = step_size.iterations_polynomial(solver_output,Opt);
                         end
@@ -193,7 +193,7 @@ function [dsn,Counter,event_out] = control(ds,Counter,solver_output,Do,x_plus,Pa
             dsn = Info.ds0;
         else
             xe = [Path.var_all(:,end);Path.l_all(end)];
-            dsn = norm(x_plus-xe)/2;
+            dsn = norm(Plus.x-xe)/2;
         end
     end
 end

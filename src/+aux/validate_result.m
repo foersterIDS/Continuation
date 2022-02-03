@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,x_plus,fun_solution,Path,ds,solver_output,solver_exitflag,solver_jacobian,last_jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
+function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,solver_output,solver_exitflag,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
     %% automated validation
     %
     is_reverse = false;
@@ -80,14 +80,14 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
         if numel(Path.l_all)>1
             try
                 Path_app = Path;
-                if isempty(x_plus)
+                if isempty(Plus.x)
                     Path_app.var_all = [Path.var_all,x_solution(1:end-1)];
                     Path_app.l_all = [Path.l_all,x_solution(end)];
                     Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-1);Path.l_all(end-1)])];
                 else
-                    Path_app.var_all = [Path.var_all,x_solution(1:end-1),x_plus(1:end-1)];
-                    Path_app.l_all = [Path.l_all,x_solution(end),x_plus(end)];
-                    Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(x_plus-x_solution)*[0,1]];
+                    Path_app.var_all = [Path.var_all,x_solution(1:end-1),Plus.x(1:end-1)];
+                    Path_app.l_all = [Path.l_all,x_solution(end),Plus.x(end)];
+                    Path_app.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(Plus.x-x_solution)*[0,1]];
                 end
                 [Plot, Opt] = live_plot(Opt, Info, Path, ds, ds, solver_output.iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation);
             catch
