@@ -182,8 +182,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         try
             if Do.homotopy
                 %% Homotopy
-                x_last_step = [var_all(:,end);Path.l_all(end)];
-                x_predictor = homotopy.h_continuation(residual,x_last_step,Opt);
+                x_predictor = homotopy.h_continuation(residual,[Path.var_all(:,end);Path.l_all(end)],Opt);
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
