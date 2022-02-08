@@ -35,7 +35,7 @@
 %   Leibniz University Hannover
 %   21.01.2022 - Tido Kubatschek
 %
-function [ds,Counter,event_out,changed] = event_adjustment(ds,Path,Counter,Opt,event_out)
+function [ds,Counter,event_out,changed,Opt] = event_adjustment(ds,Path,Counter,Opt,event_out,Initial)
     %
     % To-Do: identify relevant variables for event checking
     %        --> Path, ds, Jacobian?, fun?
@@ -44,24 +44,30 @@ function [ds,Counter,event_out,changed] = event_adjustment(ds,Path,Counter,Opt,e
     % Check if stepsize is still allowed to be changed
     %
     changed = false;
-    if Opt.event_condition(ds,Path) && Counter.event < Opt.event_counter
-        %
-        % check if condition was met in the last step
-        %
-        if ~event_out
+    if Opt.event_condition(ds,Path)
+        if Counter.event < Opt.event_counter
             %
-            % stepsize is allowed to be changed now
-            ds = Opt.ds_event;
-            Counter.event = Counter.event + 1;
-            changed = true;
+            % check if condition was met in the last step
             %
+            if ~event_out
+                %
+                % stepsize is allowed to be changed now
+                ds = Opt.ds_event;
+                Counter.event = Counter.event + 1;
+                Opt.ds_max = Opt.ds_event;
+                changed = true;
+                %
+            end
         end
-            %
-            % stepsize isnt allowed to be changed in the next step (since
-            % event occured in the last / this step)
-            %
-            event_out = true;
+        %
+        % stepsize isnt allowed to be changed in the next step (since
+        % event occured in the last / this step)
+        %
+        event_out = true;
     else
+        if event_out
+            Opt.ds_max = Initial.ds_max;
+        end
         event_out = false;
     end
 end

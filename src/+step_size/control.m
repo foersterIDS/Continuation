@@ -26,12 +26,12 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event_out] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out)
+function [dsn,Counter,event_out,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out,Initial)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
                 if Opt.step_size_event
-                    [dsn,Counter,event_out,changed] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out);
+                    [dsn,Counter,event_out,changed,Opt] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out,Initial);
                 else
                     changed = false;
                 end

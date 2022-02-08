@@ -519,7 +519,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         % adjust stepsize
         %
-        [ds,Counter,event_out] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out);
+        [ds,Counter,event_out,Opt] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out,Initial);
         %
         %% end loop
         %
