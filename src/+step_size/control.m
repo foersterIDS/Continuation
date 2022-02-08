@@ -171,18 +171,18 @@ function [dsn,Counter,event_out,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Ja
                     %
                     %% adapt step size
                     dsn = xi * ds;
-                    %% Limit to max./min. step size, also limit to 2*ds/0.5*ds:
-                    dsn = min([norm(Opt.ds_max),2*ds,dsn]);
-                    dsn = max([Opt.ds_min,ds/2,dsn]);
+                    %% Limit to max./min. step size, also limit to Opt.max_step_size_change*ds / ds/Opt.max_step_size_change*ds:
+                    dsn = min([norm(Opt.ds_max),Opt.max_step_size_change*ds,dsn]);
+                    dsn = max([Opt.ds_min,ds/Opt.max_step_size_change,dsn]);
                 end
             else
                 if Opt.step_size_control.fix
                     dsn = Info.ds0;
                 else
                     dsn = ds/2;
-                    %% Limit to max./min. step size, also limit to 2*ds/0.5*ds:
-                    dsn = min([norm(Opt.ds_max),dsn]);
-                    dsn = max([Opt.ds_min,dsn]);
+                    %% Limit to max./min. step size, also limit to Opt.max_step_size_change*ds / ds/Opt.max_step_size_change*ds:
+                    dsn = min([norm(Opt.ds_max),Opt.max_step_size_change*ds,dsn]);
+                    dsn = max([Opt.ds_min,ds/Opt.max_step_size_change,dsn]);
                 end
             end
         else
