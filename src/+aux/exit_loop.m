@@ -23,7 +23,7 @@ function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Path
     %
     if Counter.remove>Opt.max_remove_counter
         Do.continuation = false;
-        Info.exitflag = -2;
+        Info.exitflag = -3;
         Info.exit_msg = '--> continuation stoped: max_remove_counter reached';
     end
     %
@@ -93,7 +93,7 @@ function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Path
         Info.exit_msg = '--> continuation completed: user-defined break function';
     end
     %
-    %% exit due to break function:
+    %% exit due to user input:
     %
     if Do.stop_manually
         Do.continuation = false;
