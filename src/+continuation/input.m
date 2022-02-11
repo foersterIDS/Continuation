@@ -29,6 +29,9 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %% check mandatory input:
     %
     if Purpose.continuation
+        if isempty(var0)
+            error('var0 must not be empty!');
+        end
         if ~isa(var0,'double') || ~isa(l_start,'double') || ~isa(l_end,'double') || ~isa(ds0,'double')
             error('var0, l_start, l_end and ds0 must be double!');
         end
