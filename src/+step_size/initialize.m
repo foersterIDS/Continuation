@@ -10,11 +10,13 @@ function [Opt,ds0,Stepsize_options] = initialize(Opt,var0,l_start,l_end,ds0)
     if Opt.check_step_size_options
         %
         if ds0 < Opt.ds_min % ds0 must not be lower than ds_min
-            error('ds0 cannot be smaller than ds_min. Consider adapting one of them.');
+            ds0 = Opt.ds_min;
+            aux.print_line(Opt,'--> ds0 is too small! It must not be smaller than ds_min. ds0 has been adapted.\n');
         end
         %
         if ds0 > Opt.ds_max % ds0 must not be larger than ds_max
-            error('ds0 cannot be larger than ds_max. Consider adapting one of them.');
+            ds0 = Opt.ds_max;
+            aux.print_line(Opt,'--> ds0 is too large! It must not be greater than ds_max. ds0 has been adapted.\n');
         end
         %
         if Opt.ds_min < 10*Opt.solver_tol % ds_min cannot be lower than tolerance of solver
