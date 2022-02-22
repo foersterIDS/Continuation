@@ -62,7 +62,7 @@ step_size_angle<>eval<>(2/360)*(2*pi)<>#scalar#double#positive
 step_size_control<>struct<>Opt_stepsize<>#struct#ison:step_size_control
 step_size_error_max<>double<>0.6<>#scalar#double#positive#nonzero
 step_size_error_pd<>eval<>[1,0]<>#array#double#positive
-step_size_event<>eval<>false<>#logical
+step_size_event<>eval<>false<>#scalar#logical
 step_size_iterations_beta<>double<>0.5<>#scalar#double#positive#nonzero#smaller:2
 step_size_exponential_weight<>double<>4<>#scalar#double#positive#nonzero
 step_size_pid_params<>eval<>[0.075,0.175,0.01]<>#array#positive#nonzero#double#size:[1,3]
