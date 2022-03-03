@@ -369,8 +369,10 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     end
     %
     %% check whether an event condition is set
-    if ~strcmp(char(Opt.event_condition), '@(ds,var_all,l_all)false')
+    %
+    if Opt_is_set.event_condition
         Opt.step_size_event = true;
+        Opt_is_set.step_size_event = true;
     end
     %
     %% set dependent options
