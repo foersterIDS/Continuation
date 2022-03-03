@@ -44,7 +44,7 @@ function [ds,Counter,event_out,changed,Opt] = event_adjustment(ds,Path,Counter,O
     % Check if stepsize is still allowed to be changed
     %
     changed = false;
-    if Opt.event_condition(ds,Path)
+    if Opt.event_condition(ds,Path.var_all,Path.l_all)
         if Counter.event < Opt.event_counter
             %
             % check if condition was met in the last step

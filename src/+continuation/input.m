@@ -368,6 +368,11 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
         error(errmsg);
     end
     %
+    %% check whether an event condition is set
+    if ~strcmp(char(Opt.event_condition), '@(ds,var_all,l_all)false')
+        Opt.step_size_event = true;
+    end
+    %
     %% set dependent options
     %
     Info_temp = struct('ds0',ds0,'l_end',l_end,'l_start',l_start,'var0',var0);

@@ -22,7 +22,7 @@ ds_tol<>eval<>[0.5,1.5]<>#array#positive#double#increasing#size:[1,2]
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscale_min<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
 enforce_ds_max<>eval<>false<>#scalar#logical#ison:predictor_solver
-event_condition<>eval<>@(ds,Path)false<>#function_handle
+event_condition<>eval<>@(ds,var_all,l_all)false<>#function_handle
 event_counter<>double<>1<>#scalar#integer#positive#nonzero
 homotopy<>struct<>Opt_homotopy<>#struct
 homotopy_error_counter<>double<>2<>#scalar#integer#positive#nonzero#neq:Opt.deflation_error_counter
