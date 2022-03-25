@@ -14,15 +14,16 @@ function [is_closed, Opt, Counter] = closed_curve(Opt,Path,ds,Counter)
     ns = numel(Path.l_all);
     if ns > n+nu
         x_all = [Path.var_all; Path.l_all];
-        eps_dist = min([norm(x_all(:,end)-x_all(:,end-1)),2*ds,Opt.ds_max]);
+        eps_dist_x = min([2*norm(x_all(:,end)-x_all(:,end-1)),2*ds,Opt.ds_max]);
+        eps_dist_l = min([2*norm(x_all(end,end)-x_all(end,end-1)),2*ds,Opt.ds_max]);
         eps_ang = 0.5*(2*pi / 360);
         eps_dir = 1e-3;
-        
         %% exclude points before current points which are too close
         %
         ignored_dist = 2*norm(x_all(:,end)-x_all(:,end-1));
-        distance = sqrt(sum((x_all(:,1:(ns - 1)) - x_all(:,end)).^2,1));
-        last_ind = find(distance > ignored_dist);
+        distance_x = sqrt(sum((x_all(:,1:(ns - 1)) - x_all(:,end)).^2,1));
+        distance_l = sqrt((x_all(end,1:(ns - 1)) - x_all(end,end)).^2);
+        last_ind = find(distance_x > ignored_dist);
         if isempty(last_ind)
             flag = 0;
         else
@@ -30,8 +31,9 @@ function [is_closed, Opt, Counter] = closed_curve(Opt,Path,ds,Counter)
             %
             flag = 0;
             if ns>n
-                dist_x = distance(nu:(ns - ignored));
-                k_flags = find(dist_x <= eps_dist);
+                dist_x = distance_x(nu:(ns - ignored));
+                dist_l = distance_l(nu:(ns - ignored));
+                k_flags = find((dist_x <= eps_dist_x).*(dist_l <= eps_dist_l));
                 if numel(k_flags)>0
                     flag = 1;
                     k_flags = k_flags + nu - 1;
