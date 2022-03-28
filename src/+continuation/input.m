@@ -177,7 +177,12 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
                     i = i-2;
                 else
                     err_msg = sprintf('Unknown option %s.',varargin_cell{i});
-                    error(err_msg);
+                    % list of options:
+                    err_msg = [err_msg,' (List of options: ',Opt_fieldnames{1}];
+                    for ii=2:numel(Opt_fieldnames)
+                        err_msg = [err_msg,', ',Opt_fieldnames{ii}];
+                    end
+                    error(sprintf(err_msg));
                 end
             end
         catch
