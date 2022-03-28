@@ -4,11 +4,11 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
+function [inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
     %% automated validation
     %
     Is.reverse = false;
-    catch_flag = 0;
+    Is.catch = 0;
     inv_poi_str = '                          ';
     if Solver.exitflag>0
         try
@@ -18,13 +18,13 @@ function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plu
                 if ((norm_xs_xi>=Opt.ds_tol(1)*ds && norm_xs_xi<=Opt.ds_tol(2)*ds || numel(Path.l_all)==1) && norm_xs_xi<=Opt.ds_tol(2)*Opt.ds_max) || Do.convergeToTarget || Opt.corrector.unique
                     if numel(Path.l_all)==1
                         if numel(Opt.direction)==1 && sign(x_solution(end)-Path.l_all(end))==sign(Opt.direction)
-                            val = true;
+                            Is.valid = true;
                         else
                             alpha = acos(((x_solution-xi)'*Opt.direction)/(sqrt((x_solution-xi)'*(x_solution-xi))*sqrt(Opt.direction'*Opt.direction)));
                             if alpha<Opt.alpha_reverse
-                                val = true;
+                                Is.valid = true;
                             else
-                                val = false;
+                                Is.valid = false;
                                 Is.reverse = true;
                                 inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
                                 inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
@@ -34,12 +34,12 @@ function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plu
                         xim1 = [Path.var_all(:,end-1);Path.l_all(end-1)];
                         alpha = acos(((x_solution-xi)'*(xi-xim1))/(sqrt((x_solution-xi)'*(x_solution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
                         if alpha<Opt.alpha_reverse
-                            val = true;
+                            Is.valid = true;
                         else
                             if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==numel(Path.l_all)
-                                val = true;
+                                Is.valid = true;
                             else
-                                val = false;
+                                Is.valid = false;
                                 Is.reverse = true;
                                 inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
                                 inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
@@ -47,35 +47,35 @@ function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plu
                         end
                     end
                 else
-                    val = false;
+                    Is.valid = false;
                     inv_poi_str(1:25) = '(dx outside of ds-bounds)';
                 end
             else
-                val = false;
+                Is.valid = false;
                 inv_poi_str(1:18) = '(fun=0 not solved)';
             end
         catch
-            val = false;
-            catch_flag = 1;
+            Is.valid = false;
+            Is.catch = 1;
             inv_poi_str(1:24) = '(error while validating)';
         end
     else
-        val = false;
+        Is.valid = false;
         inv_poi_str(1:26) = '(Solver does not converge)';
     end
     %
     %% enforce_ds_max
     %
-    if val && Opt.enforce_ds_max
-        val = logical(heaviside(min(Opt.ds_max-(x_solution-xi))));
-        if ~val
+    if Is.valid && Opt.enforce_ds_max
+        Is.valid = logical(heaviside(min(Opt.ds_max-(x_solution-xi))));
+        if ~Is.valid
             inv_poi_str(1:17) = '(ds_max exceeded)';
         end
     end
     %
     %% approve manually
     %
-    if val && ((islogical(Opt.approve_manually) && Opt.approve_manually) || (~islogical(Opt.approve_manually) && (x_solution(end)-Opt.approve_manually)*(Path.l_all(end)-Opt.approve_manually)<=0))
+    if Is.valid && ((islogical(Opt.approve_manually) && Opt.approve_manually) || (~islogical(Opt.approve_manually) && (x_solution(end)-Opt.approve_manually)*(Path.l_all(end)-Opt.approve_manually)<=0))
         Opt.approve_manually = true;
         if numel(Path.l_all)>1
             try
@@ -102,14 +102,14 @@ function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plu
                 correct_input = true;
             elseif strcmp(input_string,'n')
                 correct_input = true;
-                val = false;
+                Is.valid = false;
                 inv_poi_str(1:19) = '(rejected manually)';
             elseif strcmp(input_string,'off')
                 correct_input = true;
                 Opt.approve_manually = false;
             elseif strcmp(input_string,'exit')
                 correct_input = true;
-                val = false;
+                Is.valid = false;
                 Do.stop_manually = true;
                 inv_poi_str(1:19) = '(rejected manually)';
             elseif ~isnan(str2double(input_string))

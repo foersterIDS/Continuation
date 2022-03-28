@@ -5,11 +5,11 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Path, Opt, Counter, Bifurcation, ds, fun_solution, Jacobian, break_fun_out, val)
+function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Is, Path, Opt, Counter, Bifurcation, ds, fun_solution, Jacobian, break_fun_out)
     %% eval. break function:
     %
     try
-        if val
+        if Is.valid
             [bfun,break_fun_out] = Opt.break_function(fun_solution,Jacobian.solver,Path.var_all(:,end),Path.l_all(end),break_fun_out);
         else
             bfun = false;

@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
 %
-function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Solver,Temp] = initialize_structs(var0,l_start,l_end,ds0,Opt,output_flag)
+function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,Stepsize_information,Temp] = initialize_structs(var0,l_start,l_end,ds0,Opt,output_flag)
     %% Bifurcation
     %
     Bifurcation = struct('bif',[],...
@@ -57,8 +57,10 @@ function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plu
     %
     %% Is
     %
-    Is = struct('current_jacobian',false,...
-                'reverse',false);
+    Is = struct('catch',false,...
+                'current_jacobian',false,...
+                'reverse',false,...
+                'valid',false);
     %
     %% Jacobian
     %
@@ -102,6 +104,11 @@ function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plu
                   'x',[],...
                   'x_predictor',[]);
     %
+    %% Remove
+    %
+    Remove = struct('ds',NaN,...
+                    's',NaN);
+    %
     %% Solver
     %
     [solver,predictor_solver,num_jac_solver,default_solver_output] = continuation.solver(Opt,output_flag);
@@ -111,6 +118,11 @@ function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plu
                     'num_jac',num_jac_solver,...
                     'output',default_solver_output,...
                     'predictor',predictor_solver);
+    %
+    %% Stepsize_information
+    %
+    Stepsize_information = struct('rate_of_contraction',NaN,...
+                                  'speed_of_continuation',NaN);
     %
     %% Temp
     %
