@@ -29,7 +29,7 @@ function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Is, 
     %
     %% exit without complete results:
     %
-    if Counter.catch >= 3
+    if Counter.catch>=3
         Info.exitflag = -2;
         Do.continuation = false;
         Info.exit_msg = sprintf('--> continuation stoped: Too many erros in function evaluation.');

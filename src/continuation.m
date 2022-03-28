@@ -84,75 +84,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         Counter.loop = Counter.loop+1;
         Is.current_jacobian = false;
         Counter.catch_old = Counter.catch;
-        %% save old values of stepsize information
-        %
-        if Stepsize_options.iterations
-            Temp.length = length(Solver.output.iterations);
-            Temp.flag = 0;
-            if Temp.length < 3 && Temp.length > 0
-                to_take = 1:Temp.length;
-            elseif Temp.length == 0
-                Temp.flag = 1;
-            else
-                to_take = Temp.length-1:Temp.length;
-            end
-            if isfield(Solver.output, 'iterations') && ~isempty(Solver.output.iterations) && ~Temp.flag
-                Temp.iterations = Solver.output.iterations(to_take);
-            else
-                Temp.iterations = [];
-            end
-        end
-        %
-        if Stepsize_options.speed_of_continuation
-            Temp.length = length(Path.speed_of_continuation);
-            Temp.flag = 0;
-            if Temp.length < 3 && Temp.length > 0
-                to_take = 1:Temp.length;
-            elseif Temp.length == 0
-                Temp.flag = 1;
-            else
-                to_take = Temp.length-1:Temp.length;
-            end
-            if isfield(Path, 'speed_of_continuation') && ~isempty(Path.speed_of_continuation) && ~Temp.flag
-                Temp.speed_of_continuation = Path.speed_of_continuation(to_take);
-            else
-                Temp.speed_of_continuation = [];
-            end
-        end
-        %
-        if Stepsize_options.predictor
-            Temp.length = size(Path.x_predictor,2);
-            Temp.flag = 0;
-            if Temp.length < 3 && Temp.length > 0
-                to_take = 1:Temp.length;
-            elseif Temp.length == 0
-                Temp.flag = 1;
-            else
-                to_take = Temp.length-1:Temp.length;
-            end
-            if isfield(Path, 'x_predictor') && ~isempty(Path.x_predictor) && ~Temp.flag
-                Temp.predictor = Path.x_predictor(:,to_take);
-            else
-                Temp.predictor = [];
-            end
-        end
-        %
-        if Stepsize_options.rate_of_contraction
-            Temp.length = length(Solver.output.rate_of_contraction);
-            Temp.flag = 0;
-            if Temp.length < 3 && Temp.length > 0
-                to_take = 1:Temp.length;
-            elseif Temp.length == 0
-                Temp.flag = 1;
-            else
-                to_take = Temp.length-1:Temp.length;
-            end
-            if isfield(Solver.output, 'rate_of_contraction') && ~isempty(Solver.output.rate_of_contraction) && ~Temp.flag
-                Temp.rate_of_contraction = Solver.output.rate_of_contraction(to_take);
-            else
-                Temp.rate_of_contraction = [];
-            end
-        end
+        Temp = step_size.update_temp(Path,Solver,Stepsize_options,Temp);
         %
         %% residual
         %
@@ -162,10 +94,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             catch
                 aux.print_line(Opt,'---> delation: catch!\n');
                 Counter.catch = Counter.catch + 1;
-                if Counter.catch >= 3
-                    aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
-                    break;
-                end
             end
         elseif Do.suspend
             residual = @(v,l_fix) aux.residual_suspend_continuation(fun,v,l_fix,Opt);
@@ -186,6 +114,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 var_predictor = x_predictor(1:end-1);
                 l_predictor = x_predictor(end);
             else
+                %% calc. predictor
                 [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,Jacobian.last,fun,res_corr,Solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
@@ -194,10 +123,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             x_predictor = [var_predictor;l_predictor];
             aux.print_line(Opt,'---> predictor: catch!\n');
             Counter.catch = Counter.catch + 1;
-            if Counter.catch >= 3
-                aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
-                break;
-            end
         end
         %
         %% solve
@@ -241,10 +166,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             Do.convergeToTarget = false;
             aux.print_line(Opt,'---> solve: catch!\n');
             Counter.catch = Counter.catch + 1;
-            if Counter.catch >= 3
-                aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
-                break;
-            end
         end
         %
         %% calc stepsize information
@@ -279,8 +200,10 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         %% check result
         %
+        % check result:
         [inv_poi_str,Do,Is,Opt] = ...
             aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
+        % confirm result:
         [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt] = ...
             aux.confirm_result(fun,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt);
         %
@@ -303,16 +226,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         %% step size control
         %
-        % save latest stepsize
-        %
+        % save latest stepsize:
         dsim1 = ds;
-        %
-        % save step size data
-        %
+        % save step size data:
         [Solver,Path] = aux.update_stepsize_data(Stepsize_options,Temp,Solver,Path);
-        %
-        % adjust stepsize
-        %
+        % adjust stepsize:
         [ds,Counter,event_out,Opt] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out,Initial);
         %
         %% end loop
