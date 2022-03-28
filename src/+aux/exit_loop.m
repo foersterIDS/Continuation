@@ -24,7 +24,15 @@ function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Path
     if Counter.remove>Opt.max_remove_counter
         Do.continuation = false;
         Info.exitflag = -3;
-        Info.exit_msg = '--> continuation stoped: max_remove_counter reached';
+        Info.exit_msg = '--> continuation stoped: max_remove_counter has been reached.';
+    end
+    %
+    %% exit without complete results:
+    %
+    if Counter.catch >= 3
+        Info.exitflag = -2;
+        Do.continuation = false;
+        Info.exit_msg = sprintf('--> continuation stoped: Too many erros in function evaluation.');
     end
     %
     %% exit without complete results:
