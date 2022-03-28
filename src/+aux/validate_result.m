@@ -4,10 +4,10 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt)
+function [val,catch_flag,inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
     %% automated validation
     %
-    is_reverse = false;
+    Is.reverse = false;
     catch_flag = 0;
     inv_poi_str = '                          ';
     if Solver.exitflag>0
@@ -25,7 +25,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                                 val = true;
                             else
                                 val = false;
-                                is_reverse = true;
+                                Is.reverse = true;
                                 inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
                                 inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
                             end
@@ -40,7 +40,7 @@ function [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = validate_result(x_solu
                                 val = true;
                             else
                                 val = false;
-                                is_reverse = true;
+                                Is.reverse = true;
                                 inv_poi_str_temp = sprintf('(alpha: %.2f)',alpha);
                                 inv_poi_str(1:numel(inv_poi_str_temp)) = inv_poi_str_temp;
                             end

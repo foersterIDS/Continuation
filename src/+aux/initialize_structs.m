@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
 %
-function [Bifurcation,Counter,Do,Info,Info_out,Initial,Jacobian,Path,Plot,Plus,Solver,Temp] = initialize_structs(var0,l_start,l_end,ds0,Opt,output_flag)
+function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Solver,Temp] = initialize_structs(var0,l_start,l_end,ds0,Opt,output_flag)
     %% Bifurcation
     %
     Bifurcation = struct('bif',[],...
@@ -54,6 +54,11 @@ function [Bifurcation,Counter,Do,Info,Info_out,Initial,Jacobian,Path,Plot,Plus,S
     %% Initial
     %
     Initial = struct('ds_max',Opt.ds_max);
+    %
+    %% Is
+    %
+    Is = struct('current_jacobian',false,...
+                'reverse',false);
     %
     %% Jacobian
     %

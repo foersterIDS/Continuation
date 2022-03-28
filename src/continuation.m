@@ -20,7 +20,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     if Stepsize_options.rate_of_contraction
         global solver_stepsizes;
     end
-    [Bifurcation,Counter,Do,Info,Info_out,Initial,Jacobian,Path,Plot,Plus,Solver,Temp] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
+    [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Solver,Temp] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
     clear('var0','l_start','l_end','ds0');
     res_corr = continuation.corrector(Opt);
     ds = Info.ds0;
@@ -82,7 +82,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %% initialize loop
         %
         Counter.loop = Counter.loop+1;
-        is_current_jacobian = false;
+        Is.current_jacobian = false;
         Counter.catch_old = Counter.catch;
         %% save old values of stepsize information
         %
@@ -232,7 +232,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 end
                 Do.convergeToTarget = false;
             end
-            is_current_jacobian = true;
+            Is.current_jacobian = true;
         catch
             x_solution = NaN(size(x_predictor));
             fun_solution = inf(size(x_predictor));
@@ -277,7 +277,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         %% check result
         %
-        [val,is_reverse,catch_flag,inv_poi_str,Do,Opt] = aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Counter,Plot,Opt);
+        [val,catch_flag,inv_poi_str,Do,Is,Opt] = aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         if val
             %% valid result
             if isempty(Plus.x)
@@ -353,7 +353,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         else
             %% invalid result
             Counter.error = Counter.error+1;
-            if Opt.deflation && ~Do.deflate && ~isnan(sum(x_solution(:,end))) && is_reverse && Counter.error>=Opt.deflation_error_counter
+            if Opt.deflation && ~Do.deflate && ~isnan(sum(x_solution(:,end))) && Is.reverse && Counter.error>=Opt.deflation_error_counter
                 Do.deflate = true;
                 x_deflation = x_solution;
             else
@@ -473,7 +473,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 Do.suspend = false;
                 Do.remove = false;
             end
-            if Opt.include_reverse && is_reverse && Solver.exitflag>0
+            if Opt.include_reverse && Is.reverse && Solver.exitflag>0
                 Path = aux.include_reverse(x_solution,Path);
             end
             if aux.ison(Opt.homotopy) && Counter.error>=Opt.homotopy_error_counter
@@ -483,10 +483,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             end
             if catch_flag
                 Counter.catch = Counter.catch + 1;
-                if Counter.catch >= 3
-                    aux.print_line(Opt,'--> Error in input! catch was used too often!\n');
-                    break;
-                end
             end
         end
         %
@@ -494,13 +490,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         Bifurcation.flag = 0;
         if aux.ison(Opt.bifurcation) && val && ~Do.homotopy && numel(Path.l_all)>2
-            if ~is_current_jacobian
+            if ~Is.current_jacobian
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
             [Bifurcation,Jacobian,Path] = bifurcation.check(fun,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt);
         elseif aux.ison(Opt.bifurcation) && val && numel(Path.l_all)<=2
-            if ~is_current_jacobian
+            if ~Is.current_jacobian
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
             end
