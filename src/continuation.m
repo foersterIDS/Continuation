@@ -16,16 +16,17 @@
 %   A. Förster, foerster@ids.uni-hannover.de
 % 
 % COPYRIGHT AND LICENSING: 
-% continuation Copyright (C) 2022  Alwin Förster
-%   							   (foerster@ids.uni-hannover.de)
-%                     			   Leibnitz University Hannover
-% This program comes with ABSOLUTELY NO WARRANTY. 
-% NLvib is free software, you can redistribute and/or modify it under the
-% GNU General Public License as published by the Free Software Foundation,
-% either version 3 of the License, or (at your option) any later version.
-% For details on license and warranty, see http://www.gnu.org/licenses
-% or gpl-3.0.txt.
+% Continuation Copyright (C) 2022 Alwin Förster
+%                                 (foerster@ids.uni-hannover.de)
+%                                 Leibnitz University Hannover
+% This program comes with NO WARRANTY. 
+% Continuation is free software, you can redistribute and/or modify it
+% under the GNU General Public License as published by the Free Software
+% Foundation, either version 3 of the License, or (at your option) any
+% later version. For details on license and warranty, see
+% http://www.gnu.org/licenses or gpl-3.0.txt.
 %
+%%
 function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,Info_out] = ...
     continuation(fun,var0,l_start,l_end,ds0,varargin)
     %% initialize
