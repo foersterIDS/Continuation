@@ -33,16 +33,22 @@ Bz = @(v,w) [      0,     -1,      0,      0;
              k+3*l*v,      c,      0,      1;
                    0,      0,      0,     -1;
                    0,      0,    w^2, 2*Df*w];
+Bz_dpa = @(v,w,l) [      0,     -1,      0,      0;
+                   k+3*l*v,      c,      0,      1;
+                         0,      0,      0,     -1;
+                         0,      0,    w^2, 2*Df*w];
 SMz = [0;0;0;1];
 Sff = @(w) 4*Df*w*sf^2;
 
 G = @(v,w) -invAz*Bz(v,w);
+G_dpa = @(v,w,l) -invAz*Bz_dpa(v,w,l);
 D = @(v,w) conj(invAz*SMz)*Sff(w)*(invAz*SMz).';
 
 vs = [1;0;0;0];
 
 %% pathConti
 fun = @(vars,om) vs'*lyap(G(vars,om),D(vars,om))*vs-vars;
+fun_dpa = @(vars,om,g) vs'*lyap(G_dpa(vars,om,g),D(vars,om))*vs-vars;
 ds0 = 0.0001;
 ds_max = 0.01;
 v0 = 0.05;

@@ -5,16 +5,24 @@
 %   08.05.2020 - Alwin Förster
 %   05.01.2021 - Tido Kubatschek
 %
-function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
+function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     %% determine purpose
     %
     Purpose = struct('continuation',false,...
-                     'homotopy',false);
+                     'homotopy',false,...
+                     'parameter_tracing',false);
     switch nargin
         case 6
-            %% continuation
-            % input: varargin_cell,fun,var0,l_start,l_end,ds0
-            Purpose.continuation = true;
+            if abs(nargin(fun))==2
+                %% continuation
+                % input: varargin_cell,fun,var0,l_start,l_end,ds0
+                Purpose.continuation = true;
+            elseif abs(nargin(fun))==3
+                %% parameter tracing
+                % input: varargin_cell,fun,var0,l_start,l_end,ds0
+                % fun = @(v,l,g) ...
+                Purpose.parameter_tracing = true;
+            end
         case 3
             %% homotopy
             % input: varargin_cell,fun,var0
@@ -55,6 +63,11 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
     Opt_is_set = struct();
     for ii=1:numel(Opt_fieldnames)
         Opt_is_set.(lower(Opt_fieldnames{ii})) = false;
+        if isstruct(Opt.(lower(Opt_fieldnames{ii})))
+            [~,Opt_sub_struct_info] = aux.csf2struct(['Opt_',Opt_fieldnames{ii}]);
+            Opt_struct_info.(lower(Opt_fieldnames{ii})) = Opt_sub_struct_info;
+            Opt_struct_fieldnames.(lower(Opt_fieldnames{ii})) = fieldnames(Opt_sub_struct_info);
+        end
     end
 	%
     %% read varargin_cell:
@@ -208,6 +221,22 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
         % in:
         if abs(nargin(fun))~=2
             error('%d is an invalid number of input arguments for fun(...).\nfun = fun(v,l)',abs(nargin(fun)))
+        else
+            func = @(v,l) fun(v,l);
+        end
+    elseif Purpose.parameter_tracing
+        % out:
+        try
+            [R,J] = fun(var0,l_start,Opt.g_0);
+            Opt.jacobian = true;
+        catch
+            Opt.jacobian = false;
+        end
+        % in:
+        if abs(nargin(fun))~=3
+            error('%d is an invalid number of input arguments for fun(...) using parameter tracing.\nfun = fun(v,l,g)',abs(nargin(fun)))
+        else
+            func = @(v,l) fun(v,l,Opt.g_0);
         end
     elseif Purpose.homotopy
         % out:
@@ -220,154 +249,15 @@ function [Opt,ds0,Opt_is_set] = input(varargin_cell,fun,var0,l_start,l_end,ds0)
         % in:
         if abs(nargin(fun))~=1
             error('%d is an invalid number of input arguments for fun(...).\nfun = fun(v)',abs(nargin(fun)))
+        else
+            func = @(v) fun(v);
         end
     end
     %
     %% check Opt:
     %
 	errmsg = '';
-    for i=1:numel(Opt_fieldnames)
-        if isfield(Opt_info,Opt_fieldnames{i})
-            icases = find(Opt_info.(Opt_fieldnames{i})=='|');
-            ncases = length(icases)+1;
-            icaseslower = [1,icases+1];
-            icasesupper = [icases-1,length(Opt_info.(Opt_fieldnames{i}))];
-            errmsg_temp = '';
-            for k=1:ncases
-                errmsg_temp = '';
-                types = Opt_info.(Opt_fieldnames{i})(icaseslower(k):icasesupper(k));
-                ilower = find(types=='#')+1;
-                iupper = [ilower(2:end)-2,length(types)];
-                for j=1:length(ilower)
-                    type = types(ilower(j):iupper(j));
-                    switch type
-                        case 'array'
-                            if isempty(Opt.(Opt_fieldnames{i}))
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be not empty',Opt_fieldnames{i})];
-                            end
-                        case 'double'
-                            if ~isa(Opt.(Opt_fieldnames{i}),'double')
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be double',Opt_fieldnames{i})];
-                            end
-                        case 'function_handle'
-                            if ~isa(Opt.(Opt_fieldnames{i}),'function_handle')
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a function_handle',Opt_fieldnames{i})];
-                            end
-                        case 'increasing'
-                            if ~prod(diff(Opt.(Opt_fieldnames{i}))>0)
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s must have increasing values',Opt_fieldnames{i})];
-                            end
-                        case 'integer'
-                            if ~prod(floor(Opt.(Opt_fieldnames{i}))==Opt.(Opt_fieldnames{i}))
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be integer',Opt_fieldnames{i})];
-                            end
-                        case 'isnan'
-                            if ~prod(isnan(Opt.(Opt_fieldnames{i})))
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be NaN',Opt_fieldnames{i})];
-                            end
-                        case 'logical'
-                            if ~isa(Opt.(Opt_fieldnames{i}),'logical')
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be logical',Opt_fieldnames{i})];
-                            end
-                        case 'nonzero'
-                            if ~prod(Opt.(Opt_fieldnames{i})~=0)
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be nonzero',Opt_fieldnames{i})];
-                            end
-                        case 'pmone'
-                            if ~(prod(Opt.(Opt_fieldnames{i}))==+1 || prod(Opt.(Opt_fieldnames{i}))==-1)
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be +-1',Opt_fieldnames{i})];
-                            end
-                        case 'positive'
-                            if ~prod(Opt.(Opt_fieldnames{i})>=0)
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be positive',Opt_fieldnames{i})];
-                            end
-                        case 'scalar'
-                            if ~(numel(Opt.(Opt_fieldnames{i}))==1)
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be scalar',Opt_fieldnames{i})];
-                            end
-                        case 'struct'
-                            if ~isa(Opt.(Opt_fieldnames{i}),'struct')
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a struct',Opt_fieldnames{i})];
-                            end
-                        case 'unique'
-                            if ~(numel(Opt.(Opt_fieldnames{i}))==numel(unique(Opt.(Opt_fieldnames{i}))))
-                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be unique',Opt_fieldnames{i})];
-                            end
-                        otherwise
-                            try
-                                if prod(type(1:3)=='max')
-                                    if ~prod(Opt.(Opt_fieldnames{i})<=eval(type(5:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be smaller equal %.2e',Opt_fieldnames{i},eval(type(5:end)))];
-                                    end
-                                elseif prod(type(1:3)=='neq')
-                                    if ~prod(Opt.(Opt_fieldnames{i})~=eval(type(5:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be not equal %s',Opt_fieldnames{i},type(5:end))];
-                                    end
-                                elseif prod(type(1:4)=='ison')
-                                    if (isstruct(Opt.(Opt_fieldnames{i})) && aux.ison(Opt.(Opt_fieldnames{i}))) || (islogical(Opt.(Opt_fieldnames{i})) && Opt.(Opt_fieldnames{i})) || sum(ismember(varargin_cell(1:2:end),Opt_fieldnames{i}))
-                                        if isfield(Opt,type(6:end))
-                                            fieldname = type(6:end);
-                                        else
-                                            fieldname = [];
-                                        end
-                                        try
-                                            if ~aux.ison(eval(['Opt.',fieldname]))
-                                                if isstruct(Opt.(fieldname))
-                                                    Opt_sub_fieldnames = fieldnames(eval(['Opt.',fieldname]));
-                                                    eval(['Opt.',fieldname,'.',Opt_sub_fieldnames{1},' = true;']);
-                                                    aux.print_line(Opt,'--> %s has to be on when using %s. %s was set to option %s.\n',fieldname,Opt_fieldnames{i},fieldname,Opt_sub_fieldnames{1});
-                                                elseif islogical(Opt.(fieldname))
-                                                    Opt.(fieldname) = true;
-                                                    aux.print_line(Opt,'--> %s has to be on when using %s. %s was set to option ''on''.\n',fieldname,Opt_fieldnames{i},fieldname);
-                                                end
-                                            end
-                                        catch
-                                            errmsg_temp = [errmsg_temp,sprintf('\n%s has to be on when using %s',type(6:end),Opt_fieldnames{i})];
-                                        end
-                                    else
-                                        % option not set
-                                    end
-                                elseif prod(type(1:4)=='norm')
-                                    try
-                                        if ~(norm(Opt.(Opt_fieldnames{i}))==eval(type(6:end)))
-                                            Opt.(Opt_fieldnames{i}) = Opt.(Opt_fieldnames{i})./norm(Opt.(Opt_fieldnames{i}));
-                                        end
-                                    catch
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to have norm %.2e but cannot be normed',Opt_fieldnames{i},eval(type(6:end)))];
-                                    end
-                                elseif prod(type(1:4)=='size')
-                                    if ~prod(size(Opt.(Opt_fieldnames{i}))==eval(type(6:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be size [%d,%d]',Opt_fieldnames{i},eval(type(6:end)))];
-                                    end
-                                elseif prod(type(1:6)=='equals')
-                                    if ~prod(Opt.(Opt_fieldnames{i})==eval(type(8:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be equal %s',Opt_fieldnames{i},type(8:end))];
-                                    end
-                                elseif prod(type(1:6)=='larger')
-                                    if ~prod(Opt.(Opt_fieldnames{i})>eval(type(8:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be larger %.2e',Opt_fieldnames{i},eval(type(8:end)))];
-                                    end
-                                elseif prod(type(1:7)=='smaller')
-                                    if ~prod(Opt.(Opt_fieldnames{i})<=eval(type(9:end)))
-                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be smaller %.2e',Opt_fieldnames{i},eval(type(9:end)))];
-                                    end
-                                else
-                                    errmsg_temp = [errmsg_temp,sprintf('\nField %s has unkown type: %s',Opt_fieldnames{i},type)];
-                                end
-                            catch
-                                errmsg_temp = [errmsg_temp,sprintf('\nField %s has unkown type: %s',Opt_fieldnames{i},type)];
-                            end
-                    end
-                end
-                if isempty(errmsg_temp)
-                    break;
-                end
-            end
-            errmsg = [errmsg,errmsg_temp];
-        else
-            errmsg = [errmsg,sprintf('\nField without type: %s',Opt_fieldnames{i})];
-        end
-    end
+    [errmsg] = continuation.check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldnames,Opt_is_set,Opt_struct_info,Opt_struct_fieldnames);
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);

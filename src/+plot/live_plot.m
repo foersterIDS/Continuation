@@ -39,14 +39,11 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 fig = figure(Opt.live_plot_fig); % use existing fig
                 hold on; % for new plot
             end
-            
-            
-            %% prepare colors 
+            %% prepare colors
             colors = cell(num_pl,1);        
             for k = 1:num_pl
                 colors(k) = {plot.get_RGB(k,num_pl,1)};
             end
-            
             %% create plot with colors
             pl = plot(Path.l_all,Path.var_all(Opt.plot_vars_index,:),'-','LineWidth',2);
             set(pl, {'Color'}, colors); hold on;
@@ -473,6 +470,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %            
         end
     elseif Opt.plot.three_dim
+        %% plot three_dim
         if num_pl+1 > 3
             aux.print_line(Opt,'--> 3D plot only works with two variables.\nFirst two are selected! Consider defining plot_vars_index.\n');
             Opt.plot_vars_index = [1,2];
@@ -481,7 +479,6 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             error('3D plot only works with at least two variables!');
         end
         if length(Path.l_all) == 1
-            
             if isnan(Opt.live_plot_fig) % test for existing figure to plot in
                 %% delete used tags
                 %
@@ -534,7 +531,6 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
-            
         elseif Bifurcation.flag == -1
             %% final change in live plot
             %
@@ -599,6 +595,168 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %% adjust x axis
             %
             xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);        
+        end
+    elseif Opt.plot.dpa
+        %% plot dpa
+        if length(Path.l_all) == 1
+            if isnan(Opt.live_plot_fig) % test for existing figure to plot in
+                %% delete used tags
+                %
+                if ~isempty(findobj('Tag', 'upperleft'))
+                    set(findobj('Tag', 'upperleft'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'upperright'))
+                    set(findobj('Tag', 'upperright'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'lowerleft'))
+                    set(findobj('Tag', 'lowerleft'),'Tag','');
+                end
+                if ~isempty(findobj('Tag', 'lowerright'))
+                    set(findobj('Tag', 'lowerright'),'Tag','');
+                end
+                %
+                %% create new fig
+                %
+                fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
+                clf;
+                old_fig = false;
+            elseif ~ishandle(Opt.live_plot_fig)
+                error('No such figure exists!');
+            else
+                fig = figure(Opt.live_plot_fig); % use existing fig
+                hold on; % for new plot
+                old_fig = true;
+            end
+            %% prepare colors
+            colors = cell(num_pl,1);        
+            for k = 1:num_pl
+                colors(k) = {plot.get_RGB(k,num_pl,1)};
+            end
+            %% create plot with colors
+            if Opt.dpa
+                pl = plot3(Path.l_all,Path.var_all(end,:),Path.var_all(1:(end-1),:),'-','LineWidth',2);
+                set(pl, {'Color'}, colors); hold on;
+                pl_curr = plot3(Path.l_all,Path.var_all(end,:),Path.var_all(1:(end-1),:),'*','LineWidth',2);
+                set(pl_curr,{'Color'},colors); hold off;
+            else
+                pl = plot3(Path.l_all,Opt.g_0*ones(size(Path.l_all)),Path.var_all,'-','LineWidth',2);
+                set(pl, {'Color'}, colors); hold on;
+                pl_curr = plot3(Path.l_all,Opt.g_0*ones(size(Path.l_all)),Path.var_all,'*','LineWidth',2);
+                set(pl_curr,{'Color'},colors); hold off;
+            end
+            if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace % test for existing figure to plot in, there must be no new labels or grid
+                grid on;
+                xlabel('$\lambda$','interpreter','latex');
+                ylabel('$\gamma$','interpreter','latex');
+                zlabel('$v_{i}$','interpreter','latex');
+                if Opt.dpa
+                    ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+                else
+                    xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+                    ylim(sort(Opt.g_0+[0,(Opt.g_target-Opt.g_0)/100]));
+                end
+            end
+            Plot.fig = fig;
+            Plot.pl = pl;
+            Plot.pl_curr = pl_curr;
+            if isnan(Opt.live_plot_fig)
+                Opt.live_plot_fig = fig.Number; % reference to existing fig
+            end
+        elseif Bifurcation.flag == -1
+            %% final change in live plot
+            %
+            set(0, 'currentfigure', Plot.fig);
+            %
+            %% save plot data
+            %
+            if Opt.dpa
+                newXData = Path.var_all(end,:);
+                newYData = Path.l_all;
+                newZData = Path.var_all(1:(end-1),:);
+            else
+                newXData = Path.l_all(1,:);
+                newYData = Path.l_all(2,:);
+                newZData = Path.var_all;
+            end
+            %
+            %% plot new plot Data
+            %
+            set(Plot.pl, 'XData', newXData, 'YData',  newYData, {'ZData'}, num2cell(newZData,2));
+%             set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
+            %
+            %% add third information to plot (current step)
+            row = dataTipTextRow('Step',0:(length(Path.l_all)-1),'%d');
+            for ii=1:numel(Plot.pl)
+                Plot.pl(ii).DataTipTemplate.DataTipRows(end+1) = row;
+            end
+            %
+            %% adjust axis
+            if Opt.dpa
+                ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            else
+                xlim([min(newXData),max(newXData)]);
+                ylim([min(newYData),max(newYData)]);
+            end
+        else
+            set(0, 'currentfigure', Plot.fig);
+            %% save plot data
+            %
+            if Opt.dpa
+                newXData = Path.var_all(end,:);
+                newYData = Path.l_all;
+                newZData = Path.var_all(1:(end-1),:);
+                newXData_curr = Path.var_all(end,end);
+                newYData_curr = Path.l_all(end);
+                newZData_curr = Path.var_all(1:(end-1),end);
+            else
+                newXData = Path.l_all;
+                newYData = Opt.g_0*ones(size(Path.l_all));
+                newZData = Path.var_all;
+                newXData_curr = Path.l_all(end);
+                newYData_curr = Opt.g_0;
+                newZData_curr = Path.var_all(:,end);
+            end
+            %
+            %% plot new plot Data
+            %
+            set(Plot.pl, 'XData', newXData, 'YData',  newYData, {'ZData'}, num2cell(newZData,2));
+            set(Plot.pl_curr, 'XData', newXData_curr, 'YData',  newYData_curr, {'ZData'}, num2cell(newZData_curr,2));
+            %
+            %% mark bifurcation points
+            %
+            if aux.ison(Opt.bifurcation) && Bifurcation.flag 
+               if ~isempty(Bifurcation.bif)
+                   hold on;
+                   if Opt.dpa
+                       if Bifurcation.bif(2,end) == 0 % brach point Bifurcation.bif
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(end,Bifurcation.bif(1,end)),Path.var_all(1:(end-1),Bifurcation.bif(1,end)),'rx','LineWidth',2);
+                       elseif Bifurcation.bif(2,end) == 1 % fold Bifurcation.bif
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(end,Bifurcation.bif(1,end)),Path.var_all(1:(end-1),Bifurcation.bif(1,end)),'ro','LineWidth',2);
+                       elseif isnan(Bifurcation.bif(2,end)) % Bifurcation.bif, but no further information
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(end,Bifurcation.bif(1,end)),Path.var_all(1:(end-1),Bifurcation.bif(1,end)),'rs','LineWidth',2);
+                       end
+                   else
+                       if Bifurcation.bif(2,end) == 0 % brach point Bifurcation.bif
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Opt.g_0,Path.var_all(:,Bifurcation.bif(1,end)),'rx','LineWidth',2);
+                       elseif Bifurcation.bif(2,end) == 1 % fold Bifurcation.bif
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Opt.g_0,Path.var_all(:,Bifurcation.bif(1,end)),'ro','LineWidth',2);
+                       elseif isnan(Bifurcation.bif(2,end)) % Bifurcation.bif, but no further information
+                           plot3(Path.l_all(Bifurcation.bif(1,end)),Opt.g_0,Path.var_all(:,Bifurcation.bif(1,end)),'rs','LineWidth',2);
+                       end
+                   end
+                   hold off;
+               end
+            end
+            %
+            %% adjust x axis
+            %
+            if Opt.dpa
+                xl = get(Plot.fig.Children,'XLim');
+                xlim([min([xl(1),Path.var_all(end,:)]),max([xl(2),Path.var_all(end,:)])]);
+                ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            else
+                xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
+            end
         end
     else
         error('No such plot method!');

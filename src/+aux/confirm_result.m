@@ -5,7 +5,7 @@
 %   28.03.2022 - Alwin Förster
 %
 function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt] = ...
-    confirm_result(fun,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt)
+    confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt)
     x_deflation = x_solution;
     if Is.valid
         %% valid result
@@ -70,7 +70,7 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
         Counter.error = 0;
         Counter.step = Counter.step + 1;
         if Do.convergeToTarget
-            Jacobian.last = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
+            Jacobian.last = aux.get_jacobian(func,Path.var_all(:,end),Path.l_all(end),Opt);
         end
         if Do.remove
             if Path.s_all(end)>(Remove.s+Remove.ds)
@@ -88,7 +88,7 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
         else
             Do.deflate = false;
         end
-        if (Counter.error==Opt.stepback_error_counter) && (numel(Path.l_all)>1)
+        if ((Counter.error==Opt.stepback_error_counter) || Do.stepback_manually) && (numel(Path.l_all)>1)
             %% stepback
             if Counter.valid_stepback<Opt.stepback_error_counter
                 Do.stepback = true;
@@ -158,7 +158,7 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             Path.s_all(n_path+((-n_rmv+1):0)) = [];
             Remove.ds = Remove.s-Path.s_all(end);
             dscale_rmv = aux.get_dscale(Opt,Path);
-            residual_fixed_value_rmv = @(v) aux.residual_fixed_value(fun,v,Path.l_all(end),Opt);
+            residual_fixed_value_rmv = @(v) aux.residual_fixed_value(func,v,Path.l_all(end),Opt);
             [var_rmv,fun_rmv,~,~,rmv_jacobian] = Solver.main(residual_fixed_value_rmv,Path.var_all(:,end),dscale_rmv(1:end-1));
             if ~isempty(Bifurcation.bif) && numel(Bifurcation.bif(1,:))>0
                 n_bifs_rmv = sum(sum(Bifurcation.bif(1,:)'==(n_path+((-n_rmv+1):0))));
@@ -168,7 +168,7 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
                 end
             end
             Path.var_all(:,end) = var_rmv;
-            Jacobian.last = [rmv_jacobian,aux.numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
+            Jacobian.last = [rmv_jacobian,aux.numeric_jacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.var_all(:,end);Path.l_all(end)],'central_value',fun_rmv,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
             if Stepsize_options.predictor
                 if n_rmv >= 3
                     Temp.predictor = x_predictor;

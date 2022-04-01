@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
+function [inv_poi_str,Counter,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
     %% automated validation
     %
     Is.reverse = false;
@@ -34,7 +34,17 @@ function [inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,
                         xim1 = [Path.var_all(:,end-1);Path.l_all(end-1)];
                         alpha = acos(((x_solution-xi)'*(xi-xim1))/(sqrt((x_solution-xi)'*(x_solution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
                         if alpha<Opt.alpha_reverse
-                            Is.valid = true;
+                            if aux.ison(Opt.bifurcation) && ~Opt.bifurcation.mark
+                                if sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)))*Jacobian.sign_det<0 && Counter.bif_stepsize_red<2
+                                    Is.valid = false;
+                                    Do.stepback_manually = true;
+                                    Counter.bif_stepsize_red = Counter.bif_stepsize_red+1;
+                                else
+                                    Is.valid = true;
+                                end
+                            else
+                                Is.valid = true;
+                            end
                         else
                             if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==numel(Path.l_all)
                                 Is.valid = true;
@@ -118,6 +128,16 @@ function [inv_poi_str,Do,Is,Opt] = validate_result(x_solution,Plus,fun_solution,
             else
                 aux.print_line(Opt,'------> Enter ''y'' for yes or ''n'' for no! (Deactivate with ''off'', set double limit or leave using ''exit'')\n');
             end
+        end
+    end
+    %
+    %% finish
+    %
+    if Is.valid
+        if Do.stepback_manually
+            Do.stepback_manually = false;
+        else
+            Counter.bif_stepsize_red = 0;
         end
     end
     %

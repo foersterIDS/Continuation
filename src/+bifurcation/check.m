@@ -5,7 +5,7 @@
 %   26.05.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Bifurcation,Jacobian,Path] = check(fun,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt)
+function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt)
     Bifurcation.flag = 0;
     solver_jacobian_red = Jacobian.solver(1:Info.nv,1:Info.nv);
     solver_jacobian_red = full(solver_jacobian_red);
@@ -17,27 +17,29 @@ function [Bifurcation,Jacobian,Path] = check(fun,Jacobian,Path,Bifurcation,Info,
             Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
             Jacobian.sign_det = sign_det_current_jacobian;
             Bifurcation.flag = 1;
+            Bifurcation.scaling = [Bifurcation.scaling,1];
         end
-    elseif Opt.bifurcation.determine || Opt.bifurcation.trace
+    elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.dpa
         %% determine bifurcation-points:
         Opt_bif = Opt;
         Opt_bif.jacobian = false;
         [bif_solver,default_bif_solver_output] = continuation.solver(Opt_bif,0);
         det_solver_jacobian_red = det(solver_jacobian_red);
-        residual_bif = @(x) bifurcation.residual(fun,x,Opt,1/det_solver_jacobian_red);
+        Bifurcation.scaling = [Bifurcation.scaling,1/det_solver_jacobian_red];
+        residual_bif = @(x) bifurcation.residual(func,x,Opt,Bifurcation.scaling(end));
         full_rank = length(solver_jacobian_red(:,1));
         rank_tol = Opt_bif.solver_tol * 10000; % TODO!!!
         sign_det_current_jacobian = sign(det_solver_jacobian_red);
         if sign_det_current_jacobian*Jacobian.sign_det<=0
             %% find exact point:
-            nds = 5;
+            nds = 11;
             dss = linspace(Path.s_all(end-1)-Path.s_all(end),0,nds);
-            dss = dss([3,2,4,1,5]);
+            dss = dss([6,7,5,8,4,9,3,10,2,11,1]);
             ind_bif = length(Path.l_all);
             bif_type = NaN;
             for i=1:nds
                 dsp = dss(i);
-                [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,dsp,solver_jacobian_red,fun,res_corr,Solver,Opt);
+                [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,dsp,solver_jacobian_red,func,res_corr,Solver,Opt);
                 dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
                 [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
                 if bif_solver_exitflag>0

@@ -5,7 +5,7 @@
 %   28.10.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,fun,res_corr)
+function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,func,res_corr)
     bif_trace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
     nbif = numel(bif_trace(1,:));
     Opt_sphere = Opt;
@@ -19,7 +19,7 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,fun,res_cor
         xdirs_trace = [];
         ds_bif = mean(diff(Path.s_all(bif_trace(1,i)+(-1:1))));
         x0 = [Path.var_all(:,bif_trace(1,i));Path.l_all(bif_trace(1,i))];
-        residual_bif_sphere = @(x) aux.merge_residuals(fun,continuation.corrector(Opt_sphere),x,x0,ds_bif,[],Opt_sphere);
+        residual_bif_sphere = @(x) aux.merge_residuals(func,continuation.corrector(Opt_sphere),x,x0,ds_bif,[],Opt_sphere);
         %% find directions of known path
         for j=1:2
             Path_trace = Path;
@@ -32,7 +32,7 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,fun,res_cor
                 Path_trace.l_all = Path.l_all(end:-1:bif_trace(1,i));
                 Path_trace.s_all = abs(Path.s_all(end:-1:bif_trace(1,i))-Path.s_all(end));
             end
-            [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path_trace,ds_bif,[],fun,res_corr,Solver,Opt_sphere);
+            [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path_trace,ds_bif,[],func,res_corr,Solver,Opt_sphere);
             x_bif_predictor = [var_bif_predictor;l_bif_predictor];
             dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
             [x_bif_ij,~,solver_bif_exitflag] = Solver.main(residual_bif_sphere,x_bif_predictor,dscale);
@@ -80,7 +80,7 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,fun,res_cor
             for j=1:ntrace
                 Opt_trace.direction = xdirs_trace(:,j)/norm(xdirs_trace(:,j));
                 Opt_trace.l_0 = x0(end);
-                [var_j,l_j,exitflag_j,Bifurcation_j,s_j] = continuation(fun,x0(1:end-1),Info.l_start,Info.l_end,ds_bif,'opt',Opt_trace);
+                [var_j,l_j,exitflag_j,Bifurcation_j,s_j] = continuation(func,x0(1:end-1),Info.l_start,Info.l_end,ds_bif,'opt',Opt_trace);
                 if exitflag_j>0
                     Path.var_all = [Path.var_all,NaN(numel(x0)-1,1),var_j];
                     Path.l_all = [Path.l_all,NaN,l_j];

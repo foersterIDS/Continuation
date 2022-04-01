@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res_corr,Solver,Opt)
+function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,func,res_corr,Solver,Opt)
     %% get fun_predictor:
     if Opt.predictor.polynomial
         if numel(Path.l_all)==1
@@ -18,7 +18,7 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res
         if numel(Path.l_all)==1
             fun_predictor = @(s) predictor.initial(Path,s,Opt);
         else
-            fun_predictor = @(s) predictor.ode(Path,s,solver_jacobian,fun,Opt);
+            fun_predictor = @(s) predictor.ode(Path,s,solver_jacobian,func,Opt);
         end
     else
         error('predictor not set or of unknown type');
@@ -56,7 +56,7 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,fun,res
     if Opt.correct_predictor && numel(Path.l_all)>1
         dxi = [Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)];
         dxip1 = xip1-[Path.var_all(:,end);Path.l_all(end)];
-        if dot(dxip1,dxi)<0
+        if dot(dxip1,dxi)<0 && ~sum(ds<0)
             dxip1 = -dxip1;
             xip1 = [Path.var_all(:,end);Path.l_all(end)]+dxip1;
         end

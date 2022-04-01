@@ -32,7 +32,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     %% initialize
     %
     warning on;
-    [Opt,ds0,Opt_is_set] = continuation.input(varargin,fun,var0,l_start,l_end,ds0);
+    [Opt,ds0,Opt_is_set,func] = continuation.input(varargin,fun,var0,l_start,l_end,ds0);
     [Opt,ds0,Stepsize_options] = step_size.initialize(Opt,var0,l_start,l_end,ds0);
     if Stepsize_options.rate_of_contraction
         global solver_stepsizes;
@@ -46,17 +46,17 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     %
     %% find initial solution
     %
-    residual_initial = @(v) aux.residual_fixed_value(fun,v,Opt.l_0,Opt);
+    residual_initial = @(v) aux.residual_fixed_value(func,v,Opt.l_0,Opt);
     [Path.var_all,fun_initial,initial_exitflag,Solver.output,Jacobian.initial] = Solver.main(residual_initial,Info.var0,Opt.dscale0(1:end-1));
     Jacobian.solver = Jacobian.initial;
     break_fun_out = [];
     event_out = false;
-    if initial_exitflag>0
+    if initial_exitflag>=0
         Path.l_all = Opt.l_0;
         Path.s_all = 0;
         Do.continuation = true;
         Do.loop = true;
-        Jacobian.solver = [Jacobian.solver,aux.numeric_jacobian(@(x) fun(x(1:Info.nv),x(Info.nv+1)),[Path.var_all;Opt.l_0],'central_value',fun_initial,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
+        Jacobian.solver = [Jacobian.solver,aux.numeric_jacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.var_all;Opt.l_0],'central_value',fun_initial,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
         Jacobian.previous = Jacobian.solver;
         Jacobian.last = Jacobian.solver;
         [~,break_fun_out] = Opt.break_function(fun_initial,Jacobian.solver,Path.var_all,Path.l_all,break_fun_out);
@@ -113,9 +113,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 Counter.catch = Counter.catch + 1;
             end
         elseif Do.suspend
-            residual = @(v,l_fix) aux.residual_suspend_continuation(fun,v,l_fix,Opt);
+            residual = @(v,l_fix) aux.residual_suspend_continuation(func,v,l_fix,Opt);
         else
-            residual = @(x) aux.merge_residuals(fun,res_corr,x,[Path.var_all;Path.l_all],ds,Jacobian.last,Opt);
+            residual = @(x) aux.merge_residuals(func,res_corr,x,[Path.var_all;Path.l_all],ds,Jacobian.last,Opt);
         end
         %
         %% predictor
@@ -132,11 +132,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 l_predictor = x_predictor(end);
             else
                 %% calc. predictor
-                [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,Jacobian.last,fun,res_corr,Solver,Opt);
+                [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,Jacobian.last,func,res_corr,Solver,Opt);
                 x_predictor = [var_predictor;l_predictor];
             end
         catch
-            [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,Jacobian.last,fun,res_corr,Solver,Opt);
+            [var_predictor,l_predictor,fun_predictor,s_predictor,ds] = continuation.predictor(Path,ds,Jacobian.last,func,res_corr,Solver,Opt);
             x_predictor = [var_predictor;l_predictor];
             aux.print_line(Opt,'---> predictor: catch!\n');
             Counter.catch = Counter.catch + 1;
@@ -148,7 +148,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             dscale = aux.get_dscale(Opt,Path);
             if sign(Path.l_all(end)-Opt.l_target)*sign(l_predictor-Opt.l_target)<=0
                 %% try to converge to target
-                residual_target = @(v) aux.residual_fixed_value(fun,v,Opt.l_target,Opt);
+                residual_target = @(v) aux.residual_fixed_value(func,v,Opt.l_target,Opt);
                 var_predictor_ctt = (var_predictor - Path.var_all(:,end))*(abs(Opt.l_target-Path.l_all(end))/abs(l_predictor-Path.l_all(end)))+Path.var_all(:,end);
                 [var_solution,fun_solution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residual_target,var_predictor_ctt,dscale(1:end-1));
                 x_solution = [var_solution;Opt.l_target];
@@ -213,16 +213,16 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         %% adaptive corrector
         %
-        [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,Solver,fun,x_predictor,dscale,Jacobian.last,ds);
+        [Do,Opt,corr_info] = corrector.adapt(Do,Opt,Path,Solver,func,x_predictor,dscale,Jacobian.last,ds);
         %
         %% check result
         %
         % check result:
-        [inv_poi_str,Do,Is,Opt] = ...
+        [inv_poi_str,Counter,Do,Is,Opt] = ...
             aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         % confirm result:
         [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt] = ...
-            aux.confirm_result(fun,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt);
+            aux.confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt);
         %
         %% Bifurcations
         %
@@ -230,13 +230,13 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         if aux.ison(Opt.bifurcation) && Is.valid && ~Do.homotopy && numel(Path.l_all)>2
             if ~Is.current_jacobian
                 %% get jacobian if not current
-                Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
+                Jacobian.solver = aux.get_jacobian(func,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            [Bifurcation,Jacobian,Path] = bifurcation.check(fun,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt);
+            [Bifurcation,Jacobian,Path] = bifurcation.check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt);
         elseif aux.ison(Opt.bifurcation) && Is.valid && numel(Path.l_all)<=2
             if ~Is.current_jacobian
                 %% get jacobian if not current
-                Jacobian.solver = aux.get_jacobian(fun,Path.var_all(:,end),Path.l_all(end),Opt);
+                Jacobian.solver = aux.get_jacobian(func,Path.var_all(:,end),Path.l_all(end),Opt);
             end
             Jacobian.sign_det = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
         end
@@ -264,7 +264,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             else
                 aux.print_line(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',inv_poi_str,ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
             end
-            
         end
         [Do,Info,Path,break_fun_out,Opt,Counter] = aux.exit_loop(Do,Info,Is,Path,Opt,Counter,Bifurcation,ds,fun_solution,Jacobian,break_fun_out);
         if Do.change_corrector
@@ -297,10 +296,18 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     if Opt.bifurcation.trace
         try
             delete(Plot.pl_curr);
-            [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,Info,fun,res_corr);
+            [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,Info,func,res_corr);
             Jacobian.last = [];
         catch
             aux.print_line(Opt,'--> Failed to trace bifurcations.\n');
+        end
+    elseif Opt.bifurcation.dpa
+        try
+            delete(Plot.pl_curr);
+            Path = bifurcation.dpa(Opt,Path,Bifurcation,Info,fun);
+            Jacobian.last = [];
+        catch
+            aux.print_line(Opt,'--> Failed to trace bifurcation parameter.\n');
         end
     end
     %
