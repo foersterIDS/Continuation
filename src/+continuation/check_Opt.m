@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [errmsg] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldnames,Opt_is_set,Opt_struct_info,Opt_struct_fieldnames)
+function [errmsg,Opt,Opt_is_set] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldnames,Opt_is_set,Opt_struct_info,Opt_struct_fieldnames)
     if nargin>8
         is_sub_level = false;
         Opt_global = Opt;
@@ -79,7 +79,12 @@ function [errmsg] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldna
                             if ~isa(Opt.(Opt_fieldnames{i}),'struct')
                                 errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a struct',Opt_fieldnames{i})];
                             else
-                                errmsg_temp = continuation.check_Opt(errmsg_temp,var0,varargin_cell,Opt.(Opt_fieldnames{i}),Opt_struct_info.(Opt_fieldnames{i}),Opt_struct_fieldnames.(Opt_fieldnames{i}),Opt_is_set,Opt_global);
+                                [errmsg_temp,Opt,Opt_is_set] = continuation.check_Opt(errmsg_temp,var0,varargin_cell,Opt.(Opt_fieldnames{i}),Opt_struct_info.(Opt_fieldnames{i}),Opt_struct_fieldnames.(Opt_fieldnames{i}),Opt_is_set,Opt_global);
+                                if is_sub_level
+                                    Opt = Opt_global;
+                                else
+                                    Opt_global = Opt;
+                                end
                             end
                         case 'true'
                             if isa(Opt.(Opt_fieldnames{i}),'logical') && ~Opt.(Opt_fieldnames{i})
@@ -166,6 +171,14 @@ function [errmsg] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldna
                                     if ~Opt_is_set.(type(7:end)) && (is_sub_level && Opt.(Opt_fieldnames{i}))
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be set when using %s',type(7:end),Opt_fieldnames{i})];
                                     end
+                                elseif prod(type(1:5)=='seton')
+                                    fieldname = type(7:end);
+                                    if is_sub_level && Opt.(Opt_fieldnames{i})
+                                        Opt_global.(fieldname) = true;
+                                        Opt_is_set.(fieldname) = true;
+                                    elseif ~is_sub_level
+                                        errmsg_temp = [errmsg_temp,sprintf('\nOpt file is corrupted. Incorrect use of seton in option %s.',Opt_fieldnames{i})];
+                                    end
                                 elseif prod(type(1:6)=='equals')
                                     if ~prod(Opt.(Opt_fieldnames{i})==eval(type(8:end)))
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be equal %s',Opt_fieldnames{i},type(8:end))];
@@ -173,6 +186,10 @@ function [errmsg] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldna
                                 elseif prod(type(1:6)=='larger')
                                     if ~prod(Opt.(Opt_fieldnames{i})>eval(type(8:end)))
                                         errmsg_temp = [errmsg_temp,sprintf('\n%s has to be larger %.2e',Opt_fieldnames{i},eval(type(8:end)))];
+                                    end
+                                elseif prod(type(1:6)=='nargin')
+                                    if ~(nargin(Opt.(Opt_fieldnames{i}))==eval(type(8:end)))
+                                        errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a function_handle with %d inputs',Opt_fieldnames{i},str2num(type(8:end)))];
                                     end
                                 elseif prod(type(1:7)=='smaller')
                                     if ~prod(Opt.(Opt_fieldnames{i})<=eval(type(9:end)))
@@ -194,5 +211,11 @@ function [errmsg] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldna
         else
             errmsg = [errmsg,sprintf('\nField without type: %s',Opt_fieldnames{i})];
         end
+    end
+    %% output:
+    if is_sub_level
+        Opt = Opt_global;
+    else
+        Opt_global = Opt;
     end
 end

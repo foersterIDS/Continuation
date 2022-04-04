@@ -18,14 +18,14 @@ function [varargout] = merge_residuals(Opt,fun,res_dpa,x,g)
         funJ = @(z) fun(z(1:nv),z(nv+1),z(nv+2));
         Jfi_add = aux.numeric_jacobian(funJ,z,'derivative_dimensions',(ny+1):(nv+2));
         Jfz = [Jfi,Jfi_add];
-        funl = @(z) res_dpa(z(1:(nv+1)),z(nv+2));
+        funl = @(z) res_dpa(z(1:nv),z(nv+1),z(nv+2));
         Rl = funl(z);
         Jlz = aux.numeric_jacobian(funl,z,'derivative_dimensions',1:(nv+2));
         varargout{1} = [Rv;Rl];
         varargout{2} = [Jfz;Jlz];
     else
         Rv = fun(v,l,g);
-        Rl = res_dpa(x,g);
+        Rl = res_dpa(v,l,g);
         varargout{1} = [Rv;Rl];
     end
 end

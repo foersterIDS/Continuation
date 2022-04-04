@@ -1,10 +1,10 @@
-%% path continuation - bifurcation.dpa
+%% path continuation - bifurcation.parameter_trace
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [Path] = dpa(Opt,Path,Bifurcation,Info,fun)
+function [Path] = parameter_trace(Opt,Path,Bifurcation,Info,fun)
     %% settings for dpa:
     bif_trace = Bifurcation.bif(1,:);
     nbif = numel(bif_trace);
@@ -13,13 +13,13 @@ function [Path] = dpa(Opt,Path,Bifurcation,Info,fun)
     Opt_trace.direction = [zeros(size(Opt_trace.direction));sign(Opt.g_target-Opt.g_0)];
     Opt_trace.l_0 = Opt.g_0;
     Opt_trace.l_target = Opt.g_target;
-    Opt_trace.dpa = true;
+    Opt_trace.dpa_gamma_var = true;
     Path_bifs = struct('var_all',[],'l_all',[],'s_all',[]);
     %% start dpa:
     for ii=1:nbif
         i = bif_trace(ii);
         sc = Bifurcation.scaling(ii);
-        res_dpa = @(x,g) dpa.res_bif(fun,x,g,Opt,sc);
+        res_dpa = @(v,l,g) dpa.res_bif(fun,[v;l],g,Opt,sc);
         func = @(x,g) dpa.merge_residuals(Opt,fun,res_dpa,x,g);
         x0 = [Path.var_all(:,i);Path.l_all(i)];
         ds_bif = mean(diff(Path.s_all(i+(-1:1))));

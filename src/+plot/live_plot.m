@@ -4,11 +4,14 @@
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
 %
-function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation)
+function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation, dpa_points)
     l_lu = [min([Info.l_start,Info.l_end]),max([Info.l_start,Info.l_end])];
     l_max = [min(Path.l_all),max(Path.l_all)];
     dl0 = abs(Info.l_end-Info.l_start)*0.05;
     num_pl = numel(Opt.plot_vars_index);
+    if nargin<12
+        dpa_points = [];
+    end
 %     if Opt.bifurcation.trace
 %         Opt.live_plot_fig = NaN;
 %     end
@@ -633,23 +636,27 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 colors(k) = {plot.get_RGB(k,num_pl,1)};
             end
             %% create plot with colors
-            if Opt.dpa
+            if Opt.dpa_gamma_var
                 pl = plot3(Path.l_all,Path.var_all(end,:),Path.var_all(1:(end-1),:),'-','LineWidth',2);
                 set(pl, {'Color'}, colors); hold on;
                 pl_curr = plot3(Path.l_all,Path.var_all(end,:),Path.var_all(1:(end-1),:),'*','LineWidth',2);
-                set(pl_curr,{'Color'},colors); hold off;
+                set(pl_curr,{'Color'},colors);
+                pl_dpa = plot3(NaN,NaN,NaN,'kd','LineWidth',2);
+                hold off;
             else
                 pl = plot3(Path.l_all,Opt.g_0*ones(size(Path.l_all)),Path.var_all,'-','LineWidth',2);
                 set(pl, {'Color'}, colors); hold on;
                 pl_curr = plot3(Path.l_all,Opt.g_0*ones(size(Path.l_all)),Path.var_all,'*','LineWidth',2);
-                set(pl_curr,{'Color'},colors); hold off;
+                set(pl_curr,{'Color'},colors);
+                pl_dpa = plot3(NaN,NaN,NaN,'kd','LineWidth',2);
+                hold off;
             end
             if isnan(Opt.live_plot_fig) || ~Opt.bifurcation.trace % test for existing figure to plot in, there must be no new labels or grid
                 grid on;
                 xlabel('$\lambda$','interpreter','latex');
                 ylabel('$\gamma$','interpreter','latex');
                 zlabel('$v_{i}$','interpreter','latex');
-                if Opt.dpa
+                if Opt.dpa_gamma_var
                     ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
                 else
                     xlim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
@@ -659,6 +666,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             Plot.fig = fig;
             Plot.pl = pl;
             Plot.pl_curr = pl_curr;
+            Plot.pl_dpa = pl_dpa;
             if isnan(Opt.live_plot_fig)
                 Opt.live_plot_fig = fig.Number; % reference to existing fig
             end
@@ -669,19 +677,34 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             %% save plot data
             %
-            if Opt.dpa
+            if Opt.dpa_gamma_var
                 newXData = Path.var_all(end,:);
                 newYData = Path.l_all;
                 newZData = Path.var_all(1:(end-1),:);
             else
-                newXData = Path.l_all(1,:);
-                newYData = Path.l_all(2,:);
-                newZData = Path.var_all;
+                if numel(Path.l_all(:,1))==1
+                    newXData = Path.l_all;
+                    newYData = Opt.g_0*ones(size(Path.l_all));
+                    newZData = Path.var_all;
+                    newXData_dpa = Path.l_all(1,dpa_points);
+                    newYData_dpa = Opt.g_0*ones(size(dpa_points));
+                    newZData_dpa = Path.var_all(:,dpa_points);
+                else
+                    newXData = Path.l_all(1,:);
+                    newYData = Path.l_all(2,:);
+                    newZData = Path.var_all;
+                    newXData_dpa = Path.l_all(1,dpa_points);
+                    newYData_dpa = Path.l_all(2,dpa_points);
+                    newZData_dpa = Path.var_all(:,dpa_points);
+                end
             end
             %
             %% plot new plot Data
             %
             set(Plot.pl, 'XData', newXData, 'YData',  newYData, {'ZData'}, num2cell(newZData,2));
+            if ~Opt.dpa_gamma_var
+                set(Plot.pl_dpa, 'XData', newXData_dpa, 'YData',  newYData_dpa, {'ZData'}, num2cell(newZData_dpa,2));
+            end
 %             set(Plot.pl_curr, {'XData'}, newXData_curr, {'YData'},  newYData_curr);
             %
             %% add third information to plot (current step)
@@ -691,23 +714,26 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             end
             %
             %% adjust axis
-            if Opt.dpa
+            if Opt.dpa_gamma_var
                 ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);
             else
                 xlim([min(newXData),max(newXData)]);
-                ylim([min(newYData),max(newYData)]);
+                ylim([Opt.g_0,Opt.g_target]);
             end
         else
             set(0, 'currentfigure', Plot.fig);
             %% save plot data
             %
-            if Opt.dpa
+            if Opt.dpa_gamma_var
                 newXData = Path.var_all(end,:);
                 newYData = Path.l_all;
                 newZData = Path.var_all(1:(end-1),:);
                 newXData_curr = Path.var_all(end,end);
                 newYData_curr = Path.l_all(end);
                 newZData_curr = Path.var_all(1:(end-1),end);
+                newXData_dpa = [];
+                newYData_dpa = [];
+                newZData_dpa = [];
             else
                 newXData = Path.l_all;
                 newYData = Opt.g_0*ones(size(Path.l_all));
@@ -715,19 +741,25 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                 newXData_curr = Path.l_all(end);
                 newYData_curr = Opt.g_0;
                 newZData_curr = Path.var_all(:,end);
+                newXData_dpa = Path.l_all(dpa_points);
+                newYData_dpa = Opt.g_0*ones(size(dpa_points));
+                newZData_dpa = Path.var_all(:,dpa_points);
             end
             %
             %% plot new plot Data
             %
-            set(Plot.pl, 'XData', newXData, 'YData',  newYData, {'ZData'}, num2cell(newZData,2));
-            set(Plot.pl_curr, 'XData', newXData_curr, 'YData',  newYData_curr, {'ZData'}, num2cell(newZData_curr,2));
+            set(Plot.pl, 'XData', newXData, 'YData', newYData, {'ZData'}, num2cell(newZData,2));
+            set(Plot.pl_curr, 'XData', newXData_curr, 'YData', newYData_curr, {'ZData'}, num2cell(newZData_curr,2));
+            if ~Opt.dpa_gamma_var
+                set(Plot.pl_dpa, 'XData', newXData_dpa, 'YData', newYData_dpa, {'ZData'}, num2cell(newZData_dpa,2));
+            end
             %
             %% mark bifurcation points
             %
             if aux.ison(Opt.bifurcation) && Bifurcation.flag 
                if ~isempty(Bifurcation.bif)
                    hold on;
-                   if Opt.dpa
+                   if Opt.dpa_gamma_var
                        if Bifurcation.bif(2,end) == 0 % brach point Bifurcation.bif
                            plot3(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(end,Bifurcation.bif(1,end)),Path.var_all(1:(end-1),Bifurcation.bif(1,end)),'rx','LineWidth',2);
                        elseif Bifurcation.bif(2,end) == 1 % fold Bifurcation.bif
@@ -750,7 +782,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             %% adjust x axis
             %
-            if Opt.dpa
+            if Opt.dpa_gamma_var
                 xl = get(Plot.fig.Children,'XLim');
                 xlim([min([xl(1),Path.var_all(end,:)]),max([xl(2),Path.var_all(end,:)])]);
                 ylim([max([l_lu(1),l_max(1)-dl0]),min([l_lu(2),l_max(2)+dl0])]);

@@ -16,6 +16,8 @@ diffquot<>struct<>Opt_diffquot<>#struct
 direction<>eval<>sign(l_end-l_start)*[zeros(size(var0));1]<>#scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
 display<>eval<>true<>#scalar#logical
 dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true#ison:plot.dpa
+dpa_gamma_var<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
+dpa_residual<>function_handle<>@(v,l,g)1<>#scalar#nargin:3
 ds_event<>double<>1e-4<>#scalar#double#positive#nonzero
 ds_max<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforce_ds_max
 ds_min<>double<>10^-9<>#scalar#double#positive#smaller:norm(Opt.ds_max)

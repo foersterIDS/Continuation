@@ -51,6 +51,8 @@ function [struct_out,struct_info_out,eval_cell] = csf2struct(struct_name)
                 temp_struct = aux.csf2struct(line_cell{3});
                 struct_out.(line_cell{1}) = temp_struct;
                 clear temp_struct;
+            case 'function_handle'
+                struct_out.(line_cell{1}) = eval(line_cell{3});
             otherwise
                 error('Unknown field type. Struct-file corrupted?');
         end

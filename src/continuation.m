@@ -42,6 +42,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     res_corr = continuation.corrector(Opt);
     ds = Info.ds0;
     aux.print_line(Opt,'Starting path continuation...\n');
+    if Opt.dpa_gamma_var
+        para_name = 'g';
+    else
+        para_name = 'l';
+    end
     t_display = tic;
     %
     %% find initial solution
@@ -56,6 +61,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         Path.s_all = 0;
         Do.continuation = true;
         Do.loop = true;
+        dpa_points = [];
         Jacobian.solver = [Jacobian.solver,aux.numeric_jacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.var_all;Opt.l_0],'central_value',fun_initial,'derivative_dimensions',Info.nv+1,'diffquot',Opt.diffquot)];
         Jacobian.previous = Jacobian.solver;
         Jacobian.last = Jacobian.solver;
@@ -63,7 +69,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         if Opt.step_size_event
             [ds,Counter,event_out,~] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out);
         end
-        aux.print_line(Opt,'Initial solution at l = %.2e\n',Opt.l_0);
+        aux.print_line(Opt,'Initial solution at %s = %.2e\n',para_name,Opt.l_0);
         if aux.ison(Opt.bifurcation)
             Jacobian.sign_det = sign(det(Jacobian.initial));
         end
@@ -241,6 +247,12 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             Jacobian.sign_det = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
         end
         %
+        %% DPA points
+        %
+        if Opt.dpa && Opt_is_set.dpa && ~Opt.dpa_gamma_var
+            [Path,dpa_points] = dpa.check_residual(fun,dpa_points,Opt,Path,Solver);
+        end
+        %
         %% step size control
         %
         % save latest stepsize:
@@ -254,9 +266,9 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         if Is.valid
             if ~isempty(Solver.output.iterations)
-                aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.n_iter_opt);
+                aux.print_line(Opt,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',para_name,Path.l_all(end),ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.n_iter_opt);
             else
-                aux.print_line(Opt,'-----> continued at l = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',Path.l_all(end),ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
+                aux.print_line(Opt,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',para_name,Path.l_all(end),ds,Counter.loop,Counter.step,[],Opt.n_iter_opt);
             end
         else
             if ~isempty(Solver.output.iterations)
@@ -277,7 +289,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         %
         if aux.ison(Opt.plot) && Is.valid
             try
-                [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation);
+                [Plot, Opt] = plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation, dpa_points);
             catch
                 aux.print_line(Opt,'--> The plot update has failed.\n');
             end
@@ -301,14 +313,20 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         catch
             aux.print_line(Opt,'--> Failed to trace bifurcations.\n');
         end
-    elseif Opt.bifurcation.dpa
+    elseif Opt.bifurcation.parameter_trace
         try
             delete(Plot.pl_curr);
-            Path = bifurcation.dpa(Opt,Path,Bifurcation,Info,fun);
+            Path = bifurcation.parameter_trace(Opt,Path,Bifurcation,Info,fun);
             Jacobian.last = [];
         catch
             aux.print_line(Opt,'--> Failed to trace bifurcation parameter.\n');
         end
+    end
+    %
+    %% DPA
+    %
+    if Opt.dpa && Opt_is_set.dpa && ~Opt.dpa_gamma_var && ~Opt.bifurcation.parameter_trace
+        Path = dpa.trace(fun,dpa_points,Info,Opt,Path);
     end
     %
     %% live plot finalization
@@ -317,7 +335,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         try
             Bifurcation_last_plot = Bifurcation;
             Bifurcation_last_plot.flag = -1;
-            plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot);
+            plot.live_plot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, fun_predictor, s_predictor, Plot, Bifurcation_last_plot,dpa_points);
             if isfield(Plot,'pl_curr')
                 delete(Plot.pl_curr);
             end

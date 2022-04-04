@@ -19,7 +19,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
             Bifurcation.flag = 1;
             Bifurcation.scaling = [Bifurcation.scaling,1];
         end
-    elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.dpa
+    elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.parameter_trace
         %% determine bifurcation-points:
         Opt_bif = Opt;
         Opt_bif.jacobian = false;

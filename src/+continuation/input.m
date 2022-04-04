@@ -238,6 +238,10 @@ function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,
         else
             func = @(v,l) fun(v,l,Opt.g_0);
         end
+        % check settings:
+        if ~(Opt.bifurcation.parameter_trace || Opt.dpa)
+            error('fun = @(v,l,g) ... can only be used for DPA.');
+        end
     elseif Purpose.homotopy
         % out:
         try
@@ -257,7 +261,7 @@ function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,
     %% check Opt:
     %
 	errmsg = '';
-    [errmsg] = continuation.check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldnames,Opt_is_set,Opt_struct_info,Opt_struct_fieldnames);
+    [errmsg,Opt,Opt_is_set] = continuation.check_Opt(errmsg,var0,varargin_cell,Opt,Opt_info,Opt_fieldnames,Opt_is_set,Opt_struct_info,Opt_struct_fieldnames);
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);
