@@ -40,6 +40,7 @@ input('Press any key to continue...');
 [var_all,l_all,exitflag] = continuation(fun,var0,l_start,l_end,ds0,'plot','on',...
                                                                                      'ds_max',ds_max,...
                                                                                      'bifurcation','trace');
+input('Press any key to continue...');
 
 %% dpa residual function:
 fun_dpa = @(var,l,g) (l-2*var-g)*(l-(var-2*g).^2-5);
