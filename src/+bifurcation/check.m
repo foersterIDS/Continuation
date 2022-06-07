@@ -7,7 +7,7 @@
 %
 function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt)
     Bifurcation.flag = 0;
-    solver_jacobian_red = Jacobian.solver(1:Info.nv,1:Info.nv);
+    solver_jacobian_red = Jacobian.solver(1:Info.nv,1:Info.nv); % Muesste Jacobian.last sein
     solver_jacobian_red = full(solver_jacobian_red);
     if Opt.bifurcation.mark
         %% mark bifurcations:
