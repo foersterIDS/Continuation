@@ -46,18 +46,18 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                     Path.s_all = [Path.s_all(1:end-1),Path.s_all(end-1)+[norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)]),norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)])+norm([Path.var_all(:,end);Path.l_all(end)]-x_bif)]];
                     Path.var_all = [Path.var_all(:,1:end-1),x_bif(1:end-1),Path.var_all(:,end)];
                     Path.l_all = [Path.l_all(1:end-1),x_bif(end),Path.l_all(end)];
-                    nv = numel(Path.var_all(:,1));
-                    solver_jacobian_red = bif_solver_jacobian(1:nv,1:nv);
-                    solver_jacobian_lam = bif_solver_jacobian(1:nv,nv+1);
-                    full_rank = length(solver_jacobian_red(:,1));
-                    %
+                    % 
                     % get type of bifurcation
-                    jac_red_jac_lam = [solver_jacobian_red, solver_jacobian_lam];
-                    bif_type = (rank(jac_red_jac_lam,rank_tol)==full_rank); % 1: fold bif.; 0: branch point bif; NaN: unknown
+                    bif_type=(sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
                     %
                     % if bif_type = 0 (branch point) calculate directions
                     % of paths by null() and save to Bifurcation.dirs cell array
                     if bif_type == 0
+                        nv = numel(Path.var_all(:,1));
+                        solver_jacobian_red = bif_solver_jacobian(1:nv,1:nv);
+                        solver_jacobian_lam = bif_solver_jacobian(1:nv,nv+1);
+                        jac_red_jac_lam = [solver_jacobian_red, solver_jacobian_lam];
+                        %
                         null_matrix = null(jac_red_jac_lam);
                         for k_dirs = 1:width(null_matrix)
                             bif_dir = null_matrix(:,k_dirs);
