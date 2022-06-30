@@ -164,7 +164,7 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
                 n_bifs_rmv = sum(sum(Bifurcation.bif(1,:)'==(n_path+((-n_rmv+1):0))));
                 if n_bifs_rmv>0
                     Bifurcation.bif(:,end+((1-n_bifs_rmv):0)) = [];
-                    Jacobian.sign_det = Jacobian.sign_det*(-1)^(n_bifs_rmv);
+                    Jacobian.sign_det_red = Jacobian.sign_det_red*(-1)^(n_bifs_rmv);
                 end
             end
             Path.var_all(:,end) = var_rmv;

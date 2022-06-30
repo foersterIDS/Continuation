@@ -71,7 +71,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         end
         aux.print_line(Opt,'Initial solution at %s = %.2e\n',para_name,Opt.l_0);
         if aux.ison(Opt.bifurcation)
-            Jacobian.sign_det = sign(det(Jacobian.initial));
+            Jacobian.sign_det_red = sign(det(Jacobian.initial));
         end
         if aux.ison(Opt.plot)
             [Plot, Opt] = plot.live_plot(Opt, Info, Path, Info.ds0, Info.ds0, Solver.output.iterations(end), Counter);
@@ -244,7 +244,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(func,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            Jacobian.sign_det = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
+            Jacobian.sign_det_red = sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)));
         end
         %
         %% DPA points

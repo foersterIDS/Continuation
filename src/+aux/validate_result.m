@@ -35,7 +35,7 @@ function [inv_poi_str,Counter,Do,Is,Opt] = validate_result(x_solution,Plus,fun_s
                         alpha = acos(((x_solution-xi)'*(xi-xim1))/(sqrt((x_solution-xi)'*(x_solution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
                         if alpha<Opt.alpha_reverse
                             if aux.ison(Opt.bifurcation) && ~Opt.bifurcation.mark
-                                if sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)))*Jacobian.sign_det<0 && Counter.bif_stepsize_red<2
+                                if sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)))*Jacobian.sign_det_red<0 && Counter.bif_stepsize_red<2
                                     Is.valid = false;
                                     Do.stepback_manually = true;
                                     Counter.bif_stepsize_red = Counter.bif_stepsize_red+1;
