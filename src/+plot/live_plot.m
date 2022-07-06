@@ -750,7 +750,7 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
             %
             set(Plot.pl, 'XData', newXData, 'YData', newYData, {'ZData'}, num2cell(newZData,2));
             set(Plot.pl_curr, 'XData', newXData_curr, 'YData', newYData_curr, {'ZData'}, num2cell(newZData_curr,2));
-            if ~Opt.dpa_gamma_var
+            if ~Opt.dpa_gamma_var && ~isempty(newXData_dpa)
                 set(Plot.pl_dpa, 'XData', newXData_dpa, 'YData', newYData_dpa, {'ZData'}, num2cell(newZData_dpa,2));
             end
             %
