@@ -342,6 +342,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         catch
             aux.print_line(Opt,'--> The plot update has failed.\n');
         end
+        drawnow;
     end
     %
     %% final disp
