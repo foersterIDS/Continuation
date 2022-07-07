@@ -115,10 +115,10 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
                     Temp.predictor = [];
                 end
             end
-            if Stepsize_options.speed_of_continuation
+            if Stepsize_options.speed_of_continuation && ~isempty(Temp.speed_of_continuation)
                 Temp.speed_of_continuation(end) = [];
             end
-            if Stepsize_options.rate_of_contraction
+            if Stepsize_options.rate_of_contraction && ~isempty(Temp.rate_of_contraction)
                 Temp.rate_of_contraction(end) = [];
             end
             Plus.jacobian = Jacobian.last;
