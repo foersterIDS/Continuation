@@ -9,7 +9,7 @@ fun = @(var,l) var-l*sin(10/(l-2.5));
 var0 = 0; % initial value of var
 l_start = 0; % initial value of l
 l_end = 2; % end value of l
-ds0 = 0.005; % initial step size
+ds0 = 0.01; % initial step size
 ds_min = 1*10^-5;
 ds_max = 2*10^-1;
 ssc = {'angle_change';
@@ -36,6 +36,7 @@ alpha_reverse = 2.5;
                                                                          'alpha_reverse',alpha_reverse,...
                                                                          'predictor','tangential',...
                                                                          'ds_min',ds_min,'ds_max',ds_max);
+drawnow;
 
 % loop over all step size control methods
 clc;
@@ -48,6 +49,7 @@ xlabel('$\lambda$','interpreter','latex');
 ylabel('$v$','interpreter','latex');
 grid on;
 box on;
+drawnow;
 for ii=1:n_ssc
     fprintf('run with scc: %s',ssc{ii});
     tic;

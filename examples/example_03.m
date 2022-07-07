@@ -38,8 +38,8 @@ input('Press any key to continue...');
 
 % show plot, use ds_max and set bifurcation detection to trace
 [var_all,l_all,exitflag] = continuation(fun,var0,l_start,l_end,ds0,'plot','on',...
-                                                                                     'ds_max',ds_max,...
-                                                                                     'bifurcation','trace');
+                                                                   'ds_max',ds_max,...
+                                                                   'bifurcation','trace');
 input('Press any key to continue...');
 
 %% dpa residual function:
@@ -63,16 +63,14 @@ ds_max = 0.05; % max. step size
 input('Press any key to continue...');
 
 % show plot, use ds_max and set bifurcation detection to trace, fix at g_0
-[var_all_trace_g_0,l_all_trace_g_0,exitflag_trace_g_0] = continuation(@(v,l) fun_dpa(v,l,g_0),var0,l_start,l_end,ds0,'plot','on',...
+[var_all_trace_g_0,l_all_trace_g_0,exitflag_trace_g_0] = continuation(@(v,l) fun_dpa(v,l,g_0),var0,l_start,l_end,ds0,'plot','off',...
                                                                                                                      'ds_max',ds_max,...
                                                                                                                      'bifurcation','trace');
-input('Press any key to continue...');
 
 % show plot, use ds_max and set bifurcation detection to trace, fix at g_target
-[var_all_trace_g_target,l_all_trace_g_target,exitflag_trace_g_target] = continuation(@(v,l) fun_dpa(v,l,g_target),var0,l_start,l_end,ds0,'plot','on',...
+[var_all_trace_g_target,l_all_trace_g_target,exitflag_trace_g_target] = continuation(@(v,l) fun_dpa(v,l,g_target),var0,l_start,l_end,ds0,'plot','off',...
                                                                                                                                          'ds_max',ds_max,...
                                                                                                                                          'bifurcation','trace');
-input('Press any key to continue...');
 
 %% plot:
 figure(8);
