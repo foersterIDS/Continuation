@@ -252,9 +252,9 @@ after which the step size is doubled/halved
 </span></a><span>    </span><a href="#H_2CA8CB62"><span>predictor
 </span></a><span>        </span><a href="#H_78EA15E1"><span>'correct_predictor' &mdash; Flip sign of predictor if the sign of the path direction changes
 </span></a><span>        </span><a href="#H_A7187963"><span>'predictor' &mdash; Determine used predictor
-</span></a><span>        </span><a href="#H_CF51BC8F"><span>'predictor_polynomial_adaptive' &mdash; Calculate polynomial fit and polynomial order adaptivly
+</span></a><span>        </span><a href="#H_CF51BC8F"><span>'predictor_polynomial_adaptive' &mdash; Calculate polynomial fit and polynomial degree adaptivly
 </span></a><span>        </span><a href="#H_A09DDDBF"><span>'predictor_polynomial_fit' &mdash; Number of additional points used for polynomial predictor
-</span></a><span>        </span><a href="#H_78ED3FCD"><span>'predictor_polynomial_order' &mdash; Polynomial order used for polynomial predictor
+</span></a><span>        </span><a href="#H_78ED3FCD"><span>'predictor_polynomial_degree' &mdash; Polynomial degree used for polynomial predictor
 </span></a><span>        </span><a href="#H_DB7FD614"><span>'predictor_solver' &mdash; Solves the corrector function for the predictor in use
 </span></a><span>    </span><a href="#H_03ECAE33"><span>reverse control
 </span></a><span>        </span><a href="#H_42E75CDD"><span>'alpha_reverse' &mdash; Limit angle for detecting the reverse continuation
@@ -911,11 +911,11 @@ the latter option when searching for errors. May be combined with </span><a href
 
 <div class="S1"><span style="font-weight: bold;"></span></div>
 
-<h4 class="S12" id="H_CF51BC8F"><span style="font-weight: bold;">'predictor_polynomial_adaptive' &mdash; Calculate polynomial fit and polynomial order adaptivly</span></h4>
+<h4 class="S12" id="H_CF51BC8F"><span style="font-weight: bold;">'predictor_polynomial_adaptive' &mdash; Calculate polynomial fit and polynomial degree adaptivly</span></h4>
 
 <div class="S1"><span>false (default) | true</span></div>
 
-<div class="S1"><span>If set to true, 'predictor_polynomial_fit' and 'predictor_polynomial_order' are recalculated.</span></div>
+<div class="S1"><span>If set to true, 'predictor_polynomial_fit' and 'predictor_polynomial_degree' are recalculated.</span></div>
 
 <div class="S1"><span style="font-weight: bold;"></span></div>
 
@@ -925,7 +925,7 @@ the latter option when searching for errors. May be combined with </span><a href
 
 <div class="S1"><span style="font-weight: bold;"></span></div>
 
-<h4 class="S12" id="H_78ED3FCD"><span style="font-weight: bold;">'predictor_polynomial_order' &mdash; Polynomial order used for polynomial predictor </span></h4>
+<h4 class="S12" id="H_78ED3FCD"><span style="font-weight: bold;">'predictor_polynomial_degree' &mdash; Polynomial degree used for polynomial predictor </span></h4>
 
 <div class="S1"><span>1 (default) | scalar, integer &gt; 0</span></div>
 
@@ -1474,10 +1474,10 @@ end
 % 'polynomial' (default) | 'tangential'
 % 
 % 
-% *'predictor_polynomial_adaptive' — Calculate polynomial fit and polynomial order adaptivly*
+% *'predictor_polynomial_adaptive' — Calculate polynomial fit and polynomial degree adaptivly*
 % false (default) | true
 % 
-% If set to true, 'predictor_polynomial_fit' and 'predictor_polynomial_order' 
+% If set to true, 'predictor_polynomial_fit' and 'predictor_polynomial_degree' 
 % are recalculated.
 % 
 % 
@@ -1485,7 +1485,7 @@ end
 % 0 (default) | scalar, integer >= 0
 % 
 % 
-% *'predictor_polynomial_order' — Polynomial order used for polynomial predictor*
+% *'predictor_polynomial_degree' — Polynomial degree used for polynomial predictor*
 % 1 (default) | scalar, integer > 0
 % 
 % 

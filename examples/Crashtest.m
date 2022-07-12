@@ -162,17 +162,17 @@ for i=1:2
     fprintf('\n### %d: predictor_tangential ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','tangential');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_tangential ###\n',i),probinfo,probcounter);
-    %% predictor_polynomial_order:
-    fprintf('\n### %d: predictor_polynomial_order: 2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_order',2);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_order: 2 ###\n',i),probinfo,probcounter);
+    %% predictor_polynomial_degree:
+    fprintf('\n### %d: predictor_polynomial_degree: 2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_degree',2);
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_degree: 2 ###\n',i),probinfo,probcounter);
     %% predictor_polynomial_fit:
     fprintf('\n### %d: predictor_polynomial_fit: 4 ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_fit',4);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_fit: 4 ###\n',i),probinfo,probcounter);
     %% predictor_polynomial_adaptive:
     fprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_adaptive','on','predictor_polynomial_order',4,'predictor_polynomial_fit',5);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_adaptive','on','predictor_polynomial_degree',4,'predictor_polynomial_fit',5);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter);
     %% predictor_polynomial_adaptive:
     fprintf('\n### %d: predictor_solver: on ###\n',i);

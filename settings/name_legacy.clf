@@ -2,6 +2,7 @@ arclength>>corrector
 closed_counter>>max_closed_counter
 corrector>linear>orthogonal
 corrector>parabola>paraboloid
+predictor_polynomial_order>>predictor_polynomial_degree
 step_size_control>pid>pid_valli
 step_size_control>iterations>iterations_polynomial
 step_size_control>angle>angle_change
