@@ -5,7 +5,7 @@
 %   19.05.2020 - Alwin Förster
 %   16.09.2020 - Tido Kubatschek 
 %
-function jac = numeric_jacobian(f, x, varargin)
+function [jac,f0] = numeric_jacobian(f, x, varargin)
     % Calculate Jacobian of function f at given x
     %
     % varargin consists of
