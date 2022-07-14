@@ -19,7 +19,7 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,func,res_co
         xdirs_trace = [];
         ds_bif = mean(diff(Path.s_all(bif_trace(1,i)+(-1:1))));
         x0 = [Path.var_all(:,bif_trace(1,i));Path.l_all(bif_trace(1,i))];
-        residual_bif_sphere = @(x) aux.merge_residuals(func,continuation.corrector(Opt_sphere),x,x0,ds_bif,[],Opt_sphere);
+        residual_bif_sphere = @(x) aux.merge_residuals(func,continuation.corrector(func,Opt_sphere),x,x0,ds_bif,[],Opt_sphere);
         %% find directions of known path
         for j=1:2
             Path_trace = Path;

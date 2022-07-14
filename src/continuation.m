@@ -39,7 +39,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     end
     [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,Stepsize_information,Temp] = aux.initialize_structs(var0,l_start,l_end,ds0,Opt,Stepsize_options.rate_of_contraction);
     clear('var0','l_start','l_end','ds0');
-    res_corr = continuation.corrector(Opt);
+    res_corr = continuation.corrector(fun,Opt);
     ds = Info.ds0;
     aux.print_line(Opt,'Starting path continuation...\n');
     if Opt.dpa_gamma_var
@@ -280,7 +280,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         [Do,Info,Path,break_fun_out,Opt,Counter] = aux.exit_loop(Do,Info,Is,Path,Opt,Counter,Bifurcation,ds,fun_solution,Jacobian,break_fun_out);
         if Do.change_corrector
             Opt = aux.seton(Opt,'corrector',corr_info);
-            res_corr = continuation.corrector(Opt);
+            res_corr = continuation.corrector(fun,Opt);
             Do.change_corrector = false;
         end
         Opt = aux.update_Opt(Opt,Opt_is_set,Info);

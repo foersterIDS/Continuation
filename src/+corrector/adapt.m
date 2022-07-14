@@ -11,7 +11,7 @@ function [Do,Opt,corr_info] = adapt(Do,Opt,Path,Solver,func,x_predictor,dscale,l
             if Solver.exitflag>0
                 if Opt.adapt_corrector.solve
                     Opt_temp = aux.seton(Opt,'corrector','orthogonal');
-                    res_corr_temp = continuation.corrector(Opt_temp);
+                    res_corr_temp = continuation.corrector(func,Opt_temp);
                     residual_temp = @(x) aux.merge_residuals(func,res_corr_temp,x,[Path.var_all;Path.l_all],ds,last_jacobian,Opt_temp);
                     [~,~,solver_exitflag_temp,solver_output_temp] = Solver.main(residual_temp,x_predictor,dscale);
                     if solver_exitflag_temp>0 && solver_output_temp.iterations<Solver.output.iterations

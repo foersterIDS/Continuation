@@ -72,6 +72,9 @@ for i=1:2
     fprintf('\n### %d: corrector: orthogonal ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: corrector: orthogonal2 ###\n',i);
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal2');
+    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal2 ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'ds_min',10^-4,'display','on','corrector','ellipsoid','predictor','tangential');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
@@ -99,7 +102,7 @@ for i=1:2
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','determine');
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: determine ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: bifurcation: trace ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','trace');
+    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','trace','n_step_max',200);
     [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: trace ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: stop_on_bifurcation: on ###\n',i);
     [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','stop_on_bifurcation','on');

@@ -5,9 +5,11 @@
 %   08.05.2020 - Alwin Förster
 %   17.09.2020 - Tido Kubatschek
 %
-function [residual] = corrector(Opt)
+function [residual] = corrector(fun,Opt)
     if Opt.corrector.orthogonal
         residual = @(x,x_all,ds,Jac) corrector.residual_orthogonal(x,x_all,ds,Jac,Opt);
+    elseif Opt.corrector.orthogonal2
+        residual = @(x,x_all,ds,Jac) corrector.residual_orthogonal2(x,x_all,ds,fun,Jac,Opt);
     elseif Opt.corrector.sphere
         residual = @(x,x_all,ds,Jac) corrector.residual_sphere(x,x_all,ds);
     elseif Opt.corrector.ellipsoid
