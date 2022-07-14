@@ -17,27 +17,27 @@ function [residual,jacobian] = residual_orthogonal(x,x_all,ds,Jac,Opt)
             else
                 tangent = Opt.direction * ds;
             end
-            xip1 = x_all(:,end) + tangent;
+            xi_predictor = x_all(:,end) + tangent;
         else
             % calc tangent via jacobian
             Path_help.var_all = x_all(1:end-1,:);
             Path_help.l_all = x_all(end,:);
-            [xip1,tangent] = predictor_initial(Path_help,ds,Opt);
+            [xi_predictor,tangent] = predictor.initial(Path_help,ds,Opt);
         end
     else
         if Opt.corrector_orthogonal_method.secant
             % approximate tangent with secant
             tangent = x_all(:,end) - x_all(:,end-1);
             xi = x_all(:,end);
-            xip1 = xi + ds*tangent/norm(tangent);
+            xi_predictor = xi + ds*tangent/norm(tangent);
         else
             % calc tangent via jacobian
             Path_help.var_all = x_all(1:end-1,:);
             Path_help.l_all = x_all(end,:);
-            [xip1,tangent] = predictor_ode(Path_help,ds,Jac,[],Opt);
+            [xi_predictor,tangent] = predictor.ode(Path_help,ds,Jac,[],Opt);
         end       
     end
     %
-    residual = tangent.' * (x - xip1);
+    residual = tangent.' * (x - xi_predictor);
     jacobian = tangent.';
 end
