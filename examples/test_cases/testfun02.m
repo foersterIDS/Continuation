@@ -1,18 +1,32 @@
+%% one-dimensional duffing oscillator
+% mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( l * t )
+%
+% 26.07.2022      Anna Lefken
+
 addpath('test_cases\testfun02_aux');
-mu = 1;%0.5;%1;
-zeta = 0.05;%0.3;%0.05;
-kappa = 1;%0.7;%1;
-gamma = 0.1;%5;%0.1;
-% gamma = 10*0.1;%5;%0.1;%critical duffing
-P = 0.18;%1;%0.18;
-% P = 10*0.18; %critical duffing
-H = 7;      % harmonic order
-N = 2^6;    % number of time samples per period
-lams = 0.5;%0.001;%0.5;  % start frequency
-lame = 1.6;%4;%1.6; % end frequency
-% lame = 10*1.6;%4;%1.6; % end frequency critical duffing
-Q = (-lams^2*mu+1i*lams*zeta+kappa)\P;
-v0 = [0;real(Q);-imag(Q);zeros(2*(H-1),1)];
-ds0 = 0.1;
-ds_max = 1;
-fun = @(x,l) HB_residual_Duffing([x;l],mu,zeta,kappa,gamma,P,H,N);
+%% Parameters
+mu = 1;
+zeta = 0.1;
+kappa = 1;
+gamma = 0.5;
+P=4;
+
+Nh=5;                                                   % number of harmonics
+Np=2^8;                                                 % number of sampling points per period
+lams = 0;                                             % lambda at start of continuation
+lame = 6;                                             % lambda at end of continuation
+ds0 = mu/100;                                           % start step length
+ds_max = mu/10;                                         % maximum step length
+%% Calculation
+[G, H] = func_FourierMatrix(Nh,Np);
+
+p=zeros(2*(Nh)+1,1);                                    % p vector in frequency domain
+p(2)=P;
+
+A1=lams*kron(diag(1:Nh),[0 1;-1 0]);
+A=[0 zeros(1, 2*Nh);zeros(2*Nh,1) A1];
+Sh=kron(A^2,mu)+kron(A,zeta)+kron(A^0,kappa);           % dynamic stiffness at start
+
+v0=Sh\p;                                                % start values from linear system
+%% Function
+fun = @(v,l) residual_fun02(v,l,mu,zeta,kappa,gamma,p,Nh,G,H);
