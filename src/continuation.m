@@ -123,6 +123,11 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         else
             residual = @(x) aux.merge_residuals(func,res_corr,x,[Path.var_all;Path.l_all],ds,Jacobian.last,Opt);
         end
+        if numel(Path.l_all)==1 && ~isempty(Opt.initial_deflation_points)
+            for ii=1:numel(Opt.initial_deflation_points(1,:))
+                residual = @(x) aux.deflation(residual,Opt.initial_deflation_points(:,ii),x,Opt);
+            end
+        end
         %
         %% predictor
         %

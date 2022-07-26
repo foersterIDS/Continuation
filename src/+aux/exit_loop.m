@@ -113,5 +113,16 @@ function [Do, Info, Path, break_fun_out, Opt,Counter] = exit_loop(Do, Info, Is, 
         Info.exit_msg = '--> continuation stoped by user';
     end
     %
+    %% exit with bifurcation:
+    %
+    if Bifurcation.flag>0 && Opt.stop_on_crossing && Bifurcation.bif(2,end)==0
+        Do.continuation = false;
+        Info.exitflag = 7;
+        Path.var_all = Path.var_all(:,1:Bifurcation.bif(1,end));
+        Path.l_all = Path.l_all(1:Bifurcation.bif(1,end));
+        Path.s_all = Path.s_all(1:Bifurcation.bif(1,end));
+        Info.exit_msg = '--> continuation completed: bifurcation reached';
+    end
+    %
 end
 
