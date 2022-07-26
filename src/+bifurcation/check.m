@@ -13,9 +13,11 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
         %% mark bifurcations:
         sign_det_current_jacobian_red = sign(det(last_jacobian_red));
         if sign_det_current_jacobian_red*Jacobian.sign_det_red<=0
-            bif_type = NaN; % 1: fold bif.; 0: branch point bif; NaN: unknown
+            sign_det_current_jacobian = sign(det(Jacobian.last));
+            bif_type = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
             Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
             Jacobian.sign_det_red = sign_det_current_jacobian_red;
+            Jacobian.sign_det = sign_det_current_jacobian;
             Bifurcation.flag = 1;
             Bifurcation.scaling = [Bifurcation.scaling,1];
         end
