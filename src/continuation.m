@@ -313,7 +313,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     if Opt.bifurcation.trace
         try
             delete(Plot.pl_curr);
-            [Path,Bifurcation] = bifurcation.trace(Opt,Path,Bifurcation,Solver,Info,func,res_corr);
+            [Path,Bifurcation] = bifurcation.trace(Opt,Opt_is_set,Path,Bifurcation,Solver,Info,func,res_corr);
             Jacobian.last = [];
         catch
             aux.print_line(Opt,'--> Failed to trace bifurcations.\n');

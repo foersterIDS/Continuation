@@ -5,14 +5,17 @@
 %   28.10.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,func,res_corr)
+function [Path,Bifurcation] = trace(Opt,Opt_is_set,Path,Bifurcation,Solver,Info,func,res_corr)
     bif_trace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
     nbif = numel(bif_trace(1,:));
     Opt_sphere = Opt;
     Opt_sphere = aux.seton(Opt_sphere,'corrector','sphere');
     Opt_trace = Opt;
+    Opt_is_set_trace = Opt_is_set;
     Opt_trace.stop_on_crossing = true;
+    Opt_is_set_trace.stop_on_crossing = true;
     Opt_trace = aux.seton(Opt_trace,'bifurcation','mark');
+    Opt_is_set_trace.bifurcation = true;
     for i=1:nbif
         ind_bif = bif_trace(1,i);
         xdirs_old = [];
@@ -79,8 +82,12 @@ function [Path,Bifurcation] = trace(Opt,Path,Bifurcation,Solver,Info,func,res_co
             ntrace = numel(xdirs_trace)/numel(x0);
             for j=1:ntrace
                 Opt_trace.direction = xdirs_trace(:,j)/norm(xdirs_trace(:,j));
+                Opt_is_set_trace.direction = true;
                 Opt_trace.l_0 = x0(end);
+                Opt_is_set_trace.l_0 = true;
                 Opt_trace.initial_deflation_points = x0+xdirs_old;
+                Opt_is_set_trace.initial_deflation_points = true;
+                Opt_trace.Opt_is_set = Opt_is_set_trace; % (set Opt_is_set with Opt)
                 [var_j,l_j,exitflag_j,Bifurcation_j,s_j] = continuation(func,x0(1:end-1),Info.l_start,Info.l_end,ds_bif,'opt',Opt_trace);
                 if exitflag_j>0
                     Path.var_all = [Path.var_all,NaN(numel(x0)-1,1),var_j];

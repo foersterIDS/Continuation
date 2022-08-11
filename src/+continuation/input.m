@@ -152,13 +152,25 @@ function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,
                 %% set Opt-struct:
                 Opt_temp = varargin_cell{i+1};
                 Opt_fieldnames_temp = fieldnames(Opt_temp);
+                do_Opt_is_set = true;
+                ind_Opt_is_set_temp = find(strcmp(Opt_fieldnames_temp,'Opt_is_set'));
+                if numel(ind_Opt_is_set_temp)>1
+                    error('Opt_is_set used to often.');
+                elseif numel(ind_Opt_is_set_temp)==1
+                    Opt_is_set = Opt_temp.(Opt_fieldnames_temp{ind_Opt_is_set_temp});
+                    Opt_temp = rmfield(Opt_temp,Opt_fieldnames_temp{ind_Opt_is_set_temp});
+                    Opt_fieldnames_temp(ind_Opt_is_set_temp) = [];
+                    do_Opt_is_set = false;
+                end
                 used_fields = zeros(numel(Opt_fieldnames_temp),1);
                 for ii=1:numel(Opt_fieldnames)
                     contains_field = contains(Opt_fieldnames_temp,Opt_fieldnames{ii});
                     if sum(contains_field)
                         used_fields(contains_field) = 1;
                         Opt.(lower(Opt_fieldnames{ii})) = Opt_temp.(lower(Opt_fieldnames{ii}));
-                        Opt_is_set.(lower(Opt_fieldnames{ii})) = true;
+                        if do_Opt_is_set
+                            Opt_is_set.(lower(Opt_fieldnames{ii})) = true;
+                        end
                     end
                 end
                 if ~prod(used_fields)
