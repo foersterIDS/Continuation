@@ -15,6 +15,14 @@ function [R] = residual(fun,x,Opt,Info,scale)
         fun_J = @(v) fun(v,x(end));
         J1 = aux.numeric_jacobian(fun_J,x(1:Info.nv),R1,'diffquot',Opt.diffquot);
     end
-    R2 = det(J1)*scale;
+    
+    if Opt.bif_residual.determinant
+        R2 = det(J1)*scale;
+    elseif Opt.bif_residual.lu_factorization
+        [~,U] = lu(J1);
+        diagU=diag(U);
+        [~,ind_min]=min(abs(diagU));
+        R2 = diagU(ind_min);
+    end
     R = [R1;R2];
 end
