@@ -3,9 +3,10 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   28.03.2022 - Alwin Förster
+%   12.08.2022 - Anna Lefken
 %
 function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt] = ...
-    confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt)
+    confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt,Opt_is_set)
     x_deflation = x_solution;
     if Is.valid
         %% valid result
@@ -13,6 +14,9 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             Path.var_all = [Path.var_all,x_solution(1:end-1)];
             Path.l_all = [Path.l_all,x_solution(end)];
             Path.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-1);Path.l_all(end-1)])];
+            if Opt_is_set.bif_additional_testfunction
+                Path.biftest_value=[Path.biftest_value Opt.bif_additional_testfunction(func,x_solution,Jacobian,Path,Info)];
+            end
             % update stepsize information
             % measure speed
             %
@@ -45,6 +49,10 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             Path.var_all = [Path.var_all,x_solution(1:end-1),Plus.x(1:end-1)];
             Path.l_all = [Path.l_all,x_solution(end),Plus.x(end)];
             Path.s_all = [Path.s_all,Path.s_all(end)+norm(x_solution-[Path.var_all(:,end-2);Path.l_all(end-2)])*[1,1]+norm(Plus.x-x_solution)*[0,1]];
+            if Opt_is_set.bif_additional_testfunction
+                Path.biftest_value=[Path.biftest_value,Opt.bif_additional_testfunction(func,x_solution,Jacobian,Path,Info),Plus.biftest_value];
+            end
+            
             if Stepsize_options.predictor
                 Temp.predictor = [Temp.predictor, x_predictor, Plus.x_predictor];
                 Plus.x_predictor = [];
@@ -93,6 +101,9 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             if Counter.valid_stepback<Opt.stepback_error_counter
                 Do.stepback = true;
                 Plus.x = [Path.var_all(:,end);Path.l_all(end)];
+                if Opt_is_set.bif_additional_testfunction
+                    Plus.biftest_value=Opt.bif_additional_testfunction(func,x_solution,Jacobian,Path,Info);
+                end
                 if Stepsize_options.predictor
                     Plus.x_predictor = x_predictor;
                 end
@@ -108,6 +119,9 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             Path.var_all(:,end) = [];
             Path.l_all(end) = [];
             Path.s_all(end) = [];
+            if Opt_is_set.bif_additional_testfunction
+                Path.biftest_value(end) = [];
+            end
             if Stepsize_options.predictor
                 if ~isempty(Temp.predictor)
                     Temp.predictor(:,end) = [];
@@ -129,6 +143,9 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
                 Path.var_all = [Path.var_all,Plus.x(1:end-1)];
                 Path.l_all = [Path.l_all,Plus.x(end)];
                 Path.s_all = [Path.s_all,Path.s_all(end)+norm([Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)])];
+                if Opt_is_set.bif_additional_testfunction
+                    Path.biftest_value = [Path.biftest_value,Plus.biftest_value];
+                end
                 if Stepsize_options.predictor
                     Temp.predictor = [Temp.predictor, Plus.x_predictor];
                 end
@@ -156,6 +173,9 @@ function [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,
             Path.var_all(:,n_path+((-n_rmv+1):0)) = [];
             Path.l_all(n_path+((-n_rmv+1):0)) = [];
             Path.s_all(n_path+((-n_rmv+1):0)) = [];
+            if Opt_is_set.bif_additional_testfunction
+                Path.biftest_value(n_path+((-n_rmv+1):0)) = [];
+            end
             Remove.ds = Remove.s-Path.s_all(end);
             dscale_rmv = aux.get_dscale(Opt,Path);
             residual_fixed_value_rmv = @(v) aux.residual_fixed_value(func,v,Path.l_all(end),Opt);

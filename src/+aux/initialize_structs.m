@@ -3,6 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
+%   06.08.2022 - Anna Lefken
 %
 function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,Stepsize_information,Temp] = initialize_structs(var0,l_start,l_end,ds0,Opt,output_flag)
     %% Bifurcation
@@ -80,7 +81,8 @@ function [Bifurcation,Counter,Do,Info,Info_out,Initial,Is,Jacobian,Path,Plot,Plu
                   's_all',[],...
                   'speed_of_continuation',[],...
                   'var_all',[],...
-                  'x_predictor',[]);
+                  'x_predictor',[],...
+                  'biftest_value',[]);
 	%
     %% Plot
     %

@@ -3,6 +3,7 @@
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   30.09.2020 - Tido Kubatschek
+%   07.08.2022 - Anna Lefken
 %
 function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation, dpa_points)
     l_lu = [min([Info.l_start,Info.l_end]),max([Info.l_start,Info.l_end])];
@@ -144,6 +145,8 @@ function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter,
                        plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'rx','LineWidth',2);
                    elseif Bifurcation.bif(2,end) == 1 % fold Bifurcation.bif
                        plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'ro','LineWidth',2);
+                   elseif Bifurcation.bif(2,end) == 2 % Bifurkation from additional testfunction
+                       plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'rd','LineWidth',2);
                    elseif isnan(Bifurcation.bif(2,end)) % Bifurcation.bif, but no further information
                        plot(Path.l_all(Bifurcation.bif(1,end)),Path.var_all(Opt.plot_vars_index,Bifurcation.bif(1,end)),'rs','LineWidth',2);
                    end

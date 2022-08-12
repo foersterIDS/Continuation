@@ -59,6 +59,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     if initial_exitflag>=0
         Path.l_all = Opt.l_0;
         Path.s_all = 0;
+        Path.biftest_value=Opt.bif_additional_testfunction(func,[Path.var_all;Path.l_all],Jacobian,Path,Info);
         Do.continuation = true;
         Do.loop = true;
         dpa_points = [];
@@ -233,7 +234,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
             aux.validate_result(x_solution,Plus,fun_solution,Path,ds,Solver,Jacobian,fun_predictor,s_predictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         % confirm result:
         [x_deflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt] = ...
-            aux.confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt);
+            aux.confirm_result(func,x_solution,x_predictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,Stepsize_information,Stepsize_options,Temp,Opt,Opt_is_set);
         %
         %% Bifurcations
         %
@@ -243,7 +244,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
                 %% get jacobian if not current
                 Jacobian.solver = aux.get_jacobian(func,Path.var_all(:,end),Path.l_all(end),Opt);
             end
-            [Bifurcation,Jacobian,Path] = bifurcation.check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt);
+            [Bifurcation,Jacobian,Path] = bifurcation.check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt,Opt_is_set);
         elseif aux.ison(Opt.bifurcation) && Is.valid && numel(Path.l_all)<=2
             if ~Is.current_jacobian
                 %% get jacobian if not current
