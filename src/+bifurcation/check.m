@@ -35,11 +35,32 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
         if sign_det_current_jacobian_red*Jacobian.sign_det_red<=0
             bif_found=1;
             %% find exact point:
-            nds = 11;
+            nds = 1000;
             dss = linspace(Path.s_all(end-1)-Path.s_all(end),0,nds);
-            dss = dss([6,7,5,8,4,9,3,10,2,11,1]);
             ind_bif = length(Path.l_all);
             bif_type = NaN;
+            nv = numel(Path.var_all(:,1));
+            
+            det_left=det(Jacobian.previous(1:nv,1:nv));
+            det_right=det(Jacobian.last(1:nv,1:nv));
+            start_dsp=det_right/(det_right-det_left)*(dss(1)-dss(end));     % estimated bifurcation point
+            ind_start=find(dss>start_dsp,1);                                % index of estimated bifurcation point
+            
+            ind_dss=zeros(nds,1);                                           % index vector for sorting dss
+            ind_dss(1)=ind_start;                                           % alternating left and right of ind_start
+            if ind_start<nds/2
+                ind_alternating_less=ind_start-1:-1:1;
+                ind_dss(2:2:length(ind_alternating_less)*2)=ind_alternating_less;
+                ind_dss(3:2:length(ind_alternating_less)*2+1)=ind_start+1:1:ind_start+length(ind_alternating_less);
+                ind_dss(length(ind_alternating_less)*2+2:end)=ind_start+length(ind_alternating_less)+1:1:nds;
+            else
+                ind_alternating_greater=ind_start+1:1:nds;
+                ind_dss(2:2:length(ind_alternating_greater)*2)=ind_start-1:-1:ind_start-length(ind_alternating_greater);
+                ind_dss(3:2:length(ind_alternating_greater)*2+1)=ind_alternating_greater;
+                ind_dss(length(ind_alternating_greater)*2+2:nds)=ind_start-length(ind_alternating_greater)-1:-1:1;
+            end
+            dss=dss(ind_dss);                                               % sort dss
+            
             for i=1:nds
                 dsp = dss(i);
                 [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,dsp,last_jacobian_red,func,res_corr,Solver,Opt);
