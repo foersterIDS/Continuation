@@ -48,7 +48,11 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
             
             ind_dss=zeros(nds,1);                                           % index vector for sorting dss
             ind_dss(1)=ind_start;                                           % alternating left and right of ind_start
-            if ind_start<nds/2
+            if ind_start==1
+                ind_dss=1:1:nds;
+            elseif ind_start==nds
+                ind_dss=nds:-1:1;
+            elseif le(ind_start,nds/2)
                 ind_alternating_less=ind_start-1:-1:1;
                 ind_dss(2:2:length(ind_alternating_less)*2)=ind_alternating_less;
                 ind_dss(3:2:length(ind_alternating_less)*2+1)=ind_start+1:1:ind_start+length(ind_alternating_less);
