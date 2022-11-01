@@ -8,7 +8,11 @@
 function [Plot,Opt] = live_plot(Opt, Info, Path, ds, dsim1, iterations, Counter, fun_predictor, s_predictor, Plot, Bifurcation, dpa_points)
     l_lu = [min([Info.l_start,Info.l_end]),max([Info.l_start,Info.l_end])];
     l_max = [min(Path.l_all),max(Path.l_all)];
-    dl0 = abs(Info.l_end-Info.l_start)*0.05;
+    if numel(Path.l_all)>=2
+        dl0 = abs(max(Path.l_all)-min(Path.l_all))*0.2;
+    else
+        dl0 = abs(Info.l_end-Info.l_start);
+    end
     num_pl = numel(Opt.plot_vars_index);
     if nargin<12
         dpa_points = [];
