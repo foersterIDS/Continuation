@@ -19,6 +19,8 @@ function [ var_h, exitflag, var_all, l_all ] = h_continuation( fun, var0, Opt )
         G = @(x) homotopy.fixNt(fun,x,fun(var0),var0,Opt);
     elseif Opt.homotopy.f2
         % nothing
+    elseif Opt.homotopy.squared
+        G = @(x) homotopy.squared(x,var0);
     else
         error('unknown homotopy-type');
     end
