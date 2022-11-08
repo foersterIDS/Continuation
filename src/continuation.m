@@ -55,7 +55,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     [Path.var_all,fun_initial,initial_exitflag,Solver.output,Jacobian.initial] = Solver.main(residual_initial,Info.var0,Opt.dscale0(1:end-1));
     Jacobian.solver = Jacobian.initial;
     break_fun_out = [];
-    event_out = false;
+    event.event_obj = [];
     if initial_exitflag>=0
         Path.l_all = Opt.l_0;
         Path.s_all = 0;
@@ -67,9 +67,6 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         Jacobian.previous = Jacobian.solver;
         Jacobian.last = Jacobian.solver;
         [~,break_fun_out] = Opt.break_function(fun_initial,Jacobian.solver,Path.var_all,Path.l_all,break_fun_out);
-        if Opt.step_size_event
-            [ds,Counter,event_out,~] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out);
-        end
         aux.print_line(Opt,'Initial solution at %s = %.2e\n',para_name,Opt.l_0);
         if aux.ison(Opt.bifurcation)
             Jacobian.sign_det_red = sign(det(Jacobian.initial));
@@ -266,7 +263,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
         % save step size data:
         [Solver,Path] = aux.update_stepsize_data(Stepsize_options,Temp,Solver,Path);
         % adjust stepsize:
-        [ds,Counter,event_out,Opt] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out,Initial);
+        [ds,Counter,event,Opt] = step_size.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event,Initial);
         %
         %% end loop
         %

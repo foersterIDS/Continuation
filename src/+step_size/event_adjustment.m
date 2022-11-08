@@ -1,73 +1,86 @@
 %% path continuation - step_size.event_adjustment
-%  Adjusts stepsize if a specified event occurs.
-%  Event can be specified in 'event_condition' and must be a function
-%  handle as follows:
-%
-%                   @(ds,Path) ...
-%  Must return true or false!
-%  Sets stepsize to the value specified in 'ds_event' (default 1e-4).
-%  Stepsize can be adapted 'event_counter' times (default 1).
-%
-%   Inputs:
-%       ds          -- latest stepsize
-%       Path        -- path information
-%       Counter     -- contains event_counter
-%       Opt         -- contains user inputs and preferences such as
-%                      ds_event
-%       event_out   -- true --> event condition was met in the last step 
-%                               and stepsize has been adapted. The step
-%                               size can only be adjusted again if the
-%                               condition is not met at least once.                                                  
-%                      false --> event condition was not met in the last 
-%                                step, so it can be adapted again.
-%                        
-%   Outputs:
-%       ds          -- adapted stepsize / latest stepsize
-%       Counter     -- contains event_counter
-%       event_out   -- ...
-%       changed     -- tells if the stepsize has been changed
-%
-%
 %
 %  See the <a href="matlab:open('..\doc\html\continuation.html')">documentation</a> or see <a href="matlab:doc('step_size.control')">other stepsize adaption methods</a>.
+%  See <a href="matlab:doc('StepSizeControlEvent')">StepSizeControlEvent class</a> for information on how to implement events
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
-%   21.01.2022 - Tido Kubatschek
+%   08.11.2022 - Tido Kubatschek
 %
-function [ds,Counter,event_out,changed,Opt] = event_adjustment(ds,Path,Counter,Opt,event_out,Initial)
+function [ds_new,event_obj,changed,Opt] = event_adjustment(ds,event_obj,Opt,Initial,variables)
     %
-    % To-Do: identify relevant variables for event checking
-    %        --> Path, ds, Jacobian?, fun?
-    %
-    %
-    % Check if stepsize is still allowed to be changed
-    %
-    changed = false;
-    if Opt.event_condition(ds,Path.var_all,Path.l_all)
-        if Counter.event < Opt.event_counter
+    % check if event_object has already been defined
+    if isempty(event_obj)
+        %
+        % create event_obj
+        %
+        event_obj = step_size.StepSizeEventManager;
+        %
+        % get information by user
+        %
+        len = length(Opt.event_user_input);
+        %
+        % check len
+        %
+        if len == 0
+            error('step_size_event has been activated, but there are no entries in user input!');
+        end
+        %
+        for k = 1:len
             %
-            % check if condition was met in the last step
+            % get inputs
             %
-            if ~event_out
-                %
-                % stepsize is allowed to be changed now
-                ds = Opt.ds_event;
-                Counter.event = Counter.event + 1;
-                Opt.ds_max = Opt.ds_event;
-                changed = true;
-                %
+            condition = Opt.event_user_input{k}.condition;
+            needed_parameters = Opt.event_user_input{k}.needed_parameters;
+            ds_min = Opt.event_user_input{k}.ds_min;
+            ds_max = Opt.event_user_input{k}.ds_max;
+
+            if isfield(Opt.event_user_input{k},'counter_max')
+                var_input = {'counter',Opt.event_user_input{k}.counter_max};
+            else
+                var_input = [];
             end
+            %
+            % create event
+            %
+            event_obj.add_event(condition,needed_parameters,ds_min,ds_max,var_input);
+            %
         end
         %
-        % stepsize isnt allowed to be changed in the next step (since
-        % event occured in the last / this step)
+        % set initial ds_min and ds_max
         %
-        event_out = true;
-    else
-        if event_out
-            Opt.ds_max = Initial.ds_max;
-        end
-        event_out = false;
+        event_obj.set_initial(Initial);
+        %
     end
+    %
+    % get list of needed variables
+    needed_parameters = event_obj.getNeededVariables;
+    %
+    % set current ds_max and ds_min
+    %
+    event_obj.set_current(Opt.ds_max,Opt.ds_min); % ist hier Opt richtig?
+    %
+    % fill value struct
+    num_of_vars = length(needed_parameters);
+    for k = 1:num_of_vars
+        eval(['value_struct.',needed_parameters{k},'=variables.',needed_parameters{k},';']);
+    end
+    %
+    current_stepsize = ds;
+    new_stepsizes = event_obj.check_events_and_adapt_stepsize(current_stepsize,value_struct);
+    changed = event_obj.getChanged;
+    %
+    % adapt ds_max, ds_min and ds
+    %
+    if ~isempty(new_stepsizes.ds_max)
+        event_obj.set_current(new_stepsizes.ds_max,new_stepsizes.ds_min);
+        Opt.ds_max = new_stepsizes.ds_max;
+        Opt.ds_min = new_stepsizes.ds_min;
+    end
+    if changed
+        ds_new = new_stepsizes.ds;
+    else
+        ds_new = ds;
+    end
+    %
 end

@@ -20,15 +20,13 @@ display<>eval<>true<>#scalar#logical
 dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true#ison:plot.dpa
 dpa_gamma_var<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
 dpa_residual<>function_handle<>@(v,l,g)1<>#scalar#nargin:3
-ds_event<>double<>1e-4<>#scalar#double#positive#nonzero
 ds_max<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforce_ds_max
 ds_min<>double<>10^-9<>#scalar#double#positive#smaller:norm(Opt.ds_max)
 ds_tol<>eval<>[0.5,1.5]<>#array#positive#double#increasing#size:[1,2]
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscale_min<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
 enforce_ds_max<>eval<>false<>#scalar#logical#ison:predictor_solver
-event_condition<>eval<>@(ds,var_all,l_all)false<>#function_handle
-event_counter<>double<>1<>#scalar#integer#positive#nonzero
+event_user_input<>cell<>{}<>#cell
 g_0<>eval<>l_start<>#scalar#double
 g_target<>eval<>l_end<>#scalar#double
 homotopy<>struct<>Opt_homotopy<>#struct

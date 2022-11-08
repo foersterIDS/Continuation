@@ -139,6 +139,8 @@ function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,
                         Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                     elseif isa(Opt.(lower(varargin_cell{i})),'function_handle') && isa(varargin_cell{i+1},'function_handle')
                         Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
+                    elseif iscell(Opt.(lower(varargin_cell{i}))) && iscell(varargin_cell{i+1})
+                        Opt.(lower(varargin_cell{i})) = varargin_cell{i+1};
                     else
                         err_msg = sprintf('invalid input');
                         error(err_msg);
@@ -277,13 +279,6 @@ function [Opt,ds0,Opt_is_set,func] = input(varargin_cell,fun,var0,l_start,l_end,
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);
-    end
-    %
-    %% check whether an event condition is set
-    %
-    if Opt_is_set.event_condition
-        Opt.step_size_event = true;
-        Opt_is_set.step_size_event = true;
     end
     %
     %% set dependent options

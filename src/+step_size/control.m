@@ -26,12 +26,39 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event_out,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event_out,Initial)
+function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event,Initial)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
-                if Opt.step_size_event
-                    [dsn,Counter,event_out,changed,Opt] = step_size.event_adjustment(ds,Path,Counter,Opt,event_out,Initial);
+                if Opt.step_size_event                 
+                    % fill variables struct
+                    % in the first run, fill with all possible variables
+                    if isempty(event.event_obj)
+                        event.variables.ds = ds;
+                        event.variables.Counter = Counter;
+                        event.variables.Solver = Solver;
+                        event.variables.Path = Path;
+                        event.variables.Jacobian = Jacobian;
+                    else
+                        % after creating event_obj, read out names of
+                        % needed variables with method and save them in
+                        % field of event
+                        if ~isfield(event,'names_of_needed_variables')
+                            % get names of needed variables
+                            event.names_of_needed_variables = event.event_obj.getNeededVariables;
+                            % empty event.variables
+                            event.variables = [];
+                        end
+                        
+                        % loop through names of needed variables and save
+                        % them on event.variables
+                        for k = 1:length(event.names_of_needed_variables)
+                            event.variables.(event.names_of_needed_variables{k}) = eval(event.names_of_needed_variables{k});
+                        end
+                    end
+
+                    % adjust stepsize
+                    [dsn,event.event_obj,changed,Opt] = step_size.event_adjustment(ds,event.event_obj,Opt,Initial,event.variables);
                 else
                     changed = false;
                 end

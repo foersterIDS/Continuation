@@ -86,6 +86,10 @@ function [errmsg,Opt,Opt_is_set] = check_Opt(errmsg,var0,varargin_cell,Opt,Opt_i
                                     Opt_global = Opt;
                                 end
                             end
+                        case 'cell'
+                            if ~iscell(Opt.(Opt_fieldnames{i}))
+                                errmsg_temp = [errmsg_temp,sprintf('\n%s has to be a cell',Opt_fieldnames{i})];
+                            end
                         case 'true'
                             if isa(Opt.(Opt_fieldnames{i}),'logical') && ~Opt.(Opt_fieldnames{i})
                                 errmsg_temp = [errmsg_temp,sprintf('\n%s has to be true',Opt_fieldnames{i})];
