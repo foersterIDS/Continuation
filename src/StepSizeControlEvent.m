@@ -1,4 +1,4 @@
-%% path continuation - step_size.StepSizeSingleEvent
+%% path continuation - StepSizeControlEvent
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
