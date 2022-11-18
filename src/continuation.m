@@ -59,7 +59,7 @@ function [var_all,l_all,exitflag,Bifurcation,s_all,jacobian_out,break_fun_out,In
     if initial_exitflag>=0
         Path.l_all = Opt.l_0;
         Path.s_all = 0;
-        Path.biftest_value=Opt.bif_additional_testfunction(func,[Path.var_all;Path.l_all],Jacobian,Path,Info);
+        Path.biftest_value = Opt.bif_additional_testfunction(func,[Path.var_all;Path.l_all],Jacobian,Path,Info);
         Do.continuation = true;
         Do.loop = true;
         dpa_points = [];
