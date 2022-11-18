@@ -1,4 +1,4 @@
-addpath('test_cases\testfun09_aux');
+addpath('testCases\testfun09_aux');
 vm = 0;
 lm = 0;
 r = 1;

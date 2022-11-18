@@ -1,55 +1,56 @@
 clear;
 close all;
 clc;
+addpath('../src/');
 %% residual function:
 fun = @(var,l) var-l;
 % It is possible that fun returns R or [R,J] with R being the residual and
 % J the Jacobian with respect to var or [var;l].
 %% settings:
 var0 = 0; % initial value of var
-l_start = 0; % initial value of l
-l_end = 5; % end value of l
+lStart = 0; % initial value of l
+lEnd = 5; % end value of l
 ds0 = 0.01; % initial step size
-ds_min = 1*10^-5;
-ds_max = 2*10^-1;
+dsMin = 1*10^-5;
+dsMax = 2*10^-1;
 
 %% event based stepsize control with two simple events
 % create StepSizeControlEvent object
-event_obj = StepSizeControlEvent();
+eventObj = StepSizeControlEvent();
 
 % Add first event
-% set new ds_max to be 5e-2 when lambda is between 1 and 1.4
-event_condition = @(Path) Path.l_all(end) >= 1 && Path.l_all(end) <= 1.4;
-event_needed_parameters = {'Path'};
-event_ds_min = ds_min;
-event_ds_max = 1e-3;
-event_counter_max = 1;
-event_obj = event_obj.addEvent(event_condition,event_needed_parameters,event_ds_min,event_ds_max,event_counter_max);
+% set new dsMax to be 5e-2 when lambda is between 1 and 1.4
+eventCondition = @(Path) Path.lAll(end) >= 1 && Path.lAll(end) <= 1.4;
+eventNeededParameters = {'Path'};
+eventDsMin = dsMin;
+eventDsMax = 1e-3;
+eventCounterMax = 1;
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
 
 % Add second event
-% set new ds_max to be 1 when lambda is greater than 3
-event_condition = @(Path) Path.l_all(end) > 3;
-event_needed_parameters = {'Path'};
-event_ds_min = ds_min;
-event_ds_max = 1e-2;
-event_counter_max = 1;
-event_obj = event_obj.addEvent(event_condition,event_needed_parameters,event_ds_min,event_ds_max,event_counter_max);
+% set new dsMax to be 1 when lambda is greater than 3
+eventCondition = @(Path) Path.lAll(end) > 3;
+eventNeededParameters = {'Path'};
+eventDsMin = dsMin;
+eventDsMax = 1e-2;
+eventCounterMax = 1;
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
 
 
 %% run continuation:
 
-% basic options & plot on (predictor tangential, ds_min/max) & activate
+% basic options & plot on (predictor tangential, dsMin/max) & activate
 % event based step size control
-[var_all,l_all,exitflag,~,s_all] = continuation(fun,var0,l_start,l_end,ds0,'plot','on',...
-                                                                         'predictor','tangential',...
-                                                                         'ds_min',ds_min,'ds_max',ds_max,...
-                                                                         'step_size_event',true,...
-                                                                         'event_user_input',event_obj.getEvents);
+[varAll,lAll,exitflag,~,sAll] = continuation(fun,var0,lStart,lEnd,ds0,'plot','on',...
+                                                                      'predictor','tangential',...
+                                                                      'dsMin',dsMin,'dsMax',dsMax,...
+                                                                      'stepSizeEvent',true,...
+                                                                      'eventUserInput',eventObj.getEvents);
 %% Also plot used stepsize
 figure('Units','normalized','Position',[0.2,0.2,0.6,0.6]);
 
-ds = [0,s_all(2:end) - s_all(1:end-1)];
-pl(1) = plot(l_all, ds,'b--x',LineWidth=2); hold on;
+ds = [0,sAll(2:end) - sAll(1:end-1)];
+pl(1) = plot(lAll, ds,'b--x',LineWidth=2); hold on;
 xlabel('$\lambda$',Interpreter='latex');
 ylabel('$\Delta s(\lambda)$',Interpreter='latex');
 xl = xlim();

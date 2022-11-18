@@ -3,7 +3,7 @@
 %
 % 26.07.2022      Anna Lefken
 
-addpath('test_cases\testfun02_aux');
+addpath('testCases\testfun02_aux');
 %% Parameters
 mu = 1;
 zeta = 0.1;

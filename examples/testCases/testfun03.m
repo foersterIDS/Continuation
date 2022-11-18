@@ -1,4 +1,4 @@
-addpath('test_cases\testfun03_aux');
+addpath('testCases\testfun03_aux');
 
 %% Settings:
 omu = 0.5;

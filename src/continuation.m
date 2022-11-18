@@ -328,7 +328,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     %% DPA
     %
-    if Opt.dpa && OptIsSet.dpa && ~Opt.dpaGammaVar && ~Opt.bifurcation.parameterTrace
+    if Opt.dpa && OptIsSet.dpa && ~Opt.dpaGammaVar && Opt.bifurcation.parameterTrace
         Path = dpa.trace(fun,dpaPoints,Info,Opt,Path);
     end
     %

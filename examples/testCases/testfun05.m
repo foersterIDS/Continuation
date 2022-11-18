@@ -1,4 +1,4 @@
-addpath('test_cases\testfun05_aux');
+addpath('testCases\testfun05_aux');
 lm = 2;
 vm = lm^2;
 r = lm/2;

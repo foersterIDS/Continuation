@@ -1,4 +1,4 @@
-addpath('test_cases\testfun13_aux');
+addpath('testCases\testfun13_aux');
 
 lams = 100;
 lame = 0;

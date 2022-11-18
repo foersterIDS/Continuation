@@ -1,10 +1,10 @@
-%% path continuation - dpa.res_bif
+%% path continuation - dpa.resBif
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [R] = res_bif(fun,x,g,Opt,scale)
+function [R] = resBif(fun,x,g,Opt,scale)
     if Opt.jacobian
         [~,J1] = fun(x(1:end-1),x(end),g);
         if diff(size(J1))
@@ -12,8 +12,8 @@ function [R] = res_bif(fun,x,g,Opt,scale)
         end
     else
         R1 = fun(x(1:end-1),x(end),g);
-        fun_J = @(v) fun(v,x(end),g);
-        J1 = aux.numeric_jacobian(fun_J,x(1:end-1),R1,'diffquot',Opt.diffquot);
+        funJ = @(v) fun(v,x(end),g);
+        J1 = aux.numericJacobian(funJ,x(1:end-1),R1,'diffquot',Opt.diffquot);
     end
     R = det(J1)*scale;
 end

@@ -1,4 +1,4 @@
-addpath('test_cases\testfun10_aux');
+addpath('testCases\testfun10_aux');
 
 v0 = 10^-15;
 lams = 1;
