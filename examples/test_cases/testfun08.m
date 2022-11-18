@@ -5,8 +5,8 @@ lams = 0;
 lame = 2*r;
 v0 = r/2;
 ds0 = r/100;
-ds_max = r/10;
+dsMax = r/10;
 %% Test-function with and without jacobian
-fun_jaco_test = cell(2,1);
-fun_jaco_test{1} = @(v,l) residual_fun08(v,l,true,r);
-fun_jaco_test{2} = @(v,l) residual_fun08(v,l,false,r);
+funJacoTest = cell(2,1);
+funJacoTest{1} = @(v,l) residual_fun08(v,l,true,r);
+funJacoTest{2} = @(v,l) residual_fun08(v,l,false,r);

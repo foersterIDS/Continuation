@@ -50,5 +50,5 @@ vs = [1;0;0;0];
 fun = @(vars,om) vs'*lyap(G(vars,om),D(vars,om))*vs-vars;
 fun_dpa = @(vars,om,g) vs'*lyap(G_dpa(vars,om,g),D(vars,om))*vs-vars;
 ds0 = 0.0001;
-ds_max = 0.01;
+dsMax = 0.01;
 v0 = 0.05;

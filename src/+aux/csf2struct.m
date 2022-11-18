@@ -5,64 +5,64 @@
 %   19.08.2021 - Alwin Förster
 %
 %   Unknown variable names or function handles are capt as strings in the
-%   specified field. The output variable eval_cell contains the names of
+%   specified field. The output variable evalCell contains the names of
 %   fields where this problem occurs. If the variable is known the value of
-%   the ith eval_cell entry can be reset using the eval function:
-%   struct_out.(eval_cell{i}) = eval(struct_out.(eval_cell{i}));
+%   the ith evalCell entry can be reset using the eval function:
+%   structOut.(evalCell{i}) = eval(structOut.(evalCell{i}));
 %
-function [struct_out,struct_info_out,eval_cell] = csf2struct(struct_name)
+function [structOut,structInfoOut,evalCell] = csf2struct(structName)
     %% set path
     %
-    temp_path = mfilename('fullpath');
-    struct_path = [temp_path(1:(numel(temp_path)-19)),'settings\',struct_name,'.csf'];
-    clear temp_path;
+    tempPath = mfilename('fullpath');
+    structPath = [tempPath(1:(numel(tempPath)-19)),'settings\',structName,'.csf'];
+    clear tempPath;
     %
     %% initialize
     %
-    struct_out = struct();
-    struct_info_out = struct();
-    eval_cell = {};
-    eval_counter = 0;
-    sturct_file_id = fopen(struct_path);
-    line_delimiter = '<>';
-    split_delimiter = '<>';
-    line_format = ['%s',line_delimiter,'%s',line_delimiter,'%s',line_delimiter,'%s'];
+    structOut = struct();
+    structInfoOut = struct();
+    evalCell = {};
+    evalCounter = 0;
+    sturctFileId = fopen(structPath);
+    lineDelimiter = '<>';
+    splitDelimiter = '<>';
+    lineFormat = ['%s',lineDelimiter,'%s',lineDelimiter,'%s',lineDelimiter,'%s'];
     %
     %% fill struct
     %
-    line_str = fscanf(sturct_file_id,line_format);
-    while ~isempty(line_str)
-        line_cell = strsplit(line_str,split_delimiter);
-        struct_info_out.(line_cell{1}) = line_cell{4};
-        switch line_cell{2}
+    lineStr = fscanf(sturctFileId,lineFormat);
+    while ~isempty(lineStr)
+        lineCell = strsplit(lineStr,splitDelimiter);
+        structInfoOut.(lineCell{1}) = lineCell{4};
+        switch lineCell{2}
             case 'eval'
                 try
-                    struct_out.(line_cell{1}) = eval(line_cell{3});
+                    structOut.(lineCell{1}) = eval(lineCell{3});
                 catch
-                    struct_out.(line_cell{1}) = line_cell{3};
-                    eval_counter = eval_counter+1;
-                    eval_cell{eval_counter} = line_cell{1};
+                    structOut.(lineCell{1}) = lineCell{3};
+                    evalCounter = evalCounter+1;
+                    evalCell{evalCounter} = lineCell{1};
                 end
             case 'double'
-                struct_out.(line_cell{1}) = str2num(line_cell{3});
+                structOut.(lineCell{1}) = str2num(lineCell{3});
             case 'string'
-                struct_out.(line_cell{1}) = line_cell{3};
+                structOut.(lineCell{1}) = lineCell{3};
             case 'struct'
-                temp_struct = aux.csf2struct(line_cell{3});
-                struct_out.(line_cell{1}) = temp_struct;
-                clear temp_struct;
+                tempStruct = aux.csf2struct(lineCell{3});
+                structOut.(lineCell{1}) = tempStruct;
+                clear tempStruct;
             case 'function_handle'
-                struct_out.(line_cell{1}) = eval(line_cell{3});
+                structOut.(lineCell{1}) = eval(lineCell{3});
             case 'cell'
-                struct_out.(line_cell{1}) = eval(line_cell{3});
+                structOut.(lineCell{1}) = eval(lineCell{3});
             otherwise
                 error('Unknown field type. Struct-file corrupted?');
         end
-        line_str = fscanf(sturct_file_id,line_format);
+        lineStr = fscanf(sturctFileId,lineFormat);
     end
     %
     %% end
     %
-    fclose(sturct_file_id);
+    fclose(sturctFileId);
     %
 end

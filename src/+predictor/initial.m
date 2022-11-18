@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   24.11.2020 - Alwin Förster
 %
-function [fun_predictor,Jac_predictor] = initial(Path,s,Opt)
+function [funPredictor,JacPredictor] = initial(Path,s,Opt)
     if numel(Opt.direction)==1
-        fun_predictor = [Path.var_all(:,end);Path.l_all(end)+sign(Opt.direction)*s];
-        Jac_predictor = [zeros(size(Path.var_all(:,end)));sign(Opt.direction)];
+        funPredictor = [Path.varAll(:,end);Path.lAll(end)+sign(Opt.direction)*s];
+        JacPredictor = [zeros(size(Path.varAll(:,end)));sign(Opt.direction)];
     else
-        fun_predictor = [Path.var_all(:,end);Path.l_all(end)]+Opt.direction*s;
-        Jac_predictor = Opt.direction;
+        funPredictor = [Path.varAll(:,end);Path.lAll(end)]+Opt.direction*s;
+        JacPredictor = Opt.direction;
     end
 end

@@ -4,7 +4,7 @@ v0 = 10^-15;
 lams = 1;
 lame = 10;
 ds0 = 0.05;
-ds_max = 0.1;
+dsMax = 0.1;
 
 opt = optimoptions('fsolve','display','None');
 solver = @(f,x) fsolve(f,x,opt);

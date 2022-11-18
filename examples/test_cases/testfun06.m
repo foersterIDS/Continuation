@@ -7,4 +7,4 @@ lame = 1;
 %v0 = ones(Nres,1);
 v0 = ones(2,1);
 ds0 = 0.01;
-ds_max = 0.1;
+dsMax = 0.1;

@@ -12,24 +12,24 @@ testfun03; % Stochastic Duffing
 
 %% Prepare stepsize event object:
 % create StepSizeControlEvent-Object
-event_obj = StepSizeControlEvent();
+eventObj = StepSizeControlEvent();
 
 % Add first event
-event_condition = @(Path) Path.l_all(end) >= 1 && Path.l_all(end) <= 1.1;
-event_needed_parameters = {'Path'};
-event_ds_min = 1e-10;
-event_ds_max = 1e-3;
-event_counter_max = 1;
-event_obj = event_obj.addEvent(event_condition,event_needed_parameters,event_ds_min,event_ds_max,event_counter_max);
+eventCondition = @(Path) Path.lAll(end) >= 1 && Path.lAll(end) <= 1.1;
+eventNeededParameters = {'Path'};
+eventDsMin = 1e-10;
+eventDsMax = 1e-3;
+eventCounterMax = 1;
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
 
 % Add second event
-event_condition = @(Path) Path.l_all(end) >= 1.4;
-event_needed_parameters = {'Path'};
-event_ds_min = 1e-10;
-event_ds_max = 1e-2;
-event_counter_max = 1;
-event_obj = event_obj.addEvent(event_condition,event_needed_parameters,event_ds_min,event_ds_max,event_counter_max);
+eventCondition = @(Path) Path.lAll(end) >= 1.4;
+eventNeededParameters = {'Path'};
+eventDsMin = 1e-10;
+eventDsMax = 1e-2;
+eventCounterMax = 1;
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
 
 %% Solve:
-[var_all,l_all,exitflag,bifs,s_all,last_jacobian,break_fun_out] = ...
-    continuation(fun,v0,lams,lame,ds0,'ds_max',ds_max,'plot','on','step_size_event',true,'event_user_input',event_obj.getEvents);
+[varAll,lAll,exitflag,bifs,sAll,lastJacobian,breakFunOut] = ...
+    continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','stepSizeEvent',true,'eventUserInput',eventObj.getEvents);

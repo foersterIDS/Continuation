@@ -3,8 +3,8 @@ close all;
 clc;
 tic
 addpath('..\src');
-addpath('test_cases');
-addpath('crashtest_aux');
+addpath('testCases');
+addpath('crashtestAux');
 probinfo = [];
 probcounter = 0;
 %% Test function #04
@@ -18,177 +18,177 @@ for i=1:2
     % i=1: with jacobian, i=2: without jacobian
     %% standard-config.:
     fprintf('\n### %d: standard-config ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max);
-    probinfo = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: standard-config ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax);
+    probinfo = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: standard-config ###\n',i),probinfo,probcounter);
     %% check residual on:
     fprintf('\n### %d: check residual: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'check_residual','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: check residual: on ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'checkResidual','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: check residual: on ###\n',i),probinfo,probcounter);
     %% display off:
     fprintf('\n### %d: correct predictor: off ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'correct_predictor','off');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: correct predictor: off ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'correctPredictor','off');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: correct predictor: off ###\n',i),probinfo,probcounter);
     %% display off:
     fprintf('\n### %d: display: off ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: display: off ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: display: off ###\n',i),probinfo,probcounter);
     %% homotopy:
     fprintf('\n### %d: homotopy: off ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','off');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: off ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','off');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: off ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: on ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: on ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: fix ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','fix');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fix ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','fix');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fix ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: fixnt ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','fixnt');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fixnt ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','fixnt');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: fixnt ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: newton ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','newton');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','newton');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: homotopy: f2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','homotopy','f2');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','homotopy','f2');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: homotopy: newton ###\n',i),probinfo,probcounter);
     %% solver:
     fprintf('\n### %d: solver: fsolve ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','fsolve');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: fsolve ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','solver','fsolve');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: fsolve ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: solver: lsqnonlin ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','on','solver','lsqnonlin');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: lsqnonlin ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','on','solver','lsqnonlin');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: lsqnonlin ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: solver: newton ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','solver','newton');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: newton ###\n',i),probinfo,probcounter);
-    %% break_function:
-    fprintf('\n### %d: break_function ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','break_function',@(f,J,v,l,break_fun_out) aux.initial_break_function(f,J,v,l,break_fun_out));
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: break_function ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','solver','newton');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: solver: newton ###\n',i),probinfo,probcounter);
+    %% breakFunction:
+    fprintf('\n### %d: breakFunction ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','breakFunction',@(f,J,v,l,breakFunOut) aux.initialBreakFunction(f,J,v,l,breakFunOut));
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: breakFunction ###\n',i),probinfo,probcounter);
     %% corrector:
     fprintf('\n### %d: corrector: sphere ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','sphere');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: sphere ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','corrector','sphere');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: sphere ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: orthogonal ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','corrector','orthogonal');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: orthogonal2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','orthogonal2');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal2 ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','corrector','orthogonal2');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: orthogonal2 ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'ds_min',10^-4,'display','on','corrector','ellipsoid','predictor','tangential');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'dsMin',10^-4,'display','on','corrector','ellipsoid','predictor','tangential');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: ellipsoid2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'n_step_max',1000,'display','off','corrector','ellipsoid2');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid2 ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'nStepMax',1000,'display','off','corrector','ellipsoid2');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: ellipsoid2 ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: unique ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','unique');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: unique ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','corrector','unique');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: unique ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: corrector: paraboloid ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','corrector','paraboloid');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: paraboloid ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','corrector','paraboloid');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: corrector: paraboloid ###\n',i),probinfo,probcounter);
     %% deflation:
     fprintf('\n### %d: deflation: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','deflation','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: deflation: on ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','deflation','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: deflation: on ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: deflation: off ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','deflation','off');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: deflation: off ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','deflation','off');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: deflation: off ###\n',i),probinfo,probcounter);
     %% bifurcation:
     fprintf('\n### %d: bifurcation: mark ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','mark');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: mark ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','bifurcation','mark');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: mark ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: bifurcation: determine ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','determine');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: determine ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','bifurcation','determine');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: determine ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: bifurcation: trace ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','bifurcation','trace','n_step_max',200);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: trace ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: stop_on_bifurcation: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','stop_on_bifurcation','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: stop_on_bifurcation: on ###\n',i),probinfo,probcounter);
-    %% n_iter_opt:
-    fprintf('\n### %d: n_iter_opt: 5 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','n_iter_opt',5);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: n_iter_opt: 5 ###\n',i),probinfo,probcounter);
-    %% ds_min:
-    fprintf('\n### %d: ds_min: ds0/2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','ds_min',ds0/2);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: ds_min: ds0/2 ###\n',i),probinfo,probcounter);
-    %% ds_tol:
-    fprintf('\n### %d: ds_tol: [0.5,1.5] ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','ds_tol',[0.5,1.5]);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: ds_tol: [0.5,1.5] ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','bifurcation','trace','nStepMax',200);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: bifurcation: trace ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: stopOnBifurcation: on ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','stopOnBifurcation','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: stopOnBifurcation: on ###\n',i),probinfo,probcounter);
+    %% nIterOpt:
+    fprintf('\n### %d: nIterOpt: 5 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','nIterOpt',5);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: nIterOpt: 5 ###\n',i),probinfo,probcounter);
+    %% dsMin:
+    fprintf('\n### %d: dsMin: ds0/2 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','dsMin',ds0/2);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: dsMin: ds0/2 ###\n',i),probinfo,probcounter);
+    %% dsTol:
+    fprintf('\n### %d: dsTol: [0.5,1.5] ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','dsTol',[0.5,1.5]);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: dsTol: [0.5,1.5] ###\n',i),probinfo,probcounter);
     %% descale
     fprintf('\n### %d: scaling: staticdscale ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','scaling','staticdscale');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: scaling: staticdscale ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','scaling','staticdscale');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: scaling: staticdscale ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: scaling: dynamicdscale ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','scaling','dynamicdscale');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: scaling: dynamicdscale ###\n',i),probinfo,probcounter);
-    %% l_0:
-    fprintf('\n### %d: l_0: (l_end-l_start)/2+l_start ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','l_0',(lame-lams)/2+lams);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: l_0: (l_end-l_start)/2+l_start ###\n',i),probinfo,probcounter);
-    %% l_target:
-    fprintf('\n### %d: l_target: (l_end-l_start)/3+l_start ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'ds_min',10^-6,'display','off','l_target',(lame-lams)/3+lams);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: l_target: (l_end-l_start)/3+l_start ###\n',i),probinfo,probcounter);
-    %% l_target:
-    fprintf('\n### %d: alpha_reverse: pi/4 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','alpha_reverse',pi/4);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: alpha_reverse: pi/4 ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','scaling','dynamicdscale');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: scaling: dynamicdscale ###\n',i),probinfo,probcounter);
+    %% l0:
+    fprintf('\n### %d: l0: (lEnd-lStart)/2+lStart ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','l0',(lame-lams)/2+lams);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: l0: (lEnd-lStart)/2+lStart ###\n',i),probinfo,probcounter);
+    %% lTarget:
+    fprintf('\n### %d: lTarget: (lEnd-lStart)/3+lStart ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'dsMin',10^-6,'display','off','lTarget',(lame-lams)/3+lams);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: lTarget: (lEnd-lStart)/3+lStart ###\n',i),probinfo,probcounter);
+    %% lTarget:
+    fprintf('\n### %d: alphaReverse: pi/4 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','alphaReverse',pi/4);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: alphaReverse: pi/4 ###\n',i),probinfo,probcounter);
     %% plot:
     fprintf('\n### %d: plot: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plot: on & bifurcation: mark ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','on','bifurcation','mark');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: mark ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','bifurcation','mark');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: mark ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plot: on & bifurcation: determine ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','on','bifurcation','determine');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: determine ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','bifurcation','determine');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: determine ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plot: on & bifurcation: trace ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','on','bifurcation','trace');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: trace ###\n',i),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','bifurcation','trace');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: trace ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plot: detail & bifurcation: trace ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','detail','bifurcation','trace');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: detail & bifurcation: trace ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: plot_vars_index: 1 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','plot','on','plot_vars_index',1);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot_vars_index: 1 ###\n',i),probinfo,probcounter);
-    %% include_reverse:
-    fprintf('\n### %d: include_reverse: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','include_reverse','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: include_reverse: on ###\n',i),probinfo,probcounter);
-    %% predictor_tangential:
-    fprintf('\n### %d: predictor_tangential ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','tangential');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_tangential ###\n',i),probinfo,probcounter);
-    %% predictor_polynomial_degree:
-    fprintf('\n### %d: predictor_polynomial_degree: 2 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_degree',2);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_degree: 2 ###\n',i),probinfo,probcounter);
-    %% predictor_polynomial_fit:
-    fprintf('\n### %d: predictor_polynomial_fit: 4 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_fit',4);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_fit: 4 ###\n',i),probinfo,probcounter);
-    %% predictor_polynomial_adaptive:
-    fprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor','polynomial','predictor_polynomial_adaptive','on','predictor_polynomial_degree',4,'predictor_polynomial_fit',5);
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_polynomial_adaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter);
-    %% predictor_polynomial_adaptive:
-    fprintf('\n### %d: predictor_solver: on ###\n',i);
-    [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','predictor_solver','on');
-    [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictor_solver: on ###\n',i),probinfo,probcounter);
-    %% step_size_control:
-    stepsize_methods = ["angle_change", "angle_custom", "contraction" , "error", "error_alt", "fayezioghani",...
-        "iterations_exponential", "iterations_polynomial", "multiplicative", "multiplicative_alt", "pid_custom",...
-        "pid_valli", "szyszkowski", "yoon"];
-    for stepsize_method = stepsize_methods
-        fprintf('\n### %d: step_size_control: %s ###\n',i, stepsize_method);
-        [vs,ls,exitflag] = continuation(fun_jaco_test{i},v0,lams,lame,ds0,'ds_max',ds_max,'display','off','step_size_control',stepsize_method);
-        [probinfo,probcounter] = crashtest_check_output(vs,ls,exitflag,lams,lame,sprintf('\n### %d: step_size_control: %s ###\n',i,stepsize_method),probinfo,probcounter);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','detail','bifurcation','trace');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: detail & bifurcation: trace ###\n',i),probinfo,probcounter);
+    fprintf('\n### %d: plotVarsIndex: 1 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','plotVarsIndex',1);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plotVarsIndex: 1 ###\n',i),probinfo,probcounter);
+    %% includeReverse:
+    fprintf('\n### %d: includeReverse: on ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','includeReverse','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: includeReverse: on ###\n',i),probinfo,probcounter);
+    %% predictorTangential:
+    fprintf('\n### %d: predictorTangential ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','predictor','tangential');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictorTangential ###\n',i),probinfo,probcounter);
+    %% predictorPolynomialDegree:
+    fprintf('\n### %d: predictorPolynomialDegree: 2 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','predictor','polynomial','predictorPolynomialDegree',2);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictorPolynomialDegree: 2 ###\n',i),probinfo,probcounter);
+    %% predictorPolynomialFit:
+    fprintf('\n### %d: predictorPolynomialFit: 4 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','predictor','polynomial','predictorPolynomialFit',4);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictorPolynomialFit: 4 ###\n',i),probinfo,probcounter);
+    %% predictorPolynomialAdaptive:
+    fprintf('\n### %d: predictorPolynomialAdaptive: nt = 4, nf = 5 ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','predictor','polynomial','predictorPolynomialAdaptive','on','predictorPolynomialDegree',4,'predictorPolynomialFit',5);
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictorPolynomialAdaptive: nt = 4, nf = 5 ###\n',i),probinfo,probcounter);
+    %% predictorPolynomialAdaptive:
+    fprintf('\n### %d: predictorSolver: on ###\n',i);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','predictorSolver','on');
+    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: predictorSolver: on ###\n',i),probinfo,probcounter);
+    %% stepSizeControl:
+    stepsizeMethods = ["angleChange", "angleCustom", "contraction" , "error", "errorAlt", "fayezioghani",...
+        "iterationsExponential", "iterationsPolynomial", "multiplicative", "multiplicativeAlt", "pidCustom",...
+        "pidValli", "szyszkowski", "yoon"];
+    for stepsizeMethod = stepsizeMethods
+        fprintf('\n### %d: stepSizeControl: %s ###\n',i, stepsizeMethod);
+        [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','stepSizeControl',stepsizeMethod);
+        [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: stepSizeControl: %s ###\n',i,stepsizeMethod),probinfo,probcounter);
     end
 end
 clc;

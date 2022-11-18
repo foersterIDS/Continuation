@@ -21,7 +21,7 @@
 % http://www.gnu.org/licenses or gpl-3.0.txt.
 %
 %%
-function [v_solution,exitflag,var_all,l_all] = homotopy(fun,var0,varargin)
+function [vSolution,exitflag,varAll,lAll] = homotopy(fun,var0,varargin)
     %% initialize
     %
     warning on;
@@ -29,6 +29,6 @@ function [v_solution,exitflag,var_all,l_all] = homotopy(fun,var0,varargin)
     %
     %% homotopy
     %
-    [v_solution, exitflag, var_all, l_all] = homotopy.h_continuation(fun,var0,Opt);
+    [vSolution, exitflag, varAll, lAll] = homotopy.hContinuation(fun,var0,Opt);
     %
 end

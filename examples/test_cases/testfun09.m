@@ -6,7 +6,7 @@ v0 = 0.001;
 lams = -1;
 lame = 4;
 ds0 = 0.05;
-ds_max = 0.1;
+dsMax = 0.1;
 
 fun = @(v,l) residual_fun09(v,l,r,vm,lm);
 % benoetigt 'direction',[1;0]

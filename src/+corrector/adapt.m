@@ -4,44 +4,44 @@
 %   Leibniz University Hannover
 %   20.01.2022 - Alwin Förster
 %
-function [Do,Opt,corr_info] = adapt(Do,Opt,Path,Solver,func,x_predictor,dscale,last_jacobian,ds)
-    corr_info = [];
-    if aux.ison(Opt.adapt_corrector)
+function [Do,Opt,corrInfo] = adapt(Do,Opt,Path,Solver,func,xPredictor,dscale,lastJacobian,ds)
+    corrInfo = [];
+    if aux.ison(Opt.adaptCorrector)
         if Opt.corrector.sphere
             if Solver.exitflag>0
-                if Opt.adapt_corrector.solve
-                    Opt_temp = aux.seton(Opt,'corrector','orthogonal');
-                    res_corr_temp = continuation.corrector(func,Opt_temp);
-                    residual_temp = @(x) aux.merge_residuals(func,res_corr_temp,x,[Path.var_all;Path.l_all],ds,last_jacobian,Opt_temp);
-                    [~,~,solver_exitflag_temp,solver_output_temp] = Solver.main(residual_temp,x_predictor,dscale);
-                    if solver_exitflag_temp>0 && solver_output_temp.iterations<Solver.output.iterations
-                        corr_info = 'orthogonal';
-                        Do.change_corrector = true;
+                if Opt.adaptCorrector.solve
+                    OptTemp = aux.seton(Opt,'corrector','orthogonal');
+                    resCorrTemp = continuation.corrector(func,OptTemp);
+                    residualTemp = @(x) aux.mergeResiduals(func,resCorrTemp,x,[Path.varAll;Path.lAll],ds,lastJacobian,OptTemp);
+                    [~,~,solverExitflagTemp,solverOutputTemp] = Solver.main(residualTemp,xPredictor,dscale);
+                    if solverExitflagTemp>0 && solverOutputTemp.iterations<Solver.output.iterations
+                        corrInfo = 'orthogonal';
+                        Do.changeCorrector = true;
                     end
                 end
             else
-                corr_info = 'orthogonal';
-                Do.change_corrector = true;
+                corrInfo = 'orthogonal';
+                Do.changeCorrector = true;
             end
         elseif Opt.corrector.orthogonal
             if Solver.exitflag>0
-                if Opt.adapt_corrector.solve
-                    Opt_temp = aux.seton(Opt,'corrector','sphere');
-                    res_corr_temp = continuation.corrector(Opt_temp);
-                    residual_temp = @(x) aux.merge_residuals(func,res_corr_temp,x,[Path.var_all;Path.l_all],ds,last_jacobian,Opt_temp);
-                    [~,~,solver_exitflag_temp,solver_output_temp] = Solver.main(residual_temp,x_predictor,dscale);
-                    if solver_exitflag_temp>0 && solver_output_temp.iterations<Solver.output.iterations
-                        corr_info = 'sphere';
-                        Do.change_corrector = true;
+                if Opt.adaptCorrector.solve
+                    OptTemp = aux.seton(Opt,'corrector','sphere');
+                    resCorrTemp = continuation.corrector(OptTemp);
+                    residualTemp = @(x) aux.mergeResiduals(func,resCorrTemp,x,[Path.varAll;Path.lAll],ds,lastJacobian,OptTemp);
+                    [~,~,solverExitflagTemp,solverOutputTemp] = Solver.main(residualTemp,xPredictor,dscale);
+                    if solverExitflagTemp>0 && solverOutputTemp.iterations<Solver.output.iterations
+                        corrInfo = 'sphere';
+                        Do.changeCorrector = true;
                     end
                 end
             else
-                corr_info = 'sphere';
-                Do.change_corrector = true;
+                corrInfo = 'sphere';
+                Do.changeCorrector = true;
             end
         else
-            corr_info = 'orthogonal';
-            Do.change_corrector = true;
+            corrInfo = 'orthogonal';
+            Do.changeCorrector = true;
         end
     end
 end

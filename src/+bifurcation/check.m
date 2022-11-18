@@ -5,154 +5,154 @@
 %   26.05.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,res_corr,Solver,Opt,Opt_is_set)
+function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,resCorr,Solver,Opt,OptIsSet)
     Bifurcation.flag = 0;
-    last_jacobian_red = Jacobian.last(1:Info.nv,1:Info.nv);
-    last_jacobian_red = full(last_jacobian_red);
-    bif_found=0;    % skip additional testfunction, when det(jac)=0
+    lastJacobianRed = Jacobian.last(1:Info.nv,1:Info.nv);
+    lastJacobianRed = full(lastJacobianRed);
+    bifFound=0;    % skip additional testfunction, when det(jac)=0
     if Opt.bifurcation.mark
         %% mark bifurcations:
-        sign_det_current_jacobian_red = sign(det(last_jacobian_red));
-        if sign_det_current_jacobian_red*Jacobian.sign_det_red<=0
-            bif_found=1;
-            sign_det_current_jacobian = sign(det(Jacobian.last));
-            bif_type = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
-            Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
-            Jacobian.sign_det_red = sign_det_current_jacobian_red;
-            Jacobian.sign_det = sign_det_current_jacobian;
+        signDetCurrentJacobianRed = sign(det(lastJacobianRed));
+        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+            bifFound=1;
+            signDetCurrentJacobian = sign(det(Jacobian.last));
+            bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+            Bifurcation.bif = [Bifurcation.bif,[numel(Path.lAll);bifType]];
+            Jacobian.signDetRed = signDetCurrentJacobianRed;
+            Jacobian.signDet = signDetCurrentJacobian;
             Bifurcation.flag = 1;
             Bifurcation.scaling = [Bifurcation.scaling,1];
         end
-    elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.parameter_trace
+    elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.parameterTrace
         %% determine bifurcation-points:
-        Opt_bif = Opt;
-        Opt_bif.jacobian = false;
-        [bif_solver,default_bif_solver_output] = continuation.solver(Opt_bif,0);
-        det_solver_jacobian_red = det(last_jacobian_red);
-        Bifurcation.scaling = [Bifurcation.scaling,1/det_solver_jacobian_red];
-        residual_bif = @(x) bifurcation.residual(func,x,Opt,Info,Bifurcation.scaling(end));
-        sign_det_current_jacobian_red = sign(det_solver_jacobian_red);
-        if sign_det_current_jacobian_red*Jacobian.sign_det_red<=0
-            bif_found=1;
+        OptBif = Opt;
+        OptBif.jacobian = false;
+        [bifSolver,defaultBifSolverOutput] = continuation.solver(OptBif,0);
+        detSolverJacobianRed = det(lastJacobianRed);
+        Bifurcation.scaling = [Bifurcation.scaling,1/detSolverJacobianRed];
+        residualBif = @(x) bifurcation.residual(func,x,Opt,Info,Bifurcation.scaling(end));
+        signDetCurrentJacobianRed = sign(detSolverJacobianRed);
+        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+            bifFound=1;
             %% find exact point:
             nds = 1000;
-            dss = linspace(Path.s_all(end-1)-Path.s_all(end),0,nds);
-            ind_bif = length(Path.l_all);
-            bif_type = NaN;
-            nv = numel(Path.var_all(:,1));
+            dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
+            indBif = length(Path.lAll);
+            bifType = NaN;
+            nv = numel(Path.varAll(:,1));
             
-            det_left=det(Jacobian.previous(1:nv,1:nv));
-            det_right=det(Jacobian.last(1:nv,1:nv));
-            start_dsp=det_right/(det_right-det_left)*(dss(1)-dss(end));     % estimated bifurcation point
-            ind_start=find(dss>start_dsp,1);                                % index of estimated bifurcation point
+            detLeft=det(Jacobian.previous(1:nv,1:nv));
+            detRight=det(Jacobian.last(1:nv,1:nv));
+            startDsp=detRight/(detRight-detLeft)*(dss(1)-dss(end));     % estimated bifurcation point
+            indStart=find(dss>startDsp,1);                                % index of estimated bifurcation point
             
-            ind_dss=zeros(nds,1);                                           % index vector for sorting dss
-            ind_dss(1)=ind_start;                                           % alternating left and right of ind_start
-            if ind_start==1
-                ind_dss=1:1:nds;
-            elseif ind_start==nds
-                ind_dss=nds:-1:1;
-            elseif le(ind_start,nds/2)
-                ind_alternating_less=ind_start-1:-1:1;
-                ind_dss(2:2:length(ind_alternating_less)*2)=ind_alternating_less;
-                ind_dss(3:2:length(ind_alternating_less)*2+1)=ind_start+1:1:ind_start+length(ind_alternating_less);
-                ind_dss(length(ind_alternating_less)*2+2:end)=ind_start+length(ind_alternating_less)+1:1:nds;
+            indDss=zeros(nds,1);                                           % index vector for sorting dss
+            indDss(1)=indStart;                                           % alternating left and right of indStart
+            if indStart==1
+                indDss=1:1:nds;
+            elseif indStart==nds
+                indDss=nds:-1:1;
+            elseif le(indStart,nds/2)
+                indAlternatingLess=indStart-1:-1:1;
+                indDss(2:2:length(indAlternatingLess)*2)=indAlternatingLess;
+                indDss(3:2:length(indAlternatingLess)*2+1)=indStart+1:1:indStart+length(indAlternatingLess);
+                indDss(length(indAlternatingLess)*2+2:end)=indStart+length(indAlternatingLess)+1:1:nds;
             else
-                ind_alternating_greater=ind_start+1:1:nds;
-                ind_dss(2:2:length(ind_alternating_greater)*2)=ind_start-1:-1:ind_start-length(ind_alternating_greater);
-                ind_dss(3:2:length(ind_alternating_greater)*2+1)=ind_alternating_greater;
-                ind_dss(length(ind_alternating_greater)*2+2:nds)=ind_start-length(ind_alternating_greater)-1:-1:1;
+                indAlternatingGreater=indStart+1:1:nds;
+                indDss(2:2:length(indAlternatingGreater)*2)=indStart-1:-1:indStart-length(indAlternatingGreater);
+                indDss(3:2:length(indAlternatingGreater)*2+1)=indAlternatingGreater;
+                indDss(length(indAlternatingGreater)*2+2:nds)=indStart-length(indAlternatingGreater)-1:-1:1;
             end
-            dss=dss(ind_dss);                                               % sort dss
+            dss=dss(indDss);                                               % sort dss
             
             for i=1:nds
                 dsp = dss(i);
-                [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,dsp,last_jacobian_red,func,res_corr,Solver,Opt);
-                dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
-                [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
-                if bif_solver_exitflag>0
-                    Path.s_all = [Path.s_all(1:end-1),Path.s_all(end-1)+[norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)]),norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)])+norm([Path.var_all(:,end);Path.l_all(end)]-x_bif)]];
-                    Path.var_all = [Path.var_all(:,1:end-1),x_bif(1:end-1),Path.var_all(:,end)];
-                    Path.l_all = [Path.l_all(1:end-1),x_bif(end),Path.l_all(end)];
-                    if Opt_is_set.bif_additional_testfunction
-                        Path.biftest_value=[Path.biftest_value Opt.bif_additional_testfunction(func,x_bif,Jacobian,Path,Info)];
+                [varBifPredictor,lBifPredictor] = continuation.predictor(Path,dsp,lastJacobianRed,func,resCorr,Solver,Opt);
+                dscale = aux.getDscale(Opt,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
+                [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
+                if bifSolverExitflag>0
+                    Path.sAll = [Path.sAll(1:end-1),Path.sAll(end-1)+[norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)]),norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)])+norm([Path.varAll(:,end);Path.lAll(end)]-xBif)]];
+                    Path.varAll = [Path.varAll(:,1:end-1),xBif(1:end-1),Path.varAll(:,end)];
+                    Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
+                    if OptIsSet.bifAdditionalTestfunction
+                        Path.biftestValue=[Path.biftestValue Opt.bifAdditionalTestfunction(func,xBif,Jacobian,Path,Info)];
                     end
                     % 
                     % get type of bifurcation
-                    bif_type = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+                    bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
                     %
-                    % if bif_type = 0 (branch point) calculate directions
+                    % if bifType = 0 (branch point) calculate directions
                     % of paths by null() and save to Bifurcation.dirs cell array
-                    if bif_type == 0
-                        nv = numel(Path.var_all(:,1));
-                        solver_jacobian_red = bif_solver_jacobian(1:nv,1:nv);
-                        solver_jacobian_lam = bif_solver_jacobian(1:nv,nv+1);
-                        jac_red_jac_lam = [solver_jacobian_red, solver_jacobian_lam];
+                    if bifType == 0
+                        nv = numel(Path.varAll(:,1));
+                        solverJacobianRed = bifSolverJacobian(1:nv,1:nv);
+                        solverJacobianLam = bifSolverJacobian(1:nv,nv+1);
+                        jacRedJacLam = [solverJacobianRed, solverJacobianLam];
                         %
-                        null_matrix = null(jac_red_jac_lam);
-                        for k_dirs = 1:width(null_matrix)
-                            bif_dir = null_matrix(:,k_dirs);
+                        nullMatrix = null(jacRedJacLam);
+                        for kDirs = 1:width(nullMatrix)
+                            bifDir = nullMatrix(:,kDirs);
                             if height(Bifurcation.dirs) == 1 && isempty(Bifurcation.dirs{1,2})
-                                Bifurcation.dirs(1,:) = [{ind_bif}, {bif_dir}];
+                                Bifurcation.dirs(1,:) = [{indBif}, {bifDir}];
                             else
-                                Bifurcation.dirs(end+1,:) = [{ind_bif}, {bif_dir}];
+                                Bifurcation.dirs(end+1,:) = [{indBif}, {bifDir}];
                             end
                         end
                     end
                     break;
                 end
             end
-            Bifurcation.bif = [Bifurcation.bif,[ind_bif;bif_type]];
-            Jacobian.sign_det_red = sign_det_current_jacobian_red;
+            Bifurcation.bif = [Bifurcation.bif,[indBif;bifType]];
+            Jacobian.signDetRed = signDetCurrentJacobianRed;
             Bifurcation.flag = 1;
         end
     else
         %% error
         error('No such bifurcation-mode');
     end
-    if Opt_is_set.bif_additional_testfunction && bif_found==0
+    if OptIsSet.bifAdditionalTestfunction && bifFound==0
         if Opt.bifurcation.mark
             %% mark bifurcations:
-            if Path.biftest_value(end-1)*Path.biftest_value(end)<=0
-                bif_found=1;
-                bif_type = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
-                Bifurcation.bif = [Bifurcation.bif,[numel(Path.l_all);bif_type]];
+            if Path.biftestValue(end-1)*Path.biftestValue(end)<=0
+                bifFound=1;
+                bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
+                Bifurcation.bif = [Bifurcation.bif,[numel(Path.lAll);bifType]];
                 Bifurcation.flag = 1;
                 Bifurcation.scaling = [Bifurcation.scaling,1];
             end
-        elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.parameter_trace
+        elseif Opt.bifurcation.determine || Opt.bifurcation.trace || Opt.bifurcation.parameterTrace
             %% determine bifurcation-points:
-            Opt_bif = Opt;
-            Opt_bif.jacobian = false;
-            [bif_solver,default_bif_solver_output] = continuation.solver(Opt_bif,0);
-            det_solver_jacobian_red = det(last_jacobian_red);
-            Bifurcation.scaling = [Bifurcation.scaling,1/det_solver_jacobian_red];
-            if Path.biftest_value(end-1)*Path.biftest_value(end)<=0
-                bif_found=1;
-                residual_bif = @(x) bifurcation.residual_additional_testfunction(func,x,Opt,Jacobian,Path,Info);
+            OptBif = Opt;
+            OptBif.jacobian = false;
+            [bifSolver,defaultBifSolverOutput] = continuation.solver(OptBif,0);
+            detSolverJacobianRed = det(lastJacobianRed);
+            Bifurcation.scaling = [Bifurcation.scaling,1/detSolverJacobianRed];
+            if Path.biftestValue(end-1)*Path.biftestValue(end)<=0
+                bifFound=1;
+                residualBif = @(x) bifurcation.residualAdditionalTestfunction(func,x,Opt,Jacobian,Path,Info);
                 %% find exact point:
                 nds = 11;
-                dss = linspace(Path.s_all(end-1)-Path.s_all(end),0,nds);
+                dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
                 dss = dss([6,7,5,8,4,9,3,10,2,11,1]);
-                ind_bif = length(Path.l_all);
-                bif_type = NaN;
+                indBif = length(Path.lAll);
+                bifType = NaN;
                 for i=1:nds
                     dsp = dss(i);
-                    [var_bif_predictor,l_bif_predictor] = continuation.predictor(Path,dsp,last_jacobian_red,func,res_corr,Solver,Opt);
-                    dscale = aux.get_dscale(Opt,struct('var_all',var_bif_predictor,'l_all',l_bif_predictor));
-                    [x_bif,fun_bif,bif_solver_exitflag,bif_solver_output,bif_solver_jacobian] = bif_solver(residual_bif,[var_bif_predictor;l_bif_predictor],dscale);
-                    if bif_solver_exitflag>0
-%                         Path.s_all = [Path.s_all(1:end-1),Path.s_all(end-1)+[norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)]),norm(x_bif-[Path.var_all(:,end-1);Path.l_all(end-1)])+norm([Path.var_all(:,end);Path.l_all(end)]-x_bif)]];
-%                         Path.var_all = [Path.var_all(:,1:end-1),x_bif(1:end-1),Path.var_all(:,end)];
-%                         Path.l_all = [Path.l_all(1:end-1),x_bif(end),Path.l_all(end)];
-%                         Path.biftest_value=[Path.biftest_value(1:end-1) Opt.bif_additional_testfunction(func,x_bif,Jacobian,Path,Info),Path.biftest_value(end)];
+                    [varBifPredictor,lBifPredictor] = continuation.predictor(Path,dsp,lastJacobianRed,func,resCorr,Solver,Opt);
+                    dscale = aux.getDscale(Opt,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
+                    [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
+                    if bifSolverExitflag>0
+%                         Path.sAll = [Path.sAll(1:end-1),Path.sAll(end-1)+[norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)]),norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)])+norm([Path.varAll(:,end);Path.lAll(end)]-xBif)]];
+%                         Path.varAll = [Path.varAll(:,1:end-1),xBif(1:end-1),Path.varAll(:,end)];
+%                         Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
+%                         Path.biftestValue=[Path.biftestValue(1:end-1) Opt.bifAdditionalTestfunction(func,xBif,Jacobian,Path,Info),Path.biftestValue(end)];
                         % 
                         % get type of bifurcation
-                        bif_type = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
+                        bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
                         break;
                     end
                 end
-                Bifurcation.bif = [Bifurcation.bif,[ind_bif;bif_type]];
+                Bifurcation.bif = [Bifurcation.bif,[indBif;bifType]];
                 Bifurcation.flag = 1;
             end
         else

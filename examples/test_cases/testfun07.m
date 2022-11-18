@@ -5,4 +5,4 @@ lams = 0;
 lame = 10;
 v0 = fsolve(@(v) fun(v,lams),3.75*ones(n,1),optimoptions('fsolve','display','off'));
 ds0 = 0.01;
-ds_max = 1;
+dsMax = 1;

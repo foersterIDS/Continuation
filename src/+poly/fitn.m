@@ -4,18 +4,18 @@
 %   Leibniz University Hannover
 %   12.10.2020 - Alwin Förster
 %
-function p = fitn(x,y,no,enforce_no)
+function p = fitn(x,y,no,enforceNo)
     [nd,nx] = size(y);
     if nx<(no+1)
         error('polynomial order to high');
     end
     if nargin<=3
-        enforce_no = false;
+        enforceNo = false;
     end
     X = kron(eye(nd),x(:).^(0:no));
     yT = y.';
     yy = yT(:);
-    if rcond(X'*X)<10^-15 && no>1 && ~enforce_no
+    if rcond(X'*X)<10^-15 && no>1 && ~enforceNo
         pr = poly.fitn(x((end-no+1):end),y(:,(end-no+1):end),no-1);
         p = zeros(1,nd*(no+1));
         ind = 1:(nd*(no+1));

@@ -1,0 +1,15 @@
+angleChange<>eval<>false<>#scalar#logical
+angleCustom<>eval<>false<>#scalar#logical
+contraction<>eval<>false<>#scalar#logical
+error<>eval<>false<>#scalar#logical
+errorAlt<>eval<>false<>#scalar#logical
+fayezioghani<>eval<>false<>#scalar#logical
+fix<>eval<>false<>#scalar#logical
+iterationsExponential<>eval<>false<>#scalar#logical
+iterationsPolynomial<>eval<>false<>#scalar#logical
+multiplicative<>eval<>true<>#scalar#logical
+multiplicativeAlt<>eval<>false<>#scalar#logical
+pidCustom<>eval<>false<>#scalar#logical
+pidValli<>eval<>false<>#scalar#logical
+szyszkowski<>eval<>false<>#scalar#logical
+yoon<>eval<>false<>#scalar#logical

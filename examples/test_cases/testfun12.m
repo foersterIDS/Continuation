@@ -5,6 +5,6 @@ v0 = [-1;0;0];
 lams = -3;
 lame = 10;
 ds0 = 0.05;
-ds_max = 0.1;
+dsMax = 0.1;
 
 fun = @(v,l) residual_fun12(v,l);

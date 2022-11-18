@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   26.05.2020 - Alwin Förster
 %
-function [state] = ison(Opt_sub_struct)
+function [state] = ison(OptSubStruct)
     % Returns true/false weather a sub-struct has one option 'on'
-    if isstruct(Opt_sub_struct)
-        state = (sum(structfun(@(x) x,Opt_sub_struct))>0);
-    elseif islogical(Opt_sub_struct)
-        state = Opt_sub_struct;
+    if isstruct(OptSubStruct)
+        state = (sum(structfun(@(x) x,OptSubStruct))>0);
+    elseif islogical(OptSubStruct)
+        state = OptSubStruct;
     else
         error('Input must be struct or logical!');
     end

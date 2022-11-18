@@ -5,28 +5,28 @@
 %   18.10.2020 - Alwin Förster
 %
 function [nt,nf] = adaptive(Path,Opt)
-    if Opt.predictor_polynomial_adaptive
-        var_old = Path.var_all(:,1:end-1);
-        l_old = Path.l_all(1:end-1);
-        s_old = Path.s_all(1:end-1);
-        var_solution = Path.var_all(:,end);
-        l_solution = Path.l_all(end);
-        x_solution = [var_solution;l_solution];
+    if Opt.predictorPolynomialAdaptive
+        varOld = Path.varAll(:,1:end-1);
+        lOld = Path.lAll(1:end-1);
+        sOld = Path.sAll(1:end-1);
+        varSolution = Path.varAll(:,end);
+        lSolution = Path.lAll(end);
+        xSolution = [varSolution;lSolution];
         errmin = inf;
-        ds_old = norm(x_solution-[var_old(:,end);l_old(end)]);
-        for kt=1:Opt.predictor_polynomial_degree
-            for kf=0:Opt.predictor_polynomial_fit
-                if length(l_old)==1
+        dsOld = norm(xSolution-[varOld(:,end);lOld(end)]);
+        for kt=1:Opt.predictorPolynomialDegree
+            for kf=0:Opt.predictorPolynomialFit
+                if length(lOld)==1
                     if numel(Opt.direction)==1
-                        x_predictor_old = [var_old;l_old+sign(Opt.direction)*ds_old];
+                        xPredictorOld = [varOld;lOld+sign(Opt.direction)*dsOld];
                     else
-                        x_predictor_old = [var_old;l_old]+Opt.direction*ds_old;
+                        xPredictorOld = [varOld;lOld]+Opt.direction*dsOld;
                     end
                 else
-                    fpt = predictor.taylor(struct('var_all',var_old,'l_all',l_old,'s_all',s_old),kt,kf);
-                    x_predictor_old = fpt(ds_old);
+                    fpt = predictor.taylor(struct('varAll',varOld,'lAll',lOld,'sAll',sOld),kt,kf);
+                    xPredictorOld = fpt(dsOld);
                 end
-                err = norm(x_predictor_old-x_solution);
+                err = norm(xPredictorOld-xSolution);
                 if err<errmin
                     errmin = err;
                     nt = kt;
@@ -35,7 +35,7 @@ function [nt,nf] = adaptive(Path,Opt)
             end
         end
     else
-        nt = Opt.predictor_polynomial_degree;
-        nf = Opt.predictor_polynomial_fit;
+        nt = Opt.predictorPolynomialDegree;
+        nf = Opt.predictorPolynomialFit;
     end
 end

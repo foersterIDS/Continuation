@@ -7,20 +7,20 @@
 %
 function [residual] = corrector(fun,Opt)
     if Opt.corrector.orthogonal
-        residual = @(x,x_all,ds,Jac) corrector.residual_orthogonal(x,x_all,ds,Jac,Opt);
+        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal(x,xAll,ds,Jac,Opt);
     elseif Opt.corrector.orthogonal2
-        residual = @(x,x_all,ds,Jac) corrector.residual_orthogonal2(x,x_all,ds,fun,Jac,Opt);
+        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal2(x,xAll,ds,fun,Jac,Opt);
     elseif Opt.corrector.sphere
-        residual = @(x,x_all,ds,Jac) corrector.residual_sphere(x,x_all,ds);
+        residual = @(x,xAll,ds,Jac) corrector.residualSphere(x,xAll,ds);
     elseif Opt.corrector.ellipsoid
         RnR = corrector.RnRotation([1;0]);
-        residual = @(x,x_all,ds,Jac) corrector.residual_ellipsoid(x,x_all,ds,RnR);
+        residual = @(x,xAll,ds,Jac) corrector.residualEllipsoid(x,xAll,ds,RnR);
     elseif Opt.corrector.ellipsoid2
-        residual = @(x,x_all,ds,Jac) corrector.residual_ellipsoid2(x,x_all,ds);
+        residual = @(x,xAll,ds,Jac) corrector.residualEllipsoid2(x,xAll,ds);
     elseif Opt.corrector.unique
-        residual = @(x,x_all,ds,Jac) corrector.residual_unique(x,x_all,ds,Opt);
+        residual = @(x,xAll,ds,Jac) corrector.residualUnique(x,xAll,ds,Opt);
     elseif Opt.corrector.paraboloid
-        residual = @(x,x_all,ds,Jac) corrector.residual_paraboloid(x,x_all,ds,Opt);
+        residual = @(x,xAll,ds,Jac) corrector.residualParaboloid(x,xAll,ds,Opt);
     else
         error('No such corrector-method');
     end

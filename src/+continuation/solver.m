@@ -4,76 +4,76 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [solver,predictor_solver,num_jac_solver,default_solver_output] = solver(Opt,output_flag)
-    predictor_solver = [];
-    if output_flag
-        outfun = @output_fun;
+function [solver,predictorSolver,numJacSolver,defaultSolverOutput] = solver(Opt,outputFlag)
+    predictorSolver = [];
+    if outputFlag
+        outfun = @outputFun;
     else
-        outfun = @do_nothing;
+        outfun = @doNothing;
     end
     if Opt.solver.fsolve
         %% fsolve
         if Opt.jacobian
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solverTol,'StepTolerance',Opt.solverTol,'OptimalityTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations,'OutputFcn', outfun);
         else
-            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
+            options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solverTol,'StepTolerance',Opt.solverTol,'OptimalityTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations,'OutputFcn', outfun);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
         solver = @(fun,x0,dscale) fsolve(fun,x0,optfun(dscale));
-        if Opt.predictor_solver
-            predictor_options = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'StepTolerance',Opt.solver_tol,'OptimalityTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations);
-            predictor_solver = @(fun_predictor,s0) fsolve(fun_predictor,s0,predictor_options);
+        if Opt.predictorSolver
+            predictorOptions = optimoptions('fsolve','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solverTol,'StepTolerance',Opt.solverTol,'OptimalityTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations);
+            predictorSolver = @(funPredictor,s0) fsolve(funPredictor,s0,predictorOptions);
         end
-        opt_num_jac = optimoptions(options,'SpecifyObjectiveGradient',false);
-        num_jac_solver = @(fun,x0) fsolve(fun,x0,opt_num_jac);
+        optNumJac = optimoptions(options,'SpecifyObjectiveGradient',false);
+        numJacSolver = @(fun,x0) fsolve(fun,x0,optNumJac);
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations,'OutputFcn', outfun);
         else
-            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations,'OutputFcn', outfun);
+            options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',false,'FunctionTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations,'OutputFcn', outfun);
         end
         optfun = @(dscale) optimoptions(options,'TypicalX',dscale);
-        solver = @(fun,x0,dscale) fun_solver.s_lsqnonlin(fun,x0,optfun(dscale));
-        if Opt.predictor_solver
-            predictor_options = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solver_tol,'MaxIterations',Opt.solver_max_iterations);
-            predictor_solver = @(fun_predictor,s0) fun_solver.s_lsqnonline(fun_predictor,s0,predictor_options);
+        solver = @(fun,x0,dscale) funSolver.sLsqnonlin(fun,x0,optfun(dscale));
+        if Opt.predictorSolver
+            predictorOptions = optimoptions('lsqnonlin','display','off','SpecifyObjectiveGradient',true,'FunctionTolerance',Opt.solverTol,'MaxIterations',Opt.solverMaxIterations);
+            predictorSolver = @(funPredictor,s0) funSolver.sLsqnonline(funPredictor,s0,predictorOptions);
         end
-        opt_num_jac = optimoptions(options,'SpecifyObjectiveGradient',false);
-        num_jac_solver = @(fun,x0) fun_solver.s_lsqnonline(fun,x0,opt_num_jac);
+        optNumJac = optimoptions(options,'SpecifyObjectiveGradient',false);
+        numJacSolver = @(fun,x0) funSolver.sLsqnonline(fun,x0,optNumJac);
     elseif Opt.solver.newton
         %% basic newton solver
-        solver = @(fun,x0,dscale) fun_solver.basic_newton(fun,x0,dscale,output_flag,Opt);
-        if Opt.predictor_solver
-            predictor_Opt = Opt;
-            predictor_Opt.jacobian = true;
-            predictor_solver = @(fun_predictor,s0) fun_solver.basic_newton(fun_predictor,s0,1,predictor_Opt);
+        solver = @(fun,x0,dscale) funSolver.basicNewton(fun,x0,dscale,outputFlag,Opt);
+        if Opt.predictorSolver
+            predictorOpt = Opt;
+            predictorOpt.jacobian = true;
+            predictorSolver = @(funPredictor,s0) funSolver.basicNewton(funPredictor,s0,1,predictorOpt);
         end
-        opt_num_jac = Opt;
-        opt_num_jac.jacobian = false;
-        num_jac_solver = @(fun,x0) fun_solver.basic_newton(fun,x0,1,opt_num_jac);
+        optNumJac = Opt;
+        optNumJac.jacobian = false;
+        numJacSolver = @(fun,x0) funSolver.basicNewton(fun,x0,1,optNumJac);
     else
         %% error
         error('No such solver');
     end
-    default_solver_output = struct('iterations',inf,...
+    defaultSolverOutput = struct('iterations',inf,...
                                    'algorithm','non',...
                                    'tolerance',inf);
 end
 
-function stop = output_fun(x,optimValues,state)
+function stop = outputFun(x,optimValues,state)
     stop = false;
-    global solver_stepsizes;
+    global solverStepsizes;
     switch state
         case 'init'
-            solver_stepsizes = [];
+            solverStepsizes = [];
         case 'iter'
             iter = optimValues.iteration;               % Iteration
             normd = optimValues.stepsize;               % Norm of step
-            solver_stepsizes = [solver_stepsizes; iter normd];
+            solverStepsizes = [solverStepsizes; iter normd];
     end
 end
 
-function stop = do_nothing(x,optimValues,state)
+function stop = doNothing(x,optimValues,state)
     stop = false;
 end

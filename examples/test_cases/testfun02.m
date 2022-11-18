@@ -16,7 +16,7 @@ Np=2^8;                                                 % number of sampling poi
 lams = 0;                                             % lambda at start of continuation
 lame = 6;                                             % lambda at end of continuation
 ds0 = mu/100;                                           % start step length
-ds_max = mu/10;                                         % maximum step length
+dsMax = mu/10;                                         % maximum step length
 %% Calculation
 [G, H] = func_FourierMatrix(Nh,Np);
 

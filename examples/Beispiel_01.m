@@ -18,39 +18,39 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun08; % Pitchfork-Bifurkation
 % testfun09; % circle
 % testfun10; % NB-excitation gap-oszillator
-% testfun11; % basic test solver_force1it
+% testfun11; % basic test solverForce1it
 % testfun12; % parabola intersecting lines
 % testfun13; % y = sin(1/x)
-% testfun14; % Infinity, Test for (...,'plot','three_dim',...)
+% testfun14; % Infinity, Test for (...,'plot','threeDim',...)
 %% Solve:
-[var_all,l_all,exitflag,bifs,s_all,last_jacobian,break_fun_out] = ...
-    continuation(fun,v0,lams,lame,ds0,'ds_max',ds_max,'plot','on');
+[varAll,lAll,exitflag,bifs,sAll,lastJacobian,breakFunOut] = ...
+    continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere');
 
 %% Smoothen path
-% [X_interp] = aux.smoothen_path([var_all; l_all], s_all);
+% [XInterp] = aux.smoothenPath([varAll; lAll], sAll);
 
 %% plot smooth curves into figure
-% plot_method = 'on'; % 'on' or 'three_dim'
+% plotMethod = 'on'; % 'on' or 'threeDim'
 % 
-% l_interp = X_interp(end, :);
-% var_interp = X_interp(1:end-1,:);
+% lInterp = XInterp(end, :);
+% varInterp = XInterp(1:end-1,:);
 % 
-% if ~strcmp(plot_method, 'three_dim')
-%     num_pl = size(var_interp,1);
+% if ~strcmp(plotMethod, 'threeDim')
+%     numPl = size(varInterp,1);
 % else
-%     num_pl = 1;
+%     numPl = 1;
 % end
 % 
-% colors = cell(num_pl,1);        
-% for k = 1:num_pl
-%     colors(k) = {plot.get_RGB(k,num_pl+5,5)};
+% colors = cell(numPl,1);        
+% for k = 1:numPl
+%     colors(k) = {plot.getRGB(k,numPl+5,5)};
 % end
 % 
 % hold on;
-% if strcmp(plot_method, 'three_dim')
-%     pl = plot3(l_interp, var_interp(1,:), var_interp(2,:), 'LineStyle', ':', 'LineWidth', 2);
+% if strcmp(plotMethod, 'threeDim')
+%     pl = plot3(lInterp, varInterp(1,:), varInterp(2,:), 'LineStyle', ':', 'LineWidth', 2);
 %     set(pl, {'Color'}, colors);
 % else
-%     pl = plot(l_interp, var_interp, 'LineStyle', ':', 'LineWidth', 2);
+%     pl = plot(lInterp, varInterp, 'LineStyle', ':', 'LineWidth', 2);
 %     set(pl, {'Color'}, colors);
 % end

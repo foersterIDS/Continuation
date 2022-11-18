@@ -17,31 +17,31 @@ classdef StepSizeControlEvent < handle
             obj.stepsizeevents = cell(0);
         end
         
-        function obj = addEvent(obj,event_condition,needed_parameters,ds_min,ds_max,counter_max)
+        function obj = addEvent(obj,eventCondition,neededParameters,dsMin,dsMax,counterMax)
             arguments
                 obj
-                event_condition function_handle
-                needed_parameters (1,:) cell
-                ds_min (1,1) double {mustBePositive}
-                ds_max (1,1) double {mustBePositive,mustBeGreaterThan(ds_max,ds_min)}
-                counter_max (1,1) double {mustBeIntegerorInf(counter_max),mustBePositive} = [];
+                eventCondition function_handle
+                neededParameters (1,:) cell
+                dsMin (1,1) double {mustBePositive}
+                dsMax (1,1) double {mustBePositive,mustBeGreaterThan(dsMax,dsMin)}
+                counterMax (1,1) double {mustBeIntegerorInf(counterMax),mustBePositive} = [];
             end
             
             len = length(obj.stepsizeevents);
             idx = len + 1;
-            obj.stepsizeevents{idx}.condition = event_condition;
-            obj.stepsizeevents{idx}.needed_parameters = needed_parameters;
-            obj.stepsizeevents{idx}.ds_min = ds_min;
-            obj.stepsizeevents{idx}.ds_max = ds_max;
+            obj.stepsizeevents{idx}.condition = eventCondition;
+            obj.stepsizeevents{idx}.neededParameters = neededParameters;
+            obj.stepsizeevents{idx}.dsMin = dsMin;
+            obj.stepsizeevents{idx}.dsMax = dsMax;
             
             if nargin == 5
-                obj.stepsizeevents{idx}.counter_max = counter_max;
+                obj.stepsizeevents{idx}.counterMax = counterMax;
             end
         end
 
-        function event_object = getEvents(obj)
+        function eventObject = getEvents(obj)
             if ~isempty(obj.stepsizeevents)
-                event_object = obj.stepsizeevents;
+                eventObject = obj.stepsizeevents;
             else
                 error('Please first create StepSizeControlEvent object and add events to it.');
             end

@@ -4,35 +4,35 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,func,res_corr,Solver,Opt)
-    %% get fun_predictor:
+function [vp,lp,funPredictor,sp,ds] = predictor(Path,ds,solverJacobian,func,resCorr,Solver,Opt)
+    %% get funPredictor:
     if Opt.predictor.polynomial
-        if numel(Path.l_all)==1
-            fun_predictor = @(s) predictor.initial(Path,s,Opt);
+        if numel(Path.lAll)==1
+            funPredictor = @(s) predictor.initial(Path,s,Opt);
         else
             [nt,nf] = predictor.adaptive(Path,Opt);
             [fpt,Jpt] = predictor.taylor(Path,nt,nf);
-            fun_predictor = @(s) aux.fncHndToVal(s,fpt,Jpt);
+            funPredictor = @(s) aux.fncHndToVal(s,fpt,Jpt);
         end
     elseif Opt.predictor.tangential
-        if numel(Path.l_all)==1
-            fun_predictor = @(s) predictor.initial(Path,s,Opt);
+        if numel(Path.lAll)==1
+            funPredictor = @(s) predictor.initial(Path,s,Opt);
         else
-            fun_predictor = @(s) predictor.ode(Path,s,solver_jacobian,func,Opt);
+            funPredictor = @(s) predictor.ode(Path,s,solverJacobian,func,Opt);
         end
     else
         error('predictor not set or of unknown type');
     end
-    %% predictor_solver:
-    if Opt.predictor_solver
-        xi = [Path.var_all(:,end);Path.l_all(end)];
-        if Opt.enforce_ds_max
-            %% enforce_ds_max:
+    %% predictorSolver:
+    if Opt.predictorSolver
+        xi = [Path.varAll(:,end);Path.lAll(end)];
+        if Opt.enforceDsMax
+            %% enforceDsMax:
             p = 0.95;
-            fun_pred = @(s,ds) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds,solver_jacobian);
-            fun_ds_max = @(s,ds) heaviside(-min(Opt.ds_max*p-(fun_predictor(s)-xi)))*min(Opt.ds_max*p-(fun_predictor(s)-xi));
-            fun_solve = @(spds) [fun_pred(spds(1),spds(2));fun_ds_max(spds(1),spds(2))];
-            [spds,~,exitflag] = Solver.num_jac(fun_solve,[ds;ds]);
+            funPred = @(s,ds) aux.mergeArlePred(funPredictor,resCorr,s,xi,ds,solverJacobian);
+            funDsMax = @(s,ds) heaviside(-min(Opt.dsMax*p-(funPredictor(s)-xi)))*min(Opt.dsMax*p-(funPredictor(s)-xi));
+            funSolve = @(spds) [funPred(spds(1),spds(2));funDsMax(spds(1),spds(2))];
+            [spds,~,exitflag] = Solver.numJac(funSolve,[ds;ds]);
             if exitflag<=0
                 sp = ds;
             else
@@ -41,8 +41,8 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,func,re
             end
         else
             %% solve arc-length
-            fun_solve = @(s) aux.merge_arle_pred(fun_predictor,res_corr,s,xi,ds,solver_jacobian);
-            [sp,~,exitflag] = Solver.predictor(fun_solve,ds);
+            funSolve = @(s) aux.mergeArlePred(funPredictor,resCorr,s,xi,ds,solverJacobian);
+            [sp,~,exitflag] = Solver.predictor(funSolve,ds);
             if exitflag<=0
                 sp = ds;
             end
@@ -51,14 +51,14 @@ function [vp,lp,fun_predictor,sp,ds] = predictor(Path,ds,solver_jacobian,func,re
         sp = ds;
     end
     %% get predictor:
-    xip1 = fun_predictor(sp);
-    %% correct_predictor:
-    if Opt.correct_predictor && numel(Path.l_all)>1
-        dxi = [Path.var_all(:,end);Path.l_all(end)]-[Path.var_all(:,end-1);Path.l_all(end-1)];
-        dxip1 = xip1-[Path.var_all(:,end);Path.l_all(end)];
+    xip1 = funPredictor(sp);
+    %% correctPredictor:
+    if Opt.correctPredictor && numel(Path.lAll)>1
+        dxi = [Path.varAll(:,end);Path.lAll(end)]-[Path.varAll(:,end-1);Path.lAll(end-1)];
+        dxip1 = xip1-[Path.varAll(:,end);Path.lAll(end)];
         if dot(dxip1,dxi)<0 && ~sum(ds<0)
             dxip1 = -dxip1;
-            xip1 = [Path.var_all(:,end);Path.l_all(end)]+dxip1;
+            xip1 = [Path.varAll(:,end);Path.lAll(end)]+dxip1;
         end
     end
     %% make output:
