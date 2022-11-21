@@ -20,8 +20,8 @@ eventObj = StepSizeControlEvent();
 
 % Add first event
 % set new dsMax to be 5e-2 when lambda is between 1 and 1.4
-eventCondition = @(Path) Path.lAll(end) >= 1 && Path.lAll(end) <= 1.4;
-eventNeededParameters = {'Path'};
+eventCondition = @(Path,dsCurrent) Path.lAll(end)+dsCurrent/3 >= 1 && Path.lAll(end)+dsCurrent/3 <= 1.4;
+eventNeededParameters = {'Path','dsCurrent'};
 eventDsMin = dsMin;
 eventDsMax = 1e-3;
 eventCounterMax = 1;
@@ -29,8 +29,8 @@ eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eve
 
 % Add second event
 % set new dsMax to be 1 when lambda is greater than 3
-eventCondition = @(Path) Path.lAll(end) > 3;
-eventNeededParameters = {'Path'};
+eventCondition = @(Path,dsCurrent) Path.lAll(end)+dsCurrent/3 > 3;
+eventNeededParameters = {'Path','dsCurrent'};
 eventDsMin = dsMin;
 eventDsMax = 1e-2;
 eventCounterMax = 1;
@@ -50,7 +50,7 @@ eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eve
 figure('Units','normalized','Position',[0.2,0.2,0.6,0.6]);
 
 ds = [0,sAll(2:end) - sAll(1:end-1)];
-pl(1) = plot(lAll, ds,'b--x',LineWidth=2); hold on;
+pl(1) = plot(lAll, ds,'bo',LineWidth=2); hold on;
 xlabel('$\lambda$',Interpreter='latex');
 ylabel('$\Delta s(\lambda)$',Interpreter='latex');
 xl = xlim();
@@ -60,5 +60,5 @@ pl(3) = fill([3, xl(2), xl(2), 3],[yl(1),yl(1),yl(2),yl(2)],'g','EdgeColor','non
 pl(4) = fill([xl(1), 1, 1, xl(1)],[yl(1),yl(1),yl(2),yl(2)],[0.5,0.5,0.5],'EdgeColor','none','FaceAlpha',0.4);
 fill([1.4, 3, 3, 1.4],[yl(1),yl(1),yl(2),yl(2)],[0.5,0.5,0.5],'EdgeColor','none','FaceAlpha',0.4);
 uistack(pl(1),'top');
-legend(pl(1:4),'used stepsize','event 1', 'event 2', 'no event');
+legend(pl(1:4),'used stepsize','Event #1', 'Event #2', 'no event active');
 fontsize(gcf, 13, 'points')

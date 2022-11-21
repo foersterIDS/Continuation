@@ -34,7 +34,9 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                     % fill variables struct
                     % in the first run, fill with all possible variables
                     if isempty(event.eventObj)
-                        event.variables.ds = ds;
+                        event.variables.dsCurrent = ds;
+                        event.variables.dsMinCurrent = Opt.dsMin;
+                        event.variables.dsMaxCurrent = Opt.dsMax;
                         event.variables.Counter = Counter;
                         event.variables.Solver = Solver;
                         event.variables.Path = Path;
@@ -53,7 +55,16 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % loop through names of needed variables and save
                         % them on event.variables
                         for k = 1:length(event.namesOfNeededVariables)
+                            switch event.namesOfNeededVariables{k}
+                                case 'dsCurrent'
+                                    event.variables.dsCurrent = ds;
+                                case 'dsMinCurrent'
+                                    event.variables.dsMinCurrent = Opt.dsMin;
+                                case 'dsMaxCurrent'
+                                    event.variables.dsMaxCurrent = Opt.dsMax;
+                                otherwise
                             event.variables.(event.namesOfNeededVariables{k}) = eval(event.namesOfNeededVariables{k});
+                            end
                         end
                     end
 
