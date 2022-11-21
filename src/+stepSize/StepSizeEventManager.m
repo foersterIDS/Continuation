@@ -58,7 +58,7 @@ classdef StepSizeEventManager < handle
                 %
                 % new stepsize is old stepsize
                 %
-                dsNew.use = dsCurrent;
+                dsNew.ds = dsCurrent;
                 %
                 % set dsMax and dsMin to initial values
                 %
