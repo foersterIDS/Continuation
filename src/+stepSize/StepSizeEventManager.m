@@ -119,6 +119,7 @@ classdef StepSizeEventManager < handle
     end
     methods (Access = private)
         function newStepsizes = setStepsize(obj,isActive,dsCurrent)
+            dominatingEvent = NaN;
             ds = inf;
             newStepsizes.dsMax = [];
             newStepsizes.dsMin = [];
@@ -136,6 +137,9 @@ classdef StepSizeEventManager < handle
                     % set min and max stepsize
                     newStepsizes.dsMax = obj.allEvents{k}.get('dsMax');
                     newStepsizes.dsMin = obj.allEvents{k}.get('dsMin');
+
+                    % save event number
+                    dominatingEvent = k;
                 end
             end
             %
@@ -145,6 +149,12 @@ classdef StepSizeEventManager < handle
                 newStepsizes.ds = dsCurrent;
             else
                 newStepsizes.ds = ds;
+            end
+            %
+            % increase event counter
+            %
+            if ~isnan(dominatingEvent)
+                obj.allEvents{dominatingEvent}.increaseCounter();
             end
         end
     end

@@ -67,6 +67,10 @@ classdef StepSizeSingleEvent < handle
             output = (obj.counter < obj.counterMax);
         end
 
+        function increaseCounter(obj)
+            obj.counter = obj.counter + 1;
+        end
+
         function value = get(obj,propertyName)
             value = obj.(propertyName);
         end

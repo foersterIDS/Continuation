@@ -185,9 +185,9 @@ function EI = calcError(Solver,Path,Opt,previous)
     %
     %% errors
     %
-    eI = (wTarget - wI)./wTarget;    
+    eI = (wI - wTarget)./wTarget;    
     %
     %% weighted error sum
     %
-    EI = (eI * weights)/sum(weights);
+    EI = -(eI * weights)/sum(abs(weights));
 end
