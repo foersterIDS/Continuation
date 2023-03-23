@@ -4,10 +4,10 @@
 %   Leibniz University Hannover
 %   25.11.2020 - Alwin Förster
 %
-function [ rgb ] = get_RGB( value, maxvalue, minvalue, cm_name )
+function [ rgb ] = getRGB( value, maxvalue, minvalue, cm_name )
     value = value(:);
     if nargin<4
-        cm_name = 'parula';
+        cm_name = 'viridis';
     elseif nargin<3
         error('not enough input arguments');
     elseif nargin>4
