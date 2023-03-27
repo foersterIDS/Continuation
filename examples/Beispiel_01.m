@@ -26,11 +26,17 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 [varAll,lAll,exitflag,bifs,sAll,lastJacobian,breakFunOut] = ...
     continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere');
 
-%% Smoothen path
-% [XInterp] = aux.smoothenPath([varAll; lAll], sAll);
-
-%% plot smooth curves into figure
+% %% Smoothen path
+% XInterp = aux.smoothenPath([varAll; lAll], sAll);
+% 
+% % plot smooth curves into figure
 % plotMethod = 'on'; % 'on' or 'threeDim'
+% 
+% axPrev = gca;
+% 
+% fig = figure('units', 'normalized', 'position', [0.2,0.3,0.6,0.5]);
+% 
+% copyobj(axPrev,fig);
 % 
 % lInterp = XInterp(end, :);
 % varInterp = XInterp(1:end-1,:);
@@ -43,14 +49,15 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % 
 % colors = cell(numPl,1);        
 % for k = 1:numPl
-%     colors(k) = {plot.getRGB(k,numPl+5,5)};
+%     colors(k) = {plot.getRGB(k,numPl,1)};
 % end
 % 
 % hold on;
+% cla;
 % if strcmp(plotMethod, 'threeDim')
-%     pl = plot3(lInterp, varInterp(1,:), varInterp(2,:), 'LineStyle', ':', 'LineWidth', 2);
+%     pl = plot3(lInterp, varInterp(1,:), varInterp(2,:), 'LineStyle', '-', 'LineWidth', 2);
 %     set(pl, {'Color'}, colors);
 % else
-%     pl = plot(lInterp, varInterp, 'LineStyle', ':', 'LineWidth', 2);
+%     pl = plot(lInterp, varInterp, 'LineStyle', '-', 'LineWidth', 2);
 %     set(pl, {'Color'}, colors);
 % end

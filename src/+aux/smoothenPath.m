@@ -84,12 +84,33 @@ function [XInterp,sInterp] = smoothenPath(XData, sData, varargin)
             error('Wrong optional input!');
         end
     end
-    %
-    if ~isnan(number)
-        sInterp = linspace(sData(1), sData(end), number);
-    else
-        sInterp = sData(1):increment:sData(end);
+    
+    %% Iteration der Interpolation
+    diffS = inf;
+    tolS = 1e-6;
+    maxIt = 10;
+    kIt = 0;
+
+    while diffS > tolS && kIt < maxIt
+        if ~isnan(number)
+            sInterp = linspace(sData(1), sData(end), number);
+        else
+            sInterp = sData(1):increment:sData(end);
+        end
+
+        % Calculate interpolated points of curve
+        XInterp = (interp1(sData, XData.', sInterp, method)).';
+
+        % With those recalculate arclength
+        sInterp = [0,cumsum(sqrt(sum((XInterp(:,2:end) - XInterp(:,1:end-1)).^2,1)))];
+
+        % caculate difference in covered arclength
+        diffS = abs(sData(end) - sInterp(end));
+
+        % update
+        sData = sInterp;
+        XData = XInterp;
+
+        kIt = kIt + 1;
     end
-    %
-    XInterp = (interp1(sData, XData.', sInterp, method)).';
 end
