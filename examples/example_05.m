@@ -41,16 +41,18 @@ eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eve
 
 % basic options & plot on (predictor tangential, dsMin/max) & activate
 % event based step size control
-[varAll,lAll,exitflag,~,sAll] = continuation(fun,var0,lStart,lEnd,ds0,'plot','on',...
+disp('Doing continuation...');
+[varAll,lAll,exitflag,~,sAll] = continuation(fun,var0,lStart,lEnd,ds0,'plot','detail',...
                                                                       'predictor','tangential',...
                                                                       'dsMin',dsMin,'dsMax',dsMax,...
                                                                       'stepSizeEvent',true,...
                                                                       'eventUserInput',eventObj.getEvents);
-%% Also plot used stepsize
-figure('Units','normalized','Position',[0.2,0.2,0.6,0.6]);
+%% Plot
+disp('Creating plot...');
+figure('Units','normalized','Position',[0.05,0.1,0.9,0.8]);
 
 ds = [0,sAll(2:end) - sAll(1:end-1)];
-pl(1) = plot(lAll, ds,'bo',LineWidth=2); hold on;
+pl(1) = stairs(lAll, ds,'b-.x',LineWidth=2); hold on;
 xlabel('$\lambda$',Interpreter='latex');
 ylabel('$\Delta s(\lambda)$',Interpreter='latex');
 xl = xlim();
