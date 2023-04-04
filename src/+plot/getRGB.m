@@ -7,7 +7,7 @@
 function [ rgb ] = getRGB( value, maxvalue, minvalue, cm_name )
     value = value(:);
     if nargin<4
-        cm_name = 'viridis';
+        cm_name = 'plot.viridis';
     elseif nargin<3
         error('not enough input arguments');
     elseif nargin>4
