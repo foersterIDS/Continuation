@@ -169,7 +169,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             nPath = numel(Path.lAll);
             Remove.s = Path.sAll(nPath);
             nRmv = min([2*Opt.removeErrorCounter,nPath-1]);
-            Opt.dsMax = max([mean(diff(Path.sAll(nPath+((-ceil(nRmv/2)+1):0))))*0.75,Opt.dsMin]);
+            Opt.dsMax = max([mean(diff(Path.sAll(nPath+((-ceil(nRmv/2)+1):0))))*0.75,Opt.dsMin,Opt.dsMin*10]);
             Path.varAll(:,nPath+((-nRmv+1):0)) = [];
             Path.lAll(nPath+((-nRmv+1):0)) = [];
             Path.sAll(nPath+((-nRmv+1):0)) = [];
