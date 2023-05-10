@@ -155,7 +155,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         %
         try
             dscale = aux.getDscale(Opt,Path);
-            if sign(Path.lAll(end)-Opt.lTarget)*sign(lPredictor-Opt.lTarget)<=0
+            if sign(Path.lAll(end)-Opt.lTarget)*sign(lPredictor*1.1-Opt.lTarget)<=0
                 %% try to converge to target
                 residualTarget = @(v) aux.residualFixedValue(func,v,Opt.lTarget,Opt);
                 varPredictorCtt = (varPredictor - Path.varAll(:,end))*(abs(Opt.lTarget-Path.lAll(end))/abs(lPredictor-Path.lAll(end)))+Path.varAll(:,end);
