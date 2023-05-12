@@ -41,6 +41,9 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     clear('var0','lStart','lEnd','ds0');
     resCorr = continuation.corrector(fun,Opt);
     ds = Info.ds0;
+    if ~Opt.jacobian
+        aux.printLine(Opt,'Using finite differences to calculate Jacobian...\n');
+    end
     aux.printLine(Opt,'Starting path continuation...\n');
     if Opt.dpaGammaVar
         paraName = 'g';
