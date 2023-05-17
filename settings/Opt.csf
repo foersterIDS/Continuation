@@ -76,6 +76,7 @@ stepSizePidTol<>double<>0.05<>#scalar#double#positive
 stopOnBifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
 stopOnCrossing<>eval<>false<>#scalar#logical#ison:bifurcation
 suspendContinuationErrorCounter<>double<>10<>#scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+targetTol<>double<>0<>#scalar#double#positive
 weightsAngleCustom<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
 weightsAngleChange<>eval<>[0.5,0.3]<>#array#positive#double#size:[1,2]
 weightsError<>eval<>[0.5,0.05,0.1,0.3,0.05]<>#array#positive#double#size:[1,5]
