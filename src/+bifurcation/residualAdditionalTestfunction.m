@@ -1,16 +1,19 @@
-%% path continuation - bifurcation.residual
+%% path continuation - bifurcation.residualAdditionalTestfunction
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
-%   27.10.2020 - Alwin Förster
+%   25.05.2023 - Anna Lefken
 %
-function [R] = residual_additional_testfunction(func,x,Opt,Jacobian,Path,Info)
+function [R] = residualAdditionalTestfunction(func,x,Opt,Jacobian,Path,Info)
     if Opt.jacobian
         [R1,~] = func(x(1:Info.nv),x(Info.nv+1));
     else
         R1 = func(x(1:end-1),x(end));
         
     end
-    R2 = Opt.bifAdditionalTestfunction(func,x,Jacobian,Path,Info);
+     % evaluate Jacobian for every new x
+     % cannot use input "Jacobian", as this is evaluated at the last path step
+    Jacobianbif.solver=aux.numericJacobian(@(x)func(x(1:end-1),x(end)), x,'diffquot', Opt.diffquot);                  
+    R2 = Opt.bifAdditionalTestfunction(func,x,Jacobianbif,Path,Info);
     R = [R1;R2];
 end

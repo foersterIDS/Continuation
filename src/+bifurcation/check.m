@@ -4,6 +4,7 @@
 %   Leibniz University Hannover
 %   26.05.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
+%   25.05.2023 - Anna Lefken
 %
 function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,resCorr,Solver,Opt,OptIsSet)
     Bifurcation.flag = 0;
@@ -142,10 +143,14 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                     dscale = aux.getDscale(Opt,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
                     [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
                     if bifSolverExitflag>0
-%                         Path.sAll = [Path.sAll(1:end-1),Path.sAll(end-1)+[norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)]),norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)])+norm([Path.varAll(:,end);Path.lAll(end)]-xBif)]];
-%                         Path.varAll = [Path.varAll(:,1:end-1),xBif(1:end-1),Path.varAll(:,end)];
-%                         Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
-%                         Path.biftestValue=[Path.biftestValue(1:end-1) Opt.bifAdditionalTestfunction(func,xBif,Jacobian,Path,Info),Path.biftestValue(end)];
+                        xBif=real(xBif);            % very small imaginary parts (probably caused by numeric differences)
+                                                    % lead to errors in following code
+                        Path.sAll = [Path.sAll(1:end-1),Path.sAll(end-1)+[norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)]),norm(xBif-[Path.varAll(:,end-1);Path.lAll(end-1)])+norm([Path.varAll(:,end);Path.lAll(end)]-xBif)]];
+                        Path.varAll = [Path.varAll(:,1:end-1),xBif(1:end-1),Path.varAll(:,end)];
+                        Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
+                        % jacobian for xBif
+                        Jacobianbif.solver=aux.numericJacobian(@(x)func(x(1:end-1),x(end)), xBif,'diffquot', Opt.diffquot); 
+                        Path.biftestValue=[Path.biftestValue(1:end-1) Opt.bifAdditionalTestfunction(func,xBif,Jacobianbif,Path,Info),Path.biftestValue(end)];
                         % 
                         % get type of bifurcation
                         bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
