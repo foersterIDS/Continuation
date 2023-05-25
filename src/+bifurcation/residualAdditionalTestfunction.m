@@ -11,6 +11,6 @@ function [R] = residual_additional_testfunction(func,x,Opt,Jacobian,Path,Info)
         R1 = func(x(1:end-1),x(end));
         
     end
-    R2 = Opt.bif_additional_testfunction(func,x,Jacobian,Path,Info);
+    R2 = Opt.bifAdditionalTestfunction(func,x,Jacobian,Path,Info);
     R = [R1;R2];
 end
