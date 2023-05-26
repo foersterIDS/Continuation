@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-%   [varAll,lAll,exitflag,Bifurcation] = continuation(fun,var0,lStart,lEnd,ds0,varargin)
+%   [varAll,lAll,exitflag,Bifurcation] = continuation(fun,var0,lStart,lEnd,ds0,NameValueArgs)
 %
 %   fun = fun(var,l) != 0
 %   lStart <= l <= lEnd
@@ -28,11 +28,109 @@
 %
 %%
 function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut] = ...
-    continuation(fun,var0,lStart,lEnd,ds0,varargin)
+    continuation(fun,var0,lStart,lEnd,ds0,NameValueArgs)
+    %% arguments
+    %
+    arguments
+        fun (1,1) function_handle
+        var0 (:,1) double
+        lStart (1,1) double
+        lEnd (1,1) double
+        ds0 (1,1) double {mustBeGreaterThan(ds0,0)}
+        NameValueArgs.Opt (1,1) struct
+        NameValueArgs.adaptCorrector (1,:) char {mustBeMember(NameValueArgs.adaptCorrector,{'basic','solve'})}
+        NameValueArgs.alphaReverse (1,1) double {mustBeGreaterThan(NameValueArgs.alphaReverse,0)}
+        NameValueArgs.approveManually {validation.scalarLogical} % #scalar#logical#ison:plot#ison:display|#scalar#double#ison:plot#ison:display
+        NameValueArgs.bifurcation (1,:) char {mustBeMember(NameValueArgs.bifurcation,{'on','off','mark','determine','trace','parameterTrace'})}
+        NameValueArgs.bifRandDir {validation.scalarLogical}
+        NameValueArgs.bifAdditionalTestfunction (1,1) function_handle
+        NameValueArgs.bifResidual (1,:) char {mustBeMember(NameValueArgs.bifResidual,{'determinant','luFactorization'})}
+        NameValueArgs.breakFunction (1,1) function_handle
+        NameValueArgs.checkResidual {validation.scalarLogical}
+        NameValueArgs.checkStepSizeOptions {validation.scalarLogical}
+        NameValueArgs.closedCurveDetection {validation.scalarLogical}
+        NameValueArgs.corrector (1,:) char {mustBeMember(NameValueArgs.corrector,{'sphere','orthogonal','orthogonal2','ellipsoid','ellipsoid2','unique','paraboloid'})}
+        NameValueArgs.correctorOrthogonalMethod (1,:) char {mustBeMember(NameValueArgs.correctorOrthogonalMethod,{'secant','tangent'})}
+        NameValueArgs.correctPredictor {validation.scalarLogical}
+        NameValueArgs.deflation {validation.scalarLogical}
+        NameValueArgs.deflationErrorCounter (1,1) double {mustBeGreaterThan(NameValueArgs.deflationErrorCounter,0)}
+        NameValueArgs.diffquot (1,:) char {mustBeMember(NameValueArgs.diffquot,{'forward','central'})}
+        NameValueArgs.direction (:,1) double % #scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
+        NameValueArgs.display {validation.scalarLogical}
+        NameValueArgs.dpa {validation.scalarLogical} % #scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true#ison:plot.dpa
+        NameValueArgs.dpaGammaVar {validation.scalarLogical} % #scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
+        NameValueArgs.dpaResidual (1,1) function_handle % #nargin:3
+        NameValueArgs.dsMax (:,1) double {mustBeGreaterThan(NameValueArgs.dsMax,0)} % #scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
+        NameValueArgs.dsMin (1,1) double {mustBeGreaterThan(NameValueArgs.dsMin,0)} % #scalar#double#positive#smaller:norm(Opt.dsMax)
+        NameValueArgs.dsTol (1,2) double {mustBePositive} % #array#positive#double#increasing#size:[1,2]
+        NameValueArgs.dscale0 (:,1) double {mustBeGreaterThan(NameValueArgs.dscale0,0)} % #array#positive#nonzero#double#size:[numel(var0)+1,1]
+        NameValueArgs.dscaleMin (:,1) double {mustBeGreaterThan(NameValueArgs.dscaleMin,0)} % #scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
+        NameValueArgs.enforceDsMax {validation.scalarLogical} % #ison:predictorSolver
+        NameValueArgs.eventUserInput (1,:) cell
+        NameValueArgs.g0 (1,1) double
+        NameValueArgs.gTarget (1,1) double
+        NameValueArgs.homotopy (1,:) char {mustBeMember(NameValueArgs.homotopy,{'on','off','f2','fix','fixnt','newton','squared'})}
+        NameValueArgs.homotopyErrorCounter (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.homotopyErrorCounter,0)} % #neq:Opt.deflationErrorCounter
+        NameValueArgs.includeReverse {validation.scalarLogical}
+        NameValueArgs.initialDeflationPoints (1,1) double
+        NameValueArgs.jacobian {validation.scalarLogical}
+        NameValueArgs.l0 (1,1) double
+        NameValueArgs.lTarget (1,1) double
+        NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
+        NameValueArgs.maxClosedCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxClosedCounter,0)}
+        NameValueArgs.maxErrorCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxErrorCounter,0)}
+        NameValueArgs.maxRemoveCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxRemoveCounter,0)}
+        NameValueArgs.maxStepSizeChange (1,1) double {mustBeGreaterThan(NameValueArgs.maxStepSizeChange,1)}
+        NameValueArgs.nBifSearch (1,1) double {mustBeGreaterThan(NameValueArgs.nBifSearch,0)}
+        NameValueArgs.nIterOpt (1,1) double {mustBeGreaterThan(NameValueArgs.nIterOpt,0)}
+        NameValueArgs.nStepMax (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.nStepMax,0)}
+        NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeSmallerThan(NameValueArgs.optimalContractionRate,1)}
+        NameValueArgs.plot (1,:) char {mustBeMember(NameValueArgs.plot,{'on','off','basic','detail','dpa','semilogx','semilogy','loglog','threeDim'})}
+        NameValueArgs.plotPause {validation.scalarLogical} % #scalar#positive#nonzero#integer|#scalar#logical
+        NameValueArgs.plotVarOfInterest (1,1) double {mustBeGreaterThan(NameValueArgs.plotVarOfInterest,0)} % #scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
+        NameValueArgs.plotVarsIndex (1,:) double % #array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
+        NameValueArgs.predictor (1,:) char {mustBeMember(NameValueArgs.predictor,{'polynomial','tangential'})}
+        NameValueArgs.predictorDistance (1,1) double {mustBeGreaterThan(NameValueArgs.predictorDistance,0)}
+        NameValueArgs.predictorPolynomialAdaptive {validation.scalarLogical}
+        NameValueArgs.predictorPolynomialFit (1,1) double {mustBeInteger,mustBePositive}
+        NameValueArgs.predictorPolynomialDegree (1,1) double {mustBeGreaterThan(NameValueArgs.predictorPolynomialDegree,0)}
+        NameValueArgs.predictorSolver {validation.scalarLogical}
+        NameValueArgs.removeErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter#neq:Opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
+        NameValueArgs.reverse  (1,:) char {mustBeMember(NameValueArgs.reverse,{'angle','jacobian'})}
+        NameValueArgs.scaling (1,:) char {mustBeMember(NameValueArgs.scaling,{'dynamicdscale','staticdscale'})}
+        NameValueArgs.solver (1,:) char {mustBeMember(NameValueArgs.solver,{'fsolve','lsqnonlin','newton'})}
+        NameValueArgs.solverForce1it {validation.scalarLogical}
+        NameValueArgs.solverMaxIterations (1,1) double {mustBeGreaterThan(NameValueArgs.solverMaxIterations,0),mustBeInteger}
+        NameValueArgs.solverTol (1,1) double {mustBeGreaterThan(NameValueArgs.solverTol,0)}
+        NameValueArgs.speedOfContinuation (1,1) double {mustBeGreaterThan(NameValueArgs.speedOfContinuation,0)}
+        NameValueArgs.stepbackErrorCounter (1,1) double {mustBePositive,mustBeInteger,mustBeGreaterThan(NameValueArgs.stepbackErrorCounter,0)} % #neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+        NameValueArgs.stepSizeAngle (1,1) double {mustBePositive}
+        NameValueArgs.stepSizeControl (1,:) char {mustBeMember(NameValueArgs.stepSizeControl,{'angleChange','angleCustom','contraction','error','errorAlt','fayezioghani','fix','iterationsExponential','iterationsPolynomial','multiplicative','multiplicativeAlt','pidCustom','pidValli','szyszkowski','yoon'})}
+        NameValueArgs.stepSizeErrorMax (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeErrorMax,0)}
+        NameValueArgs.stepSizeErrorPd (1,:) double {mustBePositive}
+        NameValueArgs.stepSizeEvent {validation.scalarLogical}
+        NameValueArgs.stepSizeIterationsBeta (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeIterationsBeta,0),mustBeSmallerThan(NameValueArgs.stepSizeIterationsBeta,2)}
+        NameValueArgs.stepSizeExponentialWeight (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeExponentialWeight,0)}
+        NameValueArgs.stepSizePidParams (1,3) double {mustBeGreaterThan(NameValueArgs.stepSizePidParams,0)}
+        NameValueArgs.stepSizePidTol (1,1) double {mustBePositive}
+        NameValueArgs.stopOnBifurcation {validation.scalarLogical} % #ison:bifurcation
+        NameValueArgs.stopOnCrossing {validation.scalarLogical} % #ison:bifurcation
+        NameValueArgs.suspendContinuationErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+        NameValueArgs.targetTol (1,1) double {mustBePositive}
+        NameValueArgs.weightsAngleCustom (1,2) double {mustBePositive}
+        NameValueArgs.weightsAngleChange (1,2) double {mustBePositive}
+        NameValueArgs.weightsError (1,5) double {mustBePositive}
+        NameValueArgs.weightsFayezioghani (1,2) double {mustBePositive}
+        NameValueArgs.weightsMultiplicative (1,5) double {mustBePositive}
+        NameValueArgs.weightsSzyszkowski (1,2) double {mustBePositive}
+        NameValueArgs.weightsYoon (1,1) double {mustBePositive}
+    end
+    nameValueArgsCell = aux.struct2cellPreserveFieldnames(NameValueArgs);
+    %
     %% initialize
     %
     warning on;
-    [Opt,ds0,OptIsSet,func] = continuation.input(varargin,fun,var0,lStart,lEnd,ds0);
+    [Opt,ds0,OptIsSet,func] = continuation.input(nameValueArgsCell,fun,var0,lStart,lEnd,ds0);
     [Opt,ds0,StepsizeOptions] = stepSize.initialize(Opt,var0,lStart,lEnd,ds0);
     if StepsizeOptions.rateOfContraction
         global solverStepsizes;
