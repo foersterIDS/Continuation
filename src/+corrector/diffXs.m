@@ -1,10 +1,10 @@
-%% path continuation - corrector.diff_xs
+%% path continuation - corrector.diffXs
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
 %
-function [dxs] = diff_xs(xs)
+function [dxs] = diffXs(xs)
     if length(xs(1,:))==1
         n = length(xs(:,1));
         dxs = [zeros(n-1,1);1];

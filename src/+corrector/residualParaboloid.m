@@ -1,11 +1,11 @@
-%% path continuation - corrector.residual_paraboloid
+%% path continuation - corrector.residualParaboloid
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   29.12.2021 - Alwin Förster
 %
-function [residual,jacobian] = residual_paraboloid(x,x_all,ds,Opt)
-    [b,a] = size(x_all);    
+function [residual,jacobian] = residualParaboloid(x,xAll,ds,Opt)
+    [b,a] = size(xAll);    
     %% approximate tangent with secant
     %
     if a == 1
@@ -15,11 +15,11 @@ function [residual,jacobian] = residual_paraboloid(x,x_all,ds,Opt)
         else
             sec = Opt.direction * ds;
         end
-        xip1 = x_all(:,end) + sec;
+        xip1 = xAll(:,end) + sec;
     else
-        sec = x_all(:,end) - x_all(:,end-1);
+        sec = xAll(:,end) - xAll(:,end-1);
         sec = ds*sec/sqrt(sum(sec.^2));
-        xi = x_all(:,end);
+        xi = xAll(:,end);
         xip1 = xi + sec;
     end
     %
@@ -31,12 +31,12 @@ function [residual,jacobian] = residual_paraboloid(x,x_all,ds,Opt)
     %% calc. squared value
     %
     sf = (ds/10)^2/ds; % scaling factor
-    r_para = -sum((chi-xip1).^2./sf);
-    x_para = chi+sec*r_para;
+    rPara = -sum((chi-xip1).^2./sf);
+    xPara = chi+sec*rPara;
     %
     %% calc. residual
     %
-    residual = norm(x_para-x);
+    residual = norm(xPara-x);
     jacobian = norm(sec)*(-(sec.'/(sec.'*sec))-sum((2*diag(x+sec*(-(sec.'/(sec.'*sec))*(x-xip1))-xip1)*(eye(b)+sec*(-(sec.'/(sec.'*sec))*eye(b))))./sf));
     %
 end

@@ -1,19 +1,19 @@
-%% path continuation - plot.get_RGB
+%% path continuation - plot.getRGB
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   25.11.2020 - Alwin Förster
 %
-function [ rgb ] = getRGB( value, maxvalue, minvalue, cm_name )
+function [ rgb ] = getRGB( value, maxvalue, minvalue, cmName )
     value = value(:);
     if nargin<4
-        cm_name = 'plot.viridis';
+        cmName = 'plot.viridis';
     elseif nargin<3
         error('not enough input arguments');
     elseif nargin>4
         error('to many input arguments');
     end
-    cm = colormap(cm_name);
+    cm = colormap(cmName);
     Pcm = linspace(0,1,numel(cm(:,1)))';
     if maxvalue<minvalue
         temp = minvalue;
