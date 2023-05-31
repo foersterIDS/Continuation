@@ -240,11 +240,13 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %
     if Purpose.continuation
         % out:
-        try
-            [R,J] = fun(var0,lStart);
-            Opt.jacobian = true;
-        catch
-            Opt.jacobian = false;
+        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+            try
+                [R,J] = fun(var0,lStart);
+                Opt.jacobian = true;
+            catch
+                Opt.jacobian = false;
+            end
         end
         % in:
         if abs(nargin(fun))~=2
@@ -254,11 +256,13 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         end
     elseif Purpose.parameterTracing
         % out:
-        try
-            [R,J] = fun(var0,lStart,Opt.g0);
-            Opt.jacobian = true;
-        catch
-            Opt.jacobian = false;
+        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+            try
+                [R,J] = fun(var0,lStart,Opt.g0);
+                Opt.jacobian = true;
+            catch
+                Opt.jacobian = false;
+            end
         end
         % in:
         if abs(nargin(fun))~=3
@@ -272,11 +276,13 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         end
     elseif Purpose.homotopy
         % out:
-        try
-            [R,J] = fun(var0);
-            Opt.jacobian = true;
-        catch
-            Opt.jacobian = false;
+        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+            try
+                [R,J] = fun(var0);
+                Opt.jacobian = true;
+            catch
+                Opt.jacobian = false;
+            end
         end
         % in:
         if abs(nargin(fun))~=1
