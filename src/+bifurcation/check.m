@@ -14,7 +14,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
     if Opt.bifurcation.mark
         %% mark bifurcations:
         signDetCurrentJacobianRed = sign(det(lastJacobianRed));
-        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && prod(size(Jacobian.previous)==size(Jacobian.last))
             bifFound=1;
             signDetCurrentJacobian = sign(det(Jacobian.last));
             bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
