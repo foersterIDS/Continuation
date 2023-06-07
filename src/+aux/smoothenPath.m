@@ -34,6 +34,11 @@
 function [XInterp,sInterp] = smoothenPath(XData, sData, varargin)
     %
     varLen = nargin - 2;
+    if numel(XData(1,:))>1
+        XLast = XData(:,end);
+    else
+        XLast = [];
+    end
     %
     if mod(varLen,2) ~= 0
         error('There must be an even number of optional inputs!');
@@ -113,4 +118,7 @@ function [XInterp,sInterp] = smoothenPath(XData, sData, varargin)
 
         kIt = kIt + 1;
     end
+    %% Last point
+    XInterp = [XInterp,XLast];
+    sInterp = [sInterp,norm(diff(XInterp(:,end+(-1:0)),1,2))];
 end
