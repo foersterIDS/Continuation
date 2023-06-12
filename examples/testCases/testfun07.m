@@ -1,4 +1,4 @@
-addpath('testCases\testfun07_aux');
+addpath('testCases/testfun07_aux');
 n = 500;
 fun = @(v,l) residual_fun07(v,l,n);
 lams = 0;

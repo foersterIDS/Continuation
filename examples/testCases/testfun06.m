@@ -1,4 +1,4 @@
-addpath('testCases\testfun06_aux');
+addpath('testCases/testfun06_aux');
 %Nres = 5;
 %fun = @(v,l) residual_fun06(v,l,Nres);
 fun = @(v,l) residual_fun06(v,l);

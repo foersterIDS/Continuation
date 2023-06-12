@@ -1,4 +1,4 @@
-addpath('testCases\testfun14_aux');
+addpath('testCases/testfun14_aux');
 
 a = 5;
 is_jacobian = 1;

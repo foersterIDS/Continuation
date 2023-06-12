@@ -1,4 +1,4 @@
-addpath('testCases\testfun12_aux');
+addpath('testCases/testfun12_aux');
 
 v0 = [-1;0;0];
 % v0 = -1;

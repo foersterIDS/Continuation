@@ -5,7 +5,7 @@ clc;
 if(~isdeployed)
   cd(fileparts(which('Beispiel_03.m')));
 end
-addpath('..\src');
+addpath('../src');
 addpath('testCases');
 %% Test functions:
 testfun03; % Stochastic Duffing

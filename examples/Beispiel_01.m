@@ -5,7 +5,7 @@ clc;
 if(~isdeployed)
   cd(fileparts(which('Beispiel_01.m')));
 end
-addpath('..\src');
+addpath('../src');
 addpath('testCases');
 %% Test functions:
 % testfun01; % 0=!v.^2+5-exp((1/l)*v)

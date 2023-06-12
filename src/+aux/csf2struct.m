@@ -14,7 +14,7 @@ function [structOut,structInfoOut,evalCell] = csf2struct(structName)
     %% set path
     %
     tempPath = mfilename('fullpath');
-    structPath = [tempPath(1:(numel(tempPath)-19)),'settings\',structName,'.csf'];
+    structPath = [tempPath(1:(numel(tempPath)-19)),'settings/',structName,'.csf'];
     clear tempPath;
     %
     %% initialize
