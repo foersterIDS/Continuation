@@ -45,6 +45,7 @@ nBifSearch<>double<>10<>#scalar#integer#positive#nonzero
 nIterOpt<>double<>3<>#scalar#integer#positive#nonzero
 nStepMax<>eval<>inf<>#scalar#integer#positive#nonzero
 optimalContractionRate<>double<>0.1<>#scalar#double#positive#nonzero#max:1
+pathInfoFunction<>eval<>@(f,J,v,l)0<>#function_handle
 plot<>struct<>OptPlot<>#struct
 plotPause<>eval<>false<>#scalar#positive#nonzero#integer|#scalar#logical
 plotVarOfInterest<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)

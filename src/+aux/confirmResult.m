@@ -15,7 +15,10 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Path.lAll = [Path.lAll,xSolution(end)];
             Path.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-1);Path.lAll(end-1)])];
             if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue=[Path.biftestValue Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info)];
+                Path.biftestValue = [Path.biftestValue,Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info)];
+            end
+            if OptIsSet.pathInfoFunction
+                Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end))];
             end
             % update stepsize information
             % measure speed
@@ -50,9 +53,11 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Path.lAll = [Path.lAll,xSolution(end),Plus.x(end)];
             Path.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-2);Path.lAll(end-2)])*[1,1]+norm(Plus.x-xSolution)*[0,1]];
             if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue=[Path.biftestValue,Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info),Plus.biftestValue];
+                Path.biftestValue = [Path.biftestValue,Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info),Plus.biftestValue];
             end
-            
+            if OptIsSet.pathInfoFunction
+                Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end)),Plus.pathInfoValue];
+            end
             if StepsizeOptions.predictor
                 Temp.predictor = [Temp.predictor, xPredictor, Plus.xPredictor];
                 Plus.xPredictor = [];
@@ -102,7 +107,10 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 Do.stepback = true;
                 Plus.x = [Path.varAll(:,end);Path.lAll(end)];
                 if OptIsSet.bifAdditionalTestfunction
-                    Plus.biftestValue=Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
+                    Plus.biftestValue = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
+                end
+                if OptIsSet.pathInfoFunction
+                    Plus.pathInfoValue = Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end));
                 end
                 if StepsizeOptions.predictor
                     Plus.xPredictor = xPredictor;
@@ -121,6 +129,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Path.sAll(end) = [];
             if OptIsSet.bifAdditionalTestfunction
                 Path.biftestValue(end) = [];
+            end
+            if OptIsSet.pathInfoFunction
+                Path.pathInfoValue(:,end) = [];
             end
             if StepsizeOptions.predictor
                 if ~isempty(Temp.predictor)
@@ -145,6 +156,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 Path.sAll = [Path.sAll,Path.sAll(end)+norm([Path.varAll(:,end);Path.lAll(end)]-[Path.varAll(:,end-1);Path.lAll(end-1)])];
                 if OptIsSet.bifAdditionalTestfunction
                     Path.biftestValue = [Path.biftestValue,Plus.biftestValue];
+                end
+                if OptIsSet.pathInfoFunction
+                    Path.pathInfoValue = [Path.pathInfoValue,Plus.pathInfoValue];
                 end
                 if StepsizeOptions.predictor
                     Temp.predictor = [Temp.predictor, Plus.xPredictor];
@@ -175,6 +189,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Path.sAll(nPath+((-nRmv+1):0)) = [];
             if OptIsSet.bifAdditionalTestfunction
                 Path.biftestValue(nPath+((-nRmv+1):0)) = [];
+            end
+            if OptIsSet.pathInfoFunction
+                Path.pathInfoValue(:,nPath+((-nRmv+1):0)) = [];
             end
             Remove.ds = Remove.s-Path.sAll(end);
             dscaleRmv = aux.getDscale(Opt,Path);

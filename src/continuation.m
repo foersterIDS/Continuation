@@ -85,6 +85,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.nIterOpt (1,1) double {mustBeGreaterThan(NameValueArgs.nIterOpt,0)}
         NameValueArgs.nStepMax (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.nStepMax,0)}
         NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeSmallerThan(NameValueArgs.optimalContractionRate,1)}
+        NameValueArgs.pathInfoFunction (1,1) function_handle
         NameValueArgs.plot (1,:) char {mustBeMember(NameValueArgs.plot,{'on','off','basic','detail','dpa','semilogx','semilogy','loglog','threeDim'})}
         NameValueArgs.plotPause {validation.scalarLogical} % #scalar#positive#nonzero#integer|#scalar#logical
         NameValueArgs.plotVarOfInterest (1,1) double {mustBeGreaterThan(NameValueArgs.plotVarOfInterest,0)} % #scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
@@ -458,6 +459,9 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     InfoOut.numberOfSteps = Counter.step;
     InfoOut.numberOfInvalidPoints = Counter.loop - Counter.step;
+    if OptIsSet.pathInfoFunction
+        InfoOut.pathInfoValue = Path.pathInfoValue;
+    end
     jacobianOut = Jacobian.last;
     exitflag = Info.exitflag;
     varAll = Path.varAll;

@@ -53,7 +53,7 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
     %% InfoOut
     %
     InfoOut = struct('numberOfSteps',0,...
-                      'numberOfInvalidPoints',0);
+                     'numberOfInvalidPoints',0);
     %
     %% Initial
     %
@@ -82,7 +82,8 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
                   'speedOfContinuation',[],...
                   'varAll',[],...
                   'xPredictor',[],...
-                  'biftestValue',[]);
+                  'biftestValue',[],...
+                  'pathInfoValue',[]);
 	%
     %% Plot
     %
