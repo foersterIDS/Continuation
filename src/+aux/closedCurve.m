@@ -10,18 +10,19 @@ function [isClosed, Opt, Counter] = closedCurve(Opt,Path,ds,Counter)
     n = 5;
     np = 4; % polynomial order (np = 2*k with k in N)
     epsPol = 2.5e-2;
+    dsTol = 1.1;
     nu = 1+np/2;
     ns = numel(Path.lAll);
     if ns > n+nu
         xAll = [Path.varAll; Path.lAll];
-        epsDistX = min([2*norm(xAll(:,end)-xAll(:,end-1)),2*ds,Opt.dsMax]);
-        epsDistL = min([2*norm(xAll(end,end)-xAll(end,end-1)),2*ds,Opt.dsMax]);
+        epsDistX = min([dsTol*norm(xAll(1:(end-1),end)-xAll(1:(end-1),end-1)),dsTol*ds,Opt.dsMax]);
+        epsDistL = min([dsTol*norm(xAll(end,end)-xAll(end,end-1)),dsTol*ds,Opt.dsMax]);
         epsAng = 0.5*(2*pi / 360);
         epsDir = 1e-3;
         %% exclude points before current points which are too close
         %
-        ignoredDist = 2*norm(xAll(:,end)-xAll(:,end-1));
-        distanceX = sqrt(sum((xAll(:,1:(ns - 1)) - xAll(:,end)).^2,1));
+        ignoredDist = dsTol*norm(xAll(:,end)-xAll(:,end-1));
+        distanceX = sqrt(sum((xAll(1:(end-1),1:(ns - 1)) - xAll(1:(end-1),end)).^2,1));
         distanceL = sqrt((xAll(end,1:(ns - 1)) - xAll(end,end)).^2);
         lastInd = find(distanceX > ignoredDist);
         if isempty(lastInd)
