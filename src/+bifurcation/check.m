@@ -11,10 +11,15 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
     lastJacobianRed = Jacobian.last(1:Info.nv,1:Info.nv);
     lastJacobianRed = full(lastJacobianRed);
     bifFound=0;    % skip additional testfunction, when det(jac)=0
+    if aux.ison(Opt.bifurcation) && numel(Path.lAll)>=3
+        basicFoldDetection = (sign(diff(Path.lAll(end+[-1,0]))*diff(Path.lAll(end+[-2,-1])))<0);
+    else
+        basicFoldDetection = false;
+    end
     if Opt.bifurcation.mark
         %% mark bifurcations:
         signDetCurrentJacobianRed = sign(det(lastJacobianRed));
-        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && prod(size(Jacobian.previous)==size(Jacobian.last))
+        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && prod(size(Jacobian.previous)==size(Jacobian.last))) || basicFoldDetection
             bifFound=1;
             signDetCurrentJacobian = sign(det(Jacobian.last));
             bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
@@ -33,38 +38,44 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
         Bifurcation.scaling = [Bifurcation.scaling,1/detSolverJacobianRed];
         residualBif = @(x) bifurcation.residual(func,x,Opt,Info,Bifurcation.scaling(end));
         signDetCurrentJacobianRed = sign(detSolverJacobianRed);
-        if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0) || basicFoldDetection
             bifFound=1;
             %% find exact point:
             nds = 1000;
-            dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
             indBif = length(Path.lAll);
             bifType = NaN;
             nv = numel(Path.varAll(:,1));
             
-            detLeft=det(Jacobian.previous(1:nv,1:nv));
-            detRight=det(Jacobian.last(1:nv,1:nv));
-            startDsp=detRight/(detRight-detLeft)*(dss(1)-dss(end));     % estimated bifurcation point
-            indStart=find(dss>startDsp,1);                                % index of estimated bifurcation point
-            
-            indDss=zeros(nds,1);                                           % index vector for sorting dss
-            indDss(1)=indStart;                                           % alternating left and right of indStart
-            if indStart==1
-                indDss=1:1:nds;
-            elseif indStart==nds
-                indDss=nds:-1:1;
-            elseif le(indStart,nds/2)
-                indAlternatingLess=indStart-1:-1:1;
-                indDss(2:2:length(indAlternatingLess)*2)=indAlternatingLess;
-                indDss(3:2:length(indAlternatingLess)*2+1)=indStart+1:1:indStart+length(indAlternatingLess);
-                indDss(length(indAlternatingLess)*2+2:end)=indStart+length(indAlternatingLess)+1:1:nds;
+            if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+                dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
+                detLeft = det(Jacobian.previous(1:nv,1:nv));
+                detRight = det(Jacobian.last(1:nv,1:nv));
+                startDsp = detRight/(detRight-detLeft)*(dss(1)-dss(end));     % estimated bifurcation point
+                indStart = find(dss>startDsp,1);                                % index of estimated bifurcation point
             else
-                indAlternatingGreater=indStart+1:1:nds;
-                indDss(2:2:length(indAlternatingGreater)*2)=indStart-1:-1:indStart-length(indAlternatingGreater);
-                indDss(3:2:length(indAlternatingGreater)*2+1)=indAlternatingGreater;
-                indDss(length(indAlternatingGreater)*2+2:nds)=indStart-length(indAlternatingGreater)-1:-1:1;
+                dss = linspace(Path.sAll(end-2)-Path.sAll(end),0,nds);
+                dll = interp1(Path.sAll-Path.sAll(end),abs(Path.lAll-Path.lAll(end-1)),dss,'spline');
+                [~,indStart] = min(dll);
             end
-            dss=dss(indDss);                                               % sort dss
+            
+            indDss = zeros(nds,1);                                           % index vector for sorting dss
+            indDss(1) = indStart;                                           % alternating left and right of indStart
+            if indStart==1
+                indDss = 1:1:nds;
+            elseif indStart==nds
+                indDss = nds:-1:1;
+            elseif le(indStart,nds/2)
+                indAlternatingLess = indStart-1:-1:1;
+                indDss(2:2:length(indAlternatingLess)*2) = indAlternatingLess;
+                indDss(3:2:length(indAlternatingLess)*2+1) = indStart+1:1:indStart+length(indAlternatingLess);
+                indDss(length(indAlternatingLess)*2+2:end) = indStart+length(indAlternatingLess)+1:1:nds;
+            else
+                indAlternatingGreater = indStart+1:1:nds;
+                indDss(2:2:length(indAlternatingGreater)*2) = indStart-1:-1:indStart-length(indAlternatingGreater);
+                indDss(3:2:length(indAlternatingGreater)*2+1) = indAlternatingGreater;
+                indDss(length(indAlternatingGreater)*2+2:nds) = indStart-length(indAlternatingGreater)-1:-1:1;
+            end
+            dss = dss(indDss);                                               % sort dss
             
             for i=1:nds
                 dsp = dss(i);
