@@ -77,8 +77,9 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
             end
             dss = dss(indDss);                                               % sort dss
             
-            for i=1:nds
-                dsp = dss(i);
+            bifType = NaN;
+            for ii=1:nds
+                dsp = dss(ii);
                 [varBifPredictor,lBifPredictor] = continuation.predictor(Path,dsp,lastJacobianRed,func,resCorr,Solver,Opt);
                 dscale = aux.getDscale(Opt,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
                 [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
@@ -148,8 +149,8 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                 dss = dss([6,7,5,8,4,9,3,10,2,11,1]);
                 indBif = length(Path.lAll);
                 bifType = NaN;
-                for i=1:nds
-                    dsp = dss(i);
+                for ii=1:nds
+                    dsp = dss(ii);
                     [varBifPredictor,lBifPredictor] = continuation.predictor(Path,dsp,lastJacobianRed,func,resCorr,Solver,Opt);
                     dscale = aux.getDscale(Opt,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
                     [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
