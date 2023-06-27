@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do, Info, Path, breakFunOut, Opt,Counter] = exitLoop(Do, Info, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
+function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
     %% eval. break function:
     %
     try
@@ -124,5 +124,37 @@ function [Do, Info, Path, breakFunOut, Opt,Counter] = exitLoop(Do, Info, Is, Pat
         Info.exitMsg = '--> continuation completed: bifurcation reached';
     end
     %
+    %% check bidirectional runs:
+    %
+    if ~Do.continuation && Opt.bidirectional && (Info.biDirRuns==0)
+        Info.biDirRuns = Info.biDirRuns+1;
+        Do.continuation = true;
+        % turn path
+        Path.varAll = Path.varAll(:,end:-1:1);
+        Path.lAll = Path.lAll(end:-1:1);
+        Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
+        if Opt.lTarget==Info.lEnd
+            Opt.lTarget = Info.lStart;
+            Opt.direction = -Opt.direction;
+            lStartTemp = Info.lStart;
+            Info.lStart = Info.lEnd;
+            Info.lEnd = lStartTemp;
+        end
+        % reset values
+        Path.speedOfContinuation = [];
+        Path.xPredictor = [];
+        Path.biftestValue = [];
+        Path.pathInfoValue = [];
+        Jacobian.last = [];
+        Jacobian.previous = [];
+        Jacobian.signDet = sign(det(Jacobian.initial));
+        Jacobian.solver = [];
+        % set step size
+        if numel(Path.sAll)>1
+            ds = Path.sAll(end)-Path.sAll(end-1);
+        else
+            ds = Info.ds0;
+        end
+    end
+    %
 end
-

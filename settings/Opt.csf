@@ -1,6 +1,7 @@
 adaptCorrector<>struct<>OptAdaptCorrector<>#struct
 alphaReverse<>double<>pi/2<>#scalar#double#positive#nonzero
 approveManually<>eval<>false<>#scalar#logical#ison:plot#ison:display|#scalar#double#ison:plot#ison:display
+bidirectional<>eval<>false<>#scalar#logical
 bifurcation<>struct<>OptBifurcation<>#struct
 bifRandDir<>eval<>true<>#scalar#logical
 bifAdditionalTestfunction<>eval<>@(func,xSolution,xPredictor,Bifurcation,Do,Info,Initial,Is,Jacobian,Path)1<>#function_handle
