@@ -383,7 +383,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                 aux.printLine(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,Counter.loop,Counter.step,[],Opt.nIterOpt);
             end
         end
-        [Do,Info,Path,breakFunOut,Opt,Counter,ds] = aux.exitLoop(Do,Info,Is,Path,Opt,Counter,Bifurcation,ds,funSolution,Jacobian,breakFunOut);
+        [Do,Info,Path,breakFunOut,Opt,Counter,ds] = aux.exitLoop(Do,Info,Initial,Is,Path,Opt,Counter,Bifurcation,ds,funSolution,Jacobian,breakFunOut);
         if Do.changeCorrector
             Opt = aux.seton(Opt,'corrector',corrInfo);
             resCorr = continuation.corrector(fun,Opt);

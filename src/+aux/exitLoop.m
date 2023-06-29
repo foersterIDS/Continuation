@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
+function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
     %% eval. break function:
     %
     try
@@ -154,6 +154,22 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Is, Path
             ds = Path.sAll(end)-Path.sAll(end-1);
         else
             ds = Info.ds0;
+        end
+    elseif ~Do.continuation && Opt.bidirectional && (Info.biDirRuns>0)
+        if Initial.lStart~=Info.lStart
+            % turn path
+            Path.varAll = Path.varAll(:,end:-1:1);
+            Path.lAll = Path.lAll(end:-1:1);
+            Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
+            % reset values
+            Path.speedOfContinuation = [];
+            Path.xPredictor = [];
+            Path.biftestValue = [];
+            Path.pathInfoValue = [];
+            Jacobian.last = [];
+            Jacobian.previous = [];
+            Jacobian.signDet = sign(det(Jacobian.initial));
+            Jacobian.solver = [];
         end
     end
     %

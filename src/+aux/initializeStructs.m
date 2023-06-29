@@ -59,7 +59,9 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
     %% Initial
     %
     Initial = struct('dsMax',Opt.dsMax,...
-                     'dsMin',Opt.dsMin);
+                     'dsMin',Opt.dsMin,...
+                     'lStart',lStart,...
+                     'lEnd',lEnd);
     %
     %% Is
     %
