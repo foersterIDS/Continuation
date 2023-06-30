@@ -86,3 +86,4 @@ weightsFayezioghani<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
 weightsMultiplicative<>eval<>[0.3,0.05,0.05,0.3,0.05]<>#array#positive#double#size:[1,5]
 weightsSzyszkowski<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]
 weightsYoon<>double<>0.5<>#scalar#double#positive
+xTarget<>eval<>inf(numel(var0)+1,1)<>#array#double#size:[numel(var0)+1,1]

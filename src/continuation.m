@@ -126,6 +126,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.weightsMultiplicative (1,5) double {mustBePositive}
         NameValueArgs.weightsSzyszkowski (1,2) double {mustBePositive}
         NameValueArgs.weightsYoon (1,1) double {mustBePositive}
+        NameValueArgs.xTarget (:,1) double
     end
     nameValueArgsCell = aux.struct2cellPreserveFieldnames(NameValueArgs);
     %
@@ -252,6 +253,13 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
             xPredictor = [varPredictor;lPredictor];
             aux.printLine(Opt,'---> predictor: catch!\n');
             Counter.catch = Counter.catch + 1;
+        end
+        % replace xPredictor with xTarget?:
+        if OptIsSet.xTarget && norm(xPredictor-[Path.varAll(:,end);Path.lAll(end)])*1.1>norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)])
+            xPredictor = Opt.xTarget;
+            ds = norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)]);
+            Do.convergeToxTarget = true;
+            residual = @(x) aux.mergeResiduals(func,resCorr,x,[Path.varAll;Path.lAll],ds,Jacobian.last,Opt);
         end
         %
         %% solve

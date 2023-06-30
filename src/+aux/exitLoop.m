@@ -57,13 +57,17 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
     %
     %% exit with success:
     %
-    if sign(Info.lEnd-Info.lStart)*(Path.lAll(end)-Info.lEnd)>=0 || sign(Opt.lTarget-Info.lStart)*(Path.lAll(end)-Opt.lTarget)>=0
+    if sign(Info.lEnd-Info.lStart)*(Path.lAll(end)-Info.lEnd)>=0 || sign(Opt.lTarget-Info.lStart)*(Path.lAll(end)-Opt.lTarget)>=0 || (Do.convergeToxTarget && norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)])<10^-8)
         Do.continuation = false;
         Info.exitflag = 1;
         if sign(Info.lEnd-Info.lStart)*(Path.lAll(end)-Info.lEnd)>=0
             Info.exitMsg = '--> continuation completed: lEnd reached';
-        else
+        elseif sign(Opt.lTarget-Info.lStart)*(Path.lAll(end)-Opt.lTarget)>=0
             Info.exitMsg = '--> continuation completed: lTarget reached';
+        elseif (Do.convergeToxTarget && norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)])<10^-8)
+            Info.exitMsg = '--> continuation completed: xTarget reached';
+        else
+            Info.exitMsg = '--> continuation completed: unknown reason';
         end
     end
     %
@@ -172,5 +176,9 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
             Jacobian.solver = [];
         end
     end
+    %
+    %% reset
+    %
+    Do.convergeToxTarget = false;
     %
 end
