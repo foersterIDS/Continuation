@@ -7,7 +7,7 @@ function [vAll,lAll] = refinePath(fun,vAll,lAll,nRef)
         nRef (1,1) double {mustBeInteger,mustBeGreaterThan(nRef,0)}
     end
     %% run
-    solverOpt = optimoptions('fsolve','Algorithm','levenberg-marquardt','Display','off');
+    solverOpt = optimoptions('fsolve','Display','off');
     for ii=1:nRef
         %% get idxMax
         xAll = [vAll;lAll];
@@ -19,7 +19,7 @@ function [vAll,lAll] = refinePath(fun,vAll,lAll,nRef)
         sPredictor = mean(sAll(idxMax+[0,1]));
         xPredictor = spline(sAll,xAll,sPredictor);
         %% solve
-        [xSolution,~,exitflag] = fsolve(@(x) fun(x(1:(end-1)),x(end)),xPredictor,solverOpt);
+        [xSolution,~,exitflag] = fsolve(@(x) [fun(x(1:(end-1)),x(end));norm(x-xAll(:,idxMax))-norm(x-xAll(:,idxMax+1))],xPredictor,solverOpt);
         dsMax = diff(sAll(idxMax+[0,1]));
         dsL = norm(xSolution-xAll(:,idxMax));
         dsU = norm(xAll(:,idxMax+1)-xSolution);
