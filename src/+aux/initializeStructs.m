@@ -133,7 +133,7 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
     %% StepsizeInformation
     %
     StepsizeInformation = struct('rateOfContraction',NaN,...
-                                  'speedOfContinuation',NaN);
+                                 'speedOfContinuation',NaN);
     %
     %% Temp
     %
