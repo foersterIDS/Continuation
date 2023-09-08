@@ -89,7 +89,7 @@ function [Path,Bifurcation] = trace(Opt,OptIsSet,Path,Bifurcation,Solver,Info,fu
                 OptIsSetTrace.initialDeflationPoints = true;
                 OptTrace.OptIsSet = OptIsSetTrace; % (set OptIsSet with Opt)
                 [varJ,lJ,exitflagJ,BifurcationJ,sJ] = continuation(func,x0(1:end-1),Info.lStart,Info.lEnd,dsBif,'opt',OptTrace);
-                if exitflagJ>0
+                if exitflagJ>=0
                     Path.varAll = [Path.varAll,NaN(numel(x0)-1,1),varJ];
                     Path.lAll = [Path.lAll,NaN,lJ];
                     Path.sAll = [Path.sAll,NaN,sJ];
