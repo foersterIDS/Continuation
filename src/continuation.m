@@ -16,7 +16,7 @@
 %   A. Förster, foerster@ids.uni-hannover.de
 % 
 % COPYRIGHT AND LICENSING: 
-% Continuation Copyright (C) 2022 Alwin Förster
+% Continuation Copyright (C) 2023 Alwin Förster
 %                                 (foerster@ids.uni-hannover.de)
 %                                 Leibnitz University Hannover
 % This program comes with NO WARRANTY. 
