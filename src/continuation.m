@@ -119,6 +119,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.stopOnCrossing {validation.scalarLogical} % #ison:bifurcation
         NameValueArgs.suspendContinuationErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
         NameValueArgs.targetTol (1,1) double {mustBePositive}
+		NameValueArgs.timeLimit (1,1) double {mustBePositive,mustBeGreaterThan(NameValueArgs.timeLimit,0)}
         NameValueArgs.weightsAngleCustom (1,2) double {mustBePositive}
         NameValueArgs.weightsAngleChange (1,2) double {mustBePositive}
         NameValueArgs.weightsError (1,5) double {mustBePositive}
@@ -151,7 +152,6 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     else
         paraName = 'l';
     end
-    tDisplay = tic;
     %
     %% find initial solution
     %
@@ -462,7 +462,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %% final disp
     %
     aux.printLine(Opt,[Info.exitMsg,'\n']);
-    aux.printLine(Opt,'--> time elapsed: %.3f s\n',toc(tDisplay));
+    aux.printLine(Opt,'--> time elapsed: %.3f s\n',toc(Info.t0));
     %
     %% output
     %

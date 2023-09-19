@@ -19,6 +19,14 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
         bfun = false;
     end
     %
+    %% exit because time limit reached:
+    %
+    if toc(Info.t0)>=Opt.timeLimit
+        Info.exitflag = -5;
+        Do.continuation = false;
+        Info.exitMsg = sprintf('--> continuation stoped: Time limit was reached.');
+    end
+    %
     %% exit without complete results:
     %
     if Counter.catch>=3
