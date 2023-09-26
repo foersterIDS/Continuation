@@ -5,7 +5,7 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
+function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
     %% eval. break function:
     %
     try
@@ -95,6 +95,9 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
         Path.varAll = Path.varAll(:,1:Bifurcation.bif(1,end));
         Path.lAll = Path.lAll(1:Bifurcation.bif(1,end));
         Path.sAll = Path.sAll(1:Bifurcation.bif(1,end));
+        if Opt.jacobianOut.full
+            Jacobian.all(:,:,1:Bifurcation.bif(1,end))
+        end
         Info.exitMsg = '--> continuation completed: bifurcation reached';
     end
     %
@@ -133,6 +136,9 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
         Path.varAll = Path.varAll(:,1:Bifurcation.bif(1,end));
         Path.lAll = Path.lAll(1:Bifurcation.bif(1,end));
         Path.sAll = Path.sAll(1:Bifurcation.bif(1,end));
+        if Opt.jacobianOut.full
+            Jacobian.all(:,:,1:Bifurcation.bif(1,end))
+        end
         Info.exitMsg = '--> continuation completed: bifurcation reached';
     end
     %
@@ -145,6 +151,9 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
         Path.varAll = Path.varAll(:,end:-1:1);
         Path.lAll = Path.lAll(end:-1:1);
         Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
+        if Opt.jacobianOut.full
+            Jacobian.all = Jacobian.all(:,:,end:-1:1);
+        end
         if Opt.lTarget==Info.lEnd
             Opt.lTarget = Info.lStart;
             Opt.direction = -Opt.direction;
@@ -173,6 +182,9 @@ function [Do,Info,Path,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial,
             Path.varAll = Path.varAll(:,end:-1:1);
             Path.lAll = Path.lAll(end:-1:1);
             Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
+            if Opt.jacobianOut.full
+                Jacobian.all = Jacobian.all(:,:,end:-1:1);
+            end
             % reset values
             Path.speedOfContinuation = [];
             Path.xPredictor = [];

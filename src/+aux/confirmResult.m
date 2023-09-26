@@ -6,7 +6,7 @@
 %   12.08.2022 - Anna Lefken
 %
 function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt] = ...
-    confirmResult(func,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet)
+    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet)
     xDeflation = xSolution;
     if Is.valid
         %% valid result
@@ -19,6 +19,13 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             end
             if OptIsSet.pathInfoFunction
                 Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end))];
+            end
+            if Opt.jacobianOut.full
+                if numel(Jacobian.solver(1,:))==(Info.nv+1)
+                    Jacobian.all = cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1)));
+                else
+                    Jacobian.all = cat(3,Jacobian.all,[Jacobian.solver,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funSolution,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)]);
+                end
             end
             % update stepsize information
             % measure speed
@@ -57,6 +64,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             end
             if OptIsSet.pathInfoFunction
                 Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end)),Plus.pathInfoValue];
+            end
+            if Opt.jacobianOut.full
+                Jacobian.all = cat(3,cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1))),Plus.jacobian);
             end
             if StepsizeOptions.predictor
                 Temp.predictor = [Temp.predictor, xPredictor, Plus.xPredictor];
@@ -160,6 +170,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 if OptIsSet.pathInfoFunction
                     Path.pathInfoValue = [Path.pathInfoValue,Plus.pathInfoValue];
                 end
+                if Opt.jacobianOut.full
+                    Jacobian.all = cat(3,Jacobian.all,Plus.jacobian);
+                end
                 if StepsizeOptions.predictor
                     Temp.predictor = [Temp.predictor, Plus.xPredictor];
                 end
@@ -193,6 +206,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             if OptIsSet.pathInfoFunction
                 Path.pathInfoValue(:,nPath+((-nRmv+1):0)) = [];
             end
+            if Opt.jacobianOut.full
+                Jacobian.all(:,:,nPath+((-nRmv+1):0)) = [];
+            end
             Remove.ds = Remove.s-Path.sAll(end);
             dscaleRmv = aux.getDscale(Opt,Path);
             residualFixedValueRmv = @(v) aux.residualFixedValue(func,v,Path.lAll(end),Opt);
@@ -206,6 +222,9 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             end
             Path.varAll(:,end) = varRmv;
             Jacobian.last = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
+            if Opt.jacobianOut.full
+                Jacobian.all(:,:,end) = Jacobian.last;
+            end
             if StepsizeOptions.predictor
                 if nRmv >= 3
                     Temp.predictor = xPredictor;
@@ -240,7 +259,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Do.remove = false;
         end
         if Opt.includeReverse && Is.reverse && Solver.exitflag>0
-            Path = aux.includeReverse(xSolution,Path);
+            [Path,Jacobian] = aux.includeReverse(xSolution,Path,Jacobian);
         end
         if aux.ison(Opt.homotopy) && Counter.error>=Opt.homotopyErrorCounter
             Do.homotopy = true;

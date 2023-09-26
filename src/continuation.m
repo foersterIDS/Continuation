@@ -4,7 +4,8 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-%   [varAll,lAll,exitflag,Bifurcation] = continuation(fun,var0,lStart,lEnd,ds0,NameValueArgs)
+%   [varAll,lAll,exitflag,Bifurcation,sAll,jacOut,breakFunOut,InfoOut] =...
+%      continuation(fun,var0,lStart,lEnd,ds0,NameValueArgs)
 %
 %   fun = fun(var,l) != 0
 %   lStart <= l <= lEnd
@@ -75,6 +76,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.includeReverse {validation.scalarLogical}
         NameValueArgs.initialDeflationPoints (1,1) double
         NameValueArgs.jacobian {validation.scalarLogical}
+        NameValueArgs.jacobianOut {mustBeMember(NameValueArgs.jacobianOut,{'basic','full'})}
         NameValueArgs.l0 (1,1) double
         NameValueArgs.lTarget (1,1) double
         NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
@@ -170,6 +172,9 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         Jacobian.solver = [Jacobian.solver,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll;Opt.l0],'centralValue',funInitial,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
         Jacobian.previous = Jacobian.solver;
         Jacobian.last = Jacobian.solver;
+        if Opt.jacobianOut.full
+            Jacobian.all = Jacobian.solver;
+        end
         [~,breakFunOut] = Opt.breakFunction(funInitial,Jacobian.solver,Path.varAll,Path.lAll,breakFunOut);
         aux.printLine(Opt,'Initial solution at %s = %.2e\n',paraName,Opt.l0);
         if aux.ison(Opt.bifurcation)
@@ -342,7 +347,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
             aux.validateResult(xSolution,Plus,funSolution,Path,ds,Solver,Jacobian,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         % confirm result:
         [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt] = ...
-            aux.confirmResult(func,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet);
+            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet);
         %
         %% Bifurcations
         %
@@ -391,7 +396,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                 aux.printLine(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,Counter.loop,Counter.step,[],Opt.nIterOpt);
             end
         end
-        [Do,Info,Path,breakFunOut,Opt,Counter,ds] = aux.exitLoop(Do,Info,Initial,Is,Path,Opt,Counter,Bifurcation,ds,funSolution,Jacobian,breakFunOut);
+        [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = aux.exitLoop(Do,Info,Initial,Is,Path,Opt,Counter,Bifurcation,ds,funSolution,Jacobian,breakFunOut);
         if Do.changeCorrector
             Opt = aux.seton(Opt,'corrector',corrInfo);
             resCorr = continuation.corrector(fun,Opt);
@@ -471,7 +476,11 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     if OptIsSet.pathInfoFunction
         InfoOut.pathInfoValue = Path.pathInfoValue;
     end
-    jacobianOut = Jacobian.last;
+    if Opt.jacobianOut.basic
+        jacobianOut = Jacobian.last;
+    elseif Opt.jacobianOut.full
+        jacobianOut = Jacobian.all;
+    end
     exitflag = Info.exitflag;
     varAll = Path.varAll;
     lAll = Path.lAll;

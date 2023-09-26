@@ -31,5 +31,5 @@ eventCounterMax = 1;
 eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
 
 %% Solve:
-[varAll,lAll,exitflag,bifs,sAll,lastJacobian,breakFunOut] = ...
+[varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
     continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','stepSizeEvent',true,'eventUserInput',eventObj.getEvents);

@@ -23,7 +23,7 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 % testfun13; % y = sin(1/x)
 % testfun14; % Infinity, Test for (...,'plot','threeDim',...)
 %% Solve:
-[varAll,lAll,exitflag,bifs,sAll,lastJacobian,breakFunOut] = ...
+[varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
     continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere');
 
 % %% Smoothen path

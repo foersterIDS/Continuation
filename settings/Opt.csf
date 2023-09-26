@@ -35,6 +35,7 @@ homotopyErrorCounter<>double<>2<>#scalar#integer#positive#nonzero#neq:Opt.deflat
 includeReverse<>eval<>false<>#scalar#logical
 initialDeflationPoints<>eval<>[]<>#double
 jacobian<>eval<>false<>#scalar#logical
+jacobianOut<>struct<>OptJacobianOut<>#struct
 l0<>eval<>lStart<>#scalar#double
 lTarget<>eval<>lEnd<>#scalar#double
 livePlotFig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
