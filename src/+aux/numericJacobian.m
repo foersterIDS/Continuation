@@ -5,41 +5,41 @@
 %   19.05.2020 - Alwin Förster
 %   16.09.2020 - Tido Kubatschek 
 %
-function [jac,f0] = numericJacobian(f, x, varargin)
+function [jac,f0] = numericJacobian(f, x, NameValueArgs)
     % Calculate Jacobian of function f at given x
     %
     % varargin consists of
     %   'fx' followed by optional f(x)
     %   'is' followed by starting value for computation of the jacobian
+
+    arguments
+        f (1,1) function_handle
+        x (:,1) double
+        NameValueArgs.centralValue (:,1) double
+        NameValueArgs.derivativeDimensions (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(NameValueArgs.derivativeDimensions,1)}
+        NameValueArgs.diffQuot (1,1) struct
+    end
     
     epsilon = 1e-6;
     epsilonInv = 1/epsilon;
     nx = length(x); % Dimension of the input x;
     
-    % test for variabel inputs
-    vl = numel(varargin);
-    if vl > 6
-        error('Too many inputs!')
-    end
-    
     fi = 0;
     ii = false;
     diffQuo = 0;
-    
-    for ki = 1:vl
-        if strcmp(varargin{ki},'centralValue')
-            f0 = varargin{ki+1};
-            fi = 1;
-        end
-        if strcmp(varargin{ki}, 'derivativeDimensions')
-            is = varargin{ki+1};
-            ii = true;
-        end
-        if strcmp(varargin{ki}, 'diffquot')
-            diffStr = varargin{ki+1};
-            if diffStr.central
-                diffQuo = 1;    
-            end
+
+    if isfield(NameValueArgs,'centralValue')
+        f0 = NameValueArgs.centralValue;
+        fi = 1;
+    end
+    if isfield(NameValueArgs,'derivativeDimensions')
+        is = NameValueArgs.derivativeDimensions;
+        ii = true;
+    end
+    if isfield(NameValueArgs,'diffQuot')
+        diffStr = NameValueArgs.diffQuot;
+        if diffStr.central
+            diffQuo = 1;    
         end
     end
     
