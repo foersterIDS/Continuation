@@ -10,7 +10,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
     %
     try
         if Is.valid
-            [bfun,breakFunOut] = Opt.breakFunction(funSolution,Jacobian.solver,Path.varAll(:,end),Path.lAll(end),breakFunOut);
+            [bfun,breakFunOut] = Opt.breakFunction(funSolution,Jacobian.solver,Path.varAll,Path.lAll,breakFunOut);
         else
             bfun = false;
         end
