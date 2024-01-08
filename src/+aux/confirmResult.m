@@ -66,7 +66,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end)),Plus.pathInfoValue];
             end
             if Opt.jacobianOut.full
-                Jacobian.all = cat(3,cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1))),Plus.jacobian);
+                Jacobian.all = cat(3,cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1))),Plus.jacobian(1:Info.nv,1:(Info.nv+1)));
             end
             if StepsizeOptions.predictor
                 Temp.predictor = [Temp.predictor, xPredictor, Plus.xPredictor];
@@ -171,7 +171,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                     Path.pathInfoValue = [Path.pathInfoValue,Plus.pathInfoValue];
                 end
                 if Opt.jacobianOut.full
-                    Jacobian.all = cat(3,Jacobian.all,Plus.jacobian);
+                    Jacobian.all = cat(3,Jacobian.all,Plus.jacobian(1:Info.nv,:));
                 end
                 if StepsizeOptions.predictor
                     Temp.predictor = [Temp.predictor, Plus.xPredictor];
