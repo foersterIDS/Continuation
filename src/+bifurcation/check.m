@@ -13,13 +13,16 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
     bifFound=0;    % skip additional testfunction, when det(jac)=0
     if aux.ison(Opt.bifurcation) && numel(Path.lAll)>=3
         basicFoldDetection = (sign(diff(Path.lAll(end+[-1,0]))*diff(Path.lAll(end+[-2,-1])))<0);
+        if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==numel(Path.lAll)-1
+            basicFoldDetection = false;
+        end
     else
         basicFoldDetection = false;
     end
     if Opt.bifurcation.mark
         %% mark bifurcations:
         signDetCurrentJacobianRed = sign(det(lastJacobianRed));
-        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && prod(size(Jacobian.previous)==size(Jacobian.last))) || basicFoldDetection
+        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && all(size(Jacobian.previous)==size(Jacobian.last))) || basicFoldDetection
             bifFound=1;
             signDetCurrentJacobian = sign(det(Jacobian.last));
             bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
