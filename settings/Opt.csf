@@ -7,6 +7,7 @@ bifRandDir<>eval<>true<>#scalar#logical
 bifAdditionalTestfunction<>eval<>@(func,xSolution,xPredictor,Bifurcation,Do,Info,Initial,Is,Jacobian,Path)1<>#function_handle
 bifResidual<>struct<>OptBifResidual<>#struct
 breakFunction<>eval<>@(f,J,v,l,breakFunOut)aux.initialBreakFunction(f,J,v,l,breakFunOut)<>#function_handle
+checkJacobian<>eval<>false<>#scalar#logical
 checkResidual<>eval<>false<>#scalar#logical
 checkStepSizeOptions<>eval<>true<>#scalar#logical
 closedCurveDetection<>eval<>true<>#scalar#logical

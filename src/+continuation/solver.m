@@ -29,7 +29,7 @@ function [solver,predictorSolver,numJacSolver,defaultSolverOutput] = solver(Opt,
             predictorSolver = @(funPredictor,s0) fsolve(funPredictor,s0,predictorOptions);
         end
         optNumJac = optimoptions(options,'SpecifyObjectiveGradient',false);
-        numJacSolver = @(fun,x0) fsolve(fun,x0,optNumJac);
+        numJacSolver = @(fun,x0,dscale) fsolve(fun,x0,optNumJac);
     elseif Opt.solver.lsqnonlin
         %% lsqnonlin
         if Opt.jacobian
@@ -48,7 +48,7 @@ function [solver,predictorSolver,numJacSolver,defaultSolverOutput] = solver(Opt,
             predictorSolver = @(funPredictor,s0) funSolver.sLsqnonline(funPredictor,s0,predictorOptions);
         end
         optNumJac = optimoptions(options,'SpecifyObjectiveGradient',false);
-        numJacSolver = @(fun,x0) funSolver.sLsqnonline(fun,x0,optNumJac);
+        numJacSolver = @(fun,x0,dscale) funSolver.sLsqnonline(fun,x0,optNumJac);
     elseif Opt.solver.newton
         %% basic newton solver
         solver = @(fun,x0,dscale) funSolver.basicNewton(fun,x0,dscale,outputFlag,Opt);
@@ -59,7 +59,7 @@ function [solver,predictorSolver,numJacSolver,defaultSolverOutput] = solver(Opt,
         end
         optNumJac = Opt;
         optNumJac.jacobian = false;
-        numJacSolver = @(fun,x0) funSolver.basicNewton(fun,x0,1,optNumJac);
+        numJacSolver = @(fun,x0,dscale) funSolver.basicNewton(fun,x0,1,optNumJac);
     else
         %% error
         error('No such solver');

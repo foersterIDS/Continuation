@@ -17,7 +17,7 @@
 %   A. Förster, foerster@ids.uni-hannover.de
 % 
 % COPYRIGHT AND LICENSING: 
-% Continuation Copyright (C) 2023 Alwin Förster
+% Continuation Copyright (C) 2024 Alwin Förster
 %                                 (foerster@ids.uni-hannover.de)
 %                                 Leibnitz University Hannover
 % This program comes with NO WARRANTY. 
@@ -48,6 +48,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.bifAdditionalTestfunction (1,1) function_handle
         NameValueArgs.bifResidual (1,:) char {mustBeMember(NameValueArgs.bifResidual,{'determinant','luFactorization'})}
         NameValueArgs.breakFunction (1,1) function_handle
+        NameValueArgs.checkJacobian {validation.scalarLogical}
         NameValueArgs.checkResidual {validation.scalarLogical}
         NameValueArgs.checkStepSizeOptions {validation.scalarLogical}
         NameValueArgs.closedCurveDetection {validation.scalarLogical}
@@ -160,6 +161,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     residualInitial = @(v) aux.residualFixedValue(func,v,Opt.l0,Opt);
     [Path.varAll,funInitial,initialExitflag,Solver.output,Jacobian.initial] = Solver.main(residualInitial,Info.var0,Opt.dscale0(1:end-1));
     Jacobian.solver = Jacobian.initial;
+    [Info,Solver] = aux.checkJacobian(residualInitial,funInitial,Path.varAll,Info,Jacobian,Opt,Solver);
     breakFunOut = [];
     event.eventObj = [];
     if initialExitflag>=0
@@ -197,13 +199,18 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         if StepsizeOptions.predictor
             Path.xPredictor = [Info.var0;Info.lStart];
         end
-    else
+    elseif Info.checkJacobian
         Path.varAll = [];
         Path.lAll = [];
         Path.sAll = [];
         Info.exitflag = -2;
         Do.continuation = false;
         aux.printLine(Opt,'No initial solution found.\n');
+    else
+        Path.varAll = [];
+        Path.lAll = [];
+        Path.sAll = [];
+        aux.printLine(Opt,'Provided Jacobian is corrupted.\n');
     end
     %
     %% continuation
@@ -278,6 +285,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                 [varSolution,funSolution,Solver.exitflag,Solver.output,Jacobian.solver] = Solver.main(residualTarget,varPredictorCtt,dscale(1:end-1));
                 xSolution = [varSolution;Opt.lTarget];
                 Do.convergeToTarget = true;
+                [Info,Solver] = aux.checkJacobian(residualTarget,funSolution,varSolution,Info,Jacobian,Opt,Solver);
             else
                 %% regular solver
                 %            
@@ -298,6 +306,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                     end
                 end
                 Do.convergeToTarget = false;
+                [Info,Solver] = aux.checkJacobian(residual,funSolution,xSolution,Info,Jacobian,Opt,Solver);
             end
             Is.currentJacobian = true;
         catch

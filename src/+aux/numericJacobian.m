@@ -60,10 +60,10 @@ function [jac,f0] = numericJacobian(f, x, NameValueArgs)
         xr(is(i)) = x(is(i)) - epsilon;
         if diffQuo == 0
             %% forward difference quotient
-            jac(:, i) = (feval(f, xn) - f0) .* epsilonInv;
+            jac(:, i) = (f(xn) - f0) .* epsilonInv;
         else
             %% central difference quotient
-            jac(:, i) = (feval(f,xn) - feval(f,xr)) .* (0.5* epsilonInv);
+            jac(:, i) = (f(xn) - f(xr)) .* (0.5* epsilonInv);
         end
     end
     
