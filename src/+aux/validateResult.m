@@ -10,13 +10,25 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
     Is.reverse = false;
     Is.catch = 0;
     invPoiStr = '                          ';
+    nPath = numel(Path.lAll);
     if Solver.exitflag>0
         try
             if ~Opt.checkResidual || (norm(funSolution)<=Opt.solverTol*10)
                 xi = [Path.varAll(:,end);Path.lAll(end)];
                 normXsXi = norm(xSolution-xi);
-                if ((normXsXi>=Opt.dsTol(1)*ds && normXsXi<=Opt.dsTol(2)*ds || numel(Path.lAll)==1) && normXsXi<=Opt.dsTol(2)*Opt.dsMax) || Do.convergeToTarget || Opt.corrector.unique
-                    if numel(Path.lAll)==1
+                if nPath>1 && Opt.alphaReverseAutoMode
+                    %% alphaReverseAutoMode
+                    dsHist = sqrt(sum(([Path.varAll;Path.lAll]-[Path.varAll(:,end);Path.lAll(end)]).^2));
+                    oobHist = find(dsHist>2*ds);
+                    if ~isempty(oobHist) && oobHist(end)<(nPath-1)
+                        idxHist = oobHist(end):(nPath-1);
+                        xHist = [Path.varAll(:,idxHist);Path.lAll(idxHist)];
+                        alphaHist = acos(((xHist(:,1:(end-1))-xi)'*(xHist(:,end)-xi))./(sqrt(diag((xHist(:,1:(end-1))-xi)'*(xHist(:,1:(end-1))-xi)))*sqrt((xHist(:,end)-xi)'*(xHist(:,end)-xi))));
+                        Opt.alphaReverse = 2*pi-2*max(alphaHist);
+                    end
+                end
+                if ((normXsXi>=Opt.dsTol(1)*ds && normXsXi<=Opt.dsTol(2)*ds || nPath==1) && normXsXi<=Opt.dsTol(2)*Opt.dsMax) || Do.convergeToTarget || Opt.corrector.unique
+                    if nPath==1
                         if numel(Opt.direction)==1 && sign(xSolution(end)-Path.lAll(end))==sign(Opt.direction)
                             Is.valid = true;
                         else
@@ -46,7 +58,7 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
                                 Is.valid = true;
                             end
                         else
-                            if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==numel(Path.lAll)
+                            if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==nPath
                                 Is.valid = true;
                             else
                                 Is.valid = false;
@@ -87,7 +99,7 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
     %
     if Is.valid && ((islogical(Opt.approveManually) && Opt.approveManually) || (~islogical(Opt.approveManually) && (xSolution(end)-Opt.approveManually)*(Path.lAll(end)-Opt.approveManually)<=0))
         Opt.approveManually = true;
-        if numel(Path.lAll)>1
+        if nPath>1
             try
                 PathApp = Path;
                 if isempty(Plus.x)

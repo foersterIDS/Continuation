@@ -41,6 +41,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.Opt (1,1) struct
         NameValueArgs.adaptCorrector (1,:) char {mustBeMember(NameValueArgs.adaptCorrector,{'basic','solve'})}
         NameValueArgs.alphaReverse (1,1) double {mustBeGreaterThan(NameValueArgs.alphaReverse,0)}
+        NameValueArgs.alphaReverseAutoMode {validation.scalarLogical}
         NameValueArgs.approveManually {validation.scalarLogical} % #scalar#logical#ison:plot#ison:display|#scalar#double#ison:plot#ison:display
         NameValueArgs.bidirectional {validation.scalarLogical}
         NameValueArgs.bifurcation (1,:) char {mustBeMember(NameValueArgs.bifurcation,{'on','off','mark','determine','trace','parameterTrace'})}

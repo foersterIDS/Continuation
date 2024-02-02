@@ -1,5 +1,6 @@
 adaptCorrector<>struct<>OptAdaptCorrector<>#struct
-alphaReverse<>double<>pi/2<>#scalar#double#positive#nonzero
+alphaReverse<>double<>pi/2<>#scalar#double#positive#nonzero#isoff:alphaReverseAutoMode
+alphaReverseAutoMode<>eval<>true<>#scalar#logical
 approveManually<>eval<>false<>#scalar#logical#ison:plot#ison:display|#scalar#double#ison:plot#ison:display
 bidirectional<>eval<>false<>#scalar#logical
 bifurcation<>struct<>OptBifurcation<>#struct
