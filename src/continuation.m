@@ -200,7 +200,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         if StepsizeOptions.predictor
             Path.xPredictor = [Info.var0;Info.lStart];
         end
-    elseif Info.checkJacobian
+    elseif Info.validJacobian
         Path.varAll = [];
         Path.lAll = [];
         Path.sAll = [];
