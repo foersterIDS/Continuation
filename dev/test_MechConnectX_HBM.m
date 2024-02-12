@@ -25,11 +25,11 @@ nlS = NonlinearMechanicalSystem(M,K,'damping',C,'nonlinearForce',fNl,...
     'externalForce',fEx);
 % HBM
 nH = 5;
-R = @(Q,Om) resHBM(nlS,nH,Q,OmPara.changeValue(Om));
+R = @(Q,Om) resHBM(nlS,nH,Q,Om,OmPara);
 %% Continuation
 Om0 = 0;
 OmE = nlS.eigenAngularFrequencies(end)*2;
-Q0 = getQ0(nlS,OmPara.changeValue(Om0),nH);
+Q0 = getQ0(nlS,nH,Om0,OmPara);
 ds0 = (OmE-Om0)*10^-3;
 dsMax = 1*10^-1;
 [Qs,Oms,exitflag,Bifurcation,sAll,Js,breakFunOut,InfoOut] =...
@@ -37,8 +37,8 @@ dsMax = 1*10^-1;
     'dsMax',dsMax,'jacobianOut','full',...
     'plot','on','checkJacobian','on');
 %% post processing
-qhs = getAmplitude(nlS,Qs,Oms,nH,'OmParameter',OmPara);
-sts = hillStability(nlS,Qs,Oms,nH,'jacobian',Js,'OmParameter',OmPara);
+qhs = getAmplitude(nlS,nH,Qs,Oms,OmPara);
+sts = hillStability(nlS,nH,Qs,Oms,OmPara,'jacobian',Js,'OmParameter',OmPara);
 idxInstab = getInstableSegments(sts);
 %% plot
 figure(362);
