@@ -16,7 +16,7 @@ function [jac,f0] = numericJacobian(f, x, NameValueArgs)
         f (1,1) function_handle
         x (:,1) double
         NameValueArgs.centralValue (:,1) double
-        NameValueArgs.derivativeDimensions (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(NameValueArgs.derivativeDimensions,1)}
+        NameValueArgs.derivativeDimensions (1,:) double {mustBeInteger,mustBeGreaterThanOrEqual(NameValueArgs.derivativeDimensions,1)}
         NameValueArgs.diffQuot (1,1) struct
     end
     
