@@ -24,7 +24,7 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
                         idxHist = oobHist(end):(nPath-1);
                         xHist = [Path.varAll(:,idxHist);Path.lAll(idxHist)];
                         alphaHist = acos(((xHist(:,1:(end-1))-xi)'*(xHist(:,end)-xi))./(sqrt(diag((xHist(:,1:(end-1))-xi)'*(xHist(:,1:(end-1))-xi)))*sqrt((xHist(:,end)-xi)'*(xHist(:,end)-xi))));
-                        Opt.alphaReverse = 2*pi-2*max(alphaHist);
+                        Opt.alphaReverse = min(max(pi-4*max(alphaHist),pi/64),3/4*pi);
                     end
                 end
                 if ((normXsXi>=Opt.dsTol(1)*ds && normXsXi<=Opt.dsTol(2)*ds || nPath==1) && normXsXi<=Opt.dsTol(2)*Opt.dsMax) || Do.convergeToTarget || Opt.corrector.unique
