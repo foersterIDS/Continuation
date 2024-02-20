@@ -38,7 +38,7 @@ dsMax = 1*10^-1;
     'plot','on','checkJacobian','on');
 %% post processing
 qhs = getAmplitude(nlS,nH,Qs,Oms,OmPara);
-sts = hillStability(nlS,nH,Qs,Oms,OmPara,'jacobian',Js,'OmParameter',OmPara);
+sts = hillStability(nlS,nH,Qs,Oms,OmPara,'jacobian',Js);
 idxInstab = getInstableSegments(sts);
 %% plot
 figure(362);
