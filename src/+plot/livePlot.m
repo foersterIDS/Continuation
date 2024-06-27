@@ -21,7 +21,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
 %         Opt.livePlotFig = NaN;
 %     end
     if (Opt.plot.basic || Opt.plot.semilogx || Opt.plot.semilogy || Opt.plot.loglog)
-        if length(Path.lAll) == 1
+        if isscalar(Path.lAll)
             
             if isnan(Opt.livePlotFig) % test for existing figure to plot in
                 %% delete used tags
@@ -85,7 +85,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
                 Opt.livePlotFig = fig.Number; % reference to existing fig
             end
             
-        elseif Bifurcation.flag == -1
+        elseif Info.finalSolutionPoint
             %% final change in live plot
             %
             set(0, 'currentfigure', Plot.fig);
@@ -191,7 +191,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             vPre = NaN(Info.nv,1);
         end
         %
-        if length(Path.lAll) == 1
+        if isscalar(Path.lAll)
             if isnan(Opt.livePlotFig) % test for existing figure to plot in
                 fig = figure('units', 'normalized', 'position', [0.05,0.1,0.9,0.8]); % create new fig
                 clf;
@@ -302,7 +302,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             if isnan(Opt.livePlotFig)
                 Opt.livePlotFig = fig.Number; % reference to existing fig
             end
-        elseif Bifurcation.flag == -1
+        elseif Info.finalSolutionPoint
             %% final change in live plot
             %
             set(0, 'currentfigure', Plot.fig);
@@ -488,7 +488,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
         elseif numPl+1 < 3
             error('3D plot only works with at least two variables!');
         end
-        if length(Path.lAll) == 1
+        if isscalar(Path.lAll)
             if isnan(Opt.livePlotFig) % test for existing figure to plot in
                 %% delete used tags
                 %
@@ -541,7 +541,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             if isnan(Opt.livePlotFig)
                 Opt.livePlotFig = fig.Number; % reference to existing fig
             end
-        elseif Bifurcation.flag == -1
+        elseif Info.finalSolutionPoint
             %% final change in live plot
             %
             set(0, 'currentfigure', Plot.fig);
@@ -608,7 +608,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
         end
     elseif Opt.plot.dpa
         %% plot dpa
-        if length(Path.lAll) == 1
+        if isscalar(Path.lAll)
             if isnan(Opt.livePlotFig) % test for existing figure to plot in
                 %% delete used tags
                 %
@@ -677,7 +677,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             if isnan(Opt.livePlotFig)
                 Opt.livePlotFig = fig.Number; % reference to existing fig
             end
-        elseif Bifurcation.flag == -1
+        elseif Info.finalSolutionPoint
             %% final change in live plot
             %
             set(0, 'currentfigure', Plot.fig);
@@ -689,7 +689,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
                 newYData = Path.lAll;
                 newZData = Path.varAll(1:(end-1),:);
             else
-                if numel(Path.lAll(:,1))==1
+                if isscalar(Path.lAll(:,1))
                     newXData = Path.lAll;
                     newYData = Opt.g0*ones(size(Path.lAll));
                     newZData = Path.varAll;

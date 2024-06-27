@@ -462,9 +462,8 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     if aux.ison(Opt.plot) && initialExitflag>0
         try
-            BifurcationLastPlot = Bifurcation;
-            BifurcationLastPlot.flag = -1;
-            plot.livePlot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, funPredictor, sPredictor, Plot, BifurcationLastPlot,dpaPoints);
+            Info.finalSolutionPoint = true;
+            plot.livePlot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, funPredictor, sPredictor, Plot, Bifurcation,dpaPoints);
             if isfield(Plot,'plCurr')
                 delete(Plot.plCurr);
             end
