@@ -34,16 +34,22 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
             neededParameters = Opt.eventUserInput{k}.neededParameters;
             dsMin = Opt.eventUserInput{k}.dsMin;
             dsMax = Opt.eventUserInput{k}.dsMax;
-
+            
             if isfield(Opt.eventUserInput{k},'counterMax')
-                varInput = {'counter',Opt.eventUserInput{k}.counterMax};
+                counterMax = Opt.eventUserInput{k}.counterMax;
             else
-                varInput = [];
+                counterMax = [];
+            end
+
+            if isfield(Opt.eventUserInput{k},'dsAfter')
+                dsAfter = Opt.eventUserInput{k}.dsAfter;
+            else
+                dsAfter = [];
             end
             %
             % create event
             %
-            eventObj.addEvent(condition,neededParameters,dsMin,dsMax,varInput);
+            eventObj.addEvent(condition,neededParameters,dsMin,dsMax,"counterMax",counterMax,"dsAfter",dsAfter);
             %
         end
         %

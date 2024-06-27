@@ -17,14 +17,15 @@ classdef StepSizeControlEvent < handle
             obj.stepsizeevents = cell(0);
         end
         
-        function obj = addEvent(obj,eventCondition,neededParameters,dsMin,dsMax,counterMax)
+        function obj = addEvent(obj,eventCondition,neededParameters,dsMin,dsMax,NameValueArgs)
             arguments
                 obj
                 eventCondition function_handle
                 neededParameters (1,:) cell
                 dsMin (1,1) double {mustBePositive}
                 dsMax (1,1) double {mustBePositive,mustBeGreaterThan(dsMax,dsMin)}
-                counterMax (1,1) double {mustBeIntegerorInf(counterMax),mustBePositive} = [];
+                NameValueArgs.counterMax (1,1) double {mustBeIntegerorInf(NameValueArgs.counterMax),mustBePositive};
+                NameValueArgs.dsAfter (1,1) double {mustBePositive}
             end
             
             len = length(obj.stepsizeevents);
@@ -34,8 +35,11 @@ classdef StepSizeControlEvent < handle
             obj.stepsizeevents{idx}.dsMin = dsMin;
             obj.stepsizeevents{idx}.dsMax = dsMax;
             
-            if nargin == 5
-                obj.stepsizeevents{idx}.counterMax = counterMax;
+            if isfield(NameValueArgs,'counterMax')
+                obj.stepsizeevents{idx}.counterMax = NameValueArgs.counterMax;
+            end
+            if isfield(NameValueArgs,'dsAfter')
+                obj.stepsizeevents{idx}.dsAfter = NameValueArgs.dsAfter;
             end
         end
 

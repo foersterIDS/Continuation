@@ -1,5 +1,5 @@
 clear;
-close all;
+% close all;
 clc;
 %% move to folder of Beispiel_03.m
 if(~isdeployed)
@@ -20,7 +20,7 @@ eventNeededParameters = {'Path'};
 eventDsMin = 1e-10;
 eventDsMax = 1e-3;
 eventCounterMax = 1;
-eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,counterMax=eventCounterMax);
 
 % Add second event
 eventCondition = @(Path) Path.lAll(end) >= 1.4;
@@ -28,7 +28,7 @@ eventNeededParameters = {'Path'};
 eventDsMin = 1e-10;
 eventDsMax = 1e-2;
 eventCounterMax = 1;
-eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,eventCounterMax);
+eventObj = eventObj.addEvent(eventCondition,eventNeededParameters,eventDsMin,eventDsMax,counterMax=eventCounterMax);
 
 %% Solve:
 [varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
