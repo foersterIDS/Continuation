@@ -13,7 +13,7 @@ function [R] = residual(fun,x,Opt,Info,scale)
     else
         R1 = fun(x(1:end-1),x(end));
         funJ = @(v) fun(v,x(end));
-        J1 = aux.numericJacobian(funJ,x(1:Info.nv),R1,'diffquot',Opt.diffquot);
+        J1 = aux.numericJacobian(funJ,x(1:Info.nv),'diffquot',Opt.diffquot);
     end
     
     if Opt.bifResidual.determinant

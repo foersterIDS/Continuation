@@ -25,6 +25,7 @@ classdef StepSizeEventManager < handle
             % check all events whether anys condition is met
             %
             obj.activeEvents = [];
+            kLastActive = zeros(len,1);
             for k = 1:len
                 if obj.allEvents{k}.checkEvent(valueStruct)
                     %
@@ -39,6 +40,7 @@ classdef StepSizeEventManager < handle
                     % if event was active in the last run but isnt now
                     %
                     if obj.allEvents{k}.get('lastActive')
+                        kLastActive(k) = 1;
                         obj.allEvents{k}.set('lastActive',false);
                     end
                 end
@@ -58,7 +60,19 @@ classdef StepSizeEventManager < handle
                 %
                 % new stepsize is old stepsize
                 %
-                dsNew.ds = dsCurrent;
+                obj.changed = false;
+                if any(kLastActive)
+                    for kk = 1:len
+                        if kLastActive(kk) && ~isempty(obj.allEvents{kk}.get('dsAfter'))
+                            dsNew.ds = obj.allEvents{kk}.get('dsAfter');
+                            obj.changed = true;
+                        else
+                            dsNew.ds = dsCurrent;
+                        end
+                    end
+                else
+                    dsNew.ds = dsCurrent;
+                end
                 %
                 % set dsMax and dsMin to initial values
                 %
@@ -71,19 +85,31 @@ classdef StepSizeEventManager < handle
             end
         end
 
-        function addEvent(obj,eventCondition, neededParams, dsMin, dsMax, varInput)
-            if nargin == 5 || isempty(varInput)
-                varInput = [];
+        function addEvent(obj,eventCondition, neededParams, dsMin, dsMax, NameValueArgs)
+            arguments
+                obj
+                eventCondition
+                neededParams
+                dsMin
+                dsMax
+                NameValueArgs.counterMax
+                NameValueArgs.dsAfter
+            end
+            if isempty(NameValueArgs.counterMax)
+                NameValueArgs = rmfield(NameValueArgs,'counterMax');
+            end
+            if isempty(NameValueArgs.dsAfter)
+                NameValueArgs = rmfield(NameValueArgs,'dsAfter');
             end
             if isempty(obj.allEvents)
-                obj.allEvents = {stepSize.StepSizeSingleEvent(eventCondition, neededParams, dsMin, dsMax, varInput)};
+                obj.allEvents = {stepSize.StepSizeSingleEvent(eventCondition, neededParams, dsMin, dsMax, NameValueArgs)};
             else
                 len = numel(obj.allEvents);
                 tmp = cell(len+1,1);
                 for k = 1:len
                     tmp{k} = obj.allEvents{k};
                 end
-                tmp{end} = stepSize.StepSizeSingleEvent(eventCondition, neededParams, dsMin, dsMax, varInput);
+                tmp{end} = stepSize.StepSizeSingleEvent(eventCondition, neededParams, dsMin, dsMax, NameValueArgs);
                 obj.allEvents = tmp;
             end
         end

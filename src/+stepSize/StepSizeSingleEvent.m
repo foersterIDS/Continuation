@@ -13,13 +13,21 @@ classdef StepSizeSingleEvent < handle
         dsMin {mustBePositive}
         dsMax {mustBePositive}
         counterMax
+        dsAfter
 
         counter = 0
         lastActive = false
     end
 
     methods
-        function obj = StepSizeSingleEvent(eventCondition, neededParameters, dsMin, dsMax, variableInput)
+        function obj = StepSizeSingleEvent(eventCondition, neededParameters, dsMin, dsMax, NameValueArgs)
+            arguments
+                eventCondition
+                neededParameters
+                dsMin
+                dsMax
+                NameValueArgs
+            end
             if isa(eventCondition, 'function_handle')
                 obj.eventCondition = eventCondition;
             else
@@ -36,18 +44,20 @@ classdef StepSizeSingleEvent < handle
             obj.dsMin = dsMin;
             obj.dsMax = dsMax;
             
-            if ~isempty(variableInput)
-                if strcmp(variableInput{1},'counter')
-                    if (round(variableInput{2}) == variableInput{2} && variableInput{2} >= 0) || isinf(variableInput{2})
-                        obj.counterMax = variableInput{2};
-                    else
-                        error('Wrong input in SingleEvent!');
-                    end
+            if isfield(NameValueArgs,'counterMax')
+                if (round(NameValueArgs.counterMax) == NameValueArgs.counterMax && NameValueArgs.counterMax >= 0) || isinf(NameValueArgs.counterMax)
+                    obj.counterMax = NameValueArgs.counterMax;
                 else
                     error('Wrong input in SingleEvent!');
                 end
             else
                 obj.counterMax = inf;
+            end
+
+            if isfield(NameValueArgs,'dsAfter')
+                obj.dsAfter = NameValueArgs.dsAfter;
+            else
+                obj.dsAfter = [];
             end
             
         end
