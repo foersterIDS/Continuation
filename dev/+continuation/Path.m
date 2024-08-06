@@ -10,6 +10,9 @@ classdef Path < handle
         biftestValue
         JAll
         lAll
+        nL
+        nVar
+        outputFormat
         pathInfoValue
         sAll
         saveAllJacobian
@@ -21,44 +24,54 @@ classdef Path < handle
 
     properties (Dependent)
         nAll
-        nv
         xAll
     end
     %% methods
     methods
         %% constructor
-        function obj = Path(NameValueArgs)
+        function obj = Path(nVar,nL,NameValueArgs)
             arguments
+                nVar (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(nVar,1)}
+                nL (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(nL,1)}
                 NameValueArgs.saveAllJacobian (1,1) logical = false
             end
+            obj.nVar = nVar;
+            obj.nL = nL;
             obj.saveAllJacobian = NameValueArgs.saveAllJacobian;
-            obj.biftestValue = [];
+            obj.biftestValue = zeros(1,0);
             if obj.saveAllJacobian
                 obj.JAll = {};
             else
                 obj.JAll = cell(1,3); % initial, last, previous
             end
-            obj.lAll = [];
-            obj.pathInfoValue = [];
-            obj.sAll = [];
-            obj.signDetJAll = [];
-            obj.speedOfContinuation = [];
-            obj.varAll = [];
-            obj.xPredictor = [];
-        end
-        %% getter
-        function nAll = get.nAll(obj)
-            nAll = numel(obj.lAll);
+            obj.lAll = zeros(nL,0);
+            obj.pathInfoValue = zeros(1,0);
+            obj.sAll = zeros(1,0);
+            obj.signDetJAll = zeros(1,0);
+            obj.speedOfContinuation = zeros(1,0);
+            obj.varAll = zeros(nVar,0);
+            obj.xPredictor = zeros(nVar+nL,0);
+            obj.resetOutput();
         end
 
-        function nv = get.nv(obj)
-            nv = numel(obj.varAll(:,1));
+        %% getter
+        function nAll = get.nAll(obj)
+            nAll = numel(obj.lAll(1,:));
         end
 
         function xAll = get.xAll(obj)
             xAll = [obj.varAll;obj.lAll];
         end
+
         %% setter
+        function set.outputFormat(obj,oF)
+            arguments
+                obj (1,1) Path
+                oF (1,:) char {mustBeMember(oF,{'singleValueForL','full'})}
+            end
+            obj.outputFormat = oF;
+        end
+
         %% general methods
         function addPoint(obj,var,l,J,pos,NameValueArgs)
             %% arguments
@@ -81,6 +94,10 @@ classdef Path < handle
             end
             %% add/insert
             % ... TODO!
+        end
+
+        function resetOutput(obj)
+            obj.outputFormat = 'singleValueForL';
         end
     end
 end
