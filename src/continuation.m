@@ -91,6 +91,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.nStepMax (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.nStepMax,0)}
         NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeSmallerThan(NameValueArgs.optimalContractionRate,1)}
         NameValueArgs.pathInfoFunction (1,1) function_handle
+        NameValueArgs.pauseOnError {validation.scalarLogical}
         NameValueArgs.plot (1,:) char {mustBeMember(NameValueArgs.plot,{'on','off','basic','detail','dpa','semilogx','semilogy','loglog','threeDim'})}
         NameValueArgs.plotPause {validation.scalarLogical} % #scalar#positive#nonzero#integer|#scalar#logical
         NameValueArgs.plotVarOfInterest (1,1) double {mustBeGreaterThan(NameValueArgs.plotVarOfInterest,0)} % #scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
@@ -160,15 +161,14 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %% find initial solution
     %
     residualInitial = @(v) aux.residualFixedValue(func,v,Opt.l0,Opt);
-    [Path.varAll,funInitial,initialExitflag,Solver.output,Jacobian.initial] = Solver.main(residualInitial,Info.var0,Opt.dscale0(1:end-1));
+    [varInitial,funInitial,initialExitflag,Solver.output,Jacobian.initial] = Solver.main(residualInitial,Info.var0,Opt.dscale0(1:end-1));
     Jacobian.solver = Jacobian.initial;
-    [Info,Solver] = aux.checkJacobian(residualInitial,funInitial,Path.varAll,Info,Jacobian,Opt,Solver);
+    [Info,Solver] = aux.checkJacobian(residualInitial,funInitial,varInitial,Info,Jacobian,Opt,Solver);
     breakFunOut = [];
     event.eventObj = [];
     if initialExitflag>=0
-        Path.lAll = Opt.l0;
-        Path.sAll = 0;
-        Path.biftestValue = Opt.bifAdditionalTestfunction(func,[Path.varAll;Path.lAll],Jacobian,Path,Info);
+        Path.addPointAtEnd(varInitial,Opt.l0,Jacobian.initial,...
+            'bifTestValue',Opt.bifAdditionalTestfunction(func,[varInitial;Opt.l0],Jacobian,Path,Info));
         Do.continuation = true;
         Do.loop = true;
         dpaPoints = [];
@@ -178,7 +178,9 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         if Opt.jacobianOut.full
             Jacobian.all = Jacobian.solver;
         end
+        Path.outputFormat = 'full';
         [~,breakFunOut] = Opt.breakFunction(funInitial,Jacobian.solver,Path.varAll,Path.lAll,breakFunOut);
+        Path.resetOutput();
         aux.printLine(Opt,'Initial solution at %s = %.2e\n',paraName,Opt.l0);
         if aux.ison(Opt.bifurcation)
             Jacobian.signDetRed = sign(det(Jacobian.initial));
@@ -229,8 +231,12 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         if Do.deflate
             try
                 residual = @(x) aux.deflation(residual,xDeflation,x,Opt);
-            catch
-                aux.printLine(Opt,'---> delation: catch!\n');
+            catch exceptionDeflation
+                aux.printLine(Opt,'---> deflation: catch!\n');
+                if Opt.pauseOnError
+                    aux.printLine(Opt,['----> ',exceptionDeflation.message]);
+                    input('Press [ENTER] to continue...');
+                end
                 Counter.catch = Counter.catch + 1;
             end
         elseif Do.suspend
@@ -261,10 +267,14 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                 [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(Path,ds,Jacobian.last,func,resCorr,Solver,Opt);
                 xPredictor = [varPredictor;lPredictor];
             end
-        catch
+        catch exceptionPredictor
             [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(Path,ds,Jacobian.last,func,resCorr,Solver,Opt);
             xPredictor = [varPredictor;lPredictor];
             aux.printLine(Opt,'---> predictor: catch!\n');
+            if Opt.pauseOnError
+                aux.printLine(Opt,['----> ',exceptionPredictor.message]);
+                input('Press [ENTER] to continue...');
+            end
             Counter.catch = Counter.catch + 1;
         end
         % replace xPredictor with xTarget?:
@@ -310,13 +320,17 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
                 [Info,Solver] = aux.checkJacobian(residual,funSolution,xSolution,Info,Jacobian,Opt,Solver);
             end
             Is.currentJacobian = true;
-        catch
+        catch exceptionSolve
             xSolution = NaN(size(xPredictor));
             funSolution = inf(size(xPredictor));
             Solver.exitflag = -2;
             Solver.output = Solver.defaultOutput;
             Do.convergeToTarget = false;
             aux.printLine(Opt,'---> solve: catch!\n');
+            if Opt.pauseOnError
+                aux.printLine(Opt,['----> ',exceptionSolve.message]);
+                input('Press [ENTER] to continue...');
+            end
             Counter.catch = Counter.catch + 1;
         end
         %
@@ -419,8 +433,12 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         if aux.ison(Opt.plot) && Is.valid
             try
                 [Plot, Opt] = plot.livePlot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, funPredictor, sPredictor, Plot, Bifurcation, dpaPoints);
-            catch
+            catch exceptionPlot
                 aux.printLine(Opt,'--> The plot update has failed.\n');
+                if Opt.pauseOnError
+                    aux.printLine(Opt,['----> ',exceptionPlot.message]);
+                    input('Press [ENTER] to continue...');
+                end
             end
         end
         %
@@ -439,16 +457,24 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
             delete(Plot.plCurr);
             [Path,Bifurcation] = bifurcation.trace(Opt,OptIsSet,Path,Bifurcation,Solver,Info,func,resCorr);
             Jacobian.last = [];
-        catch
+        catch exceptionBifurcationTrace
             aux.printLine(Opt,'--> Failed to trace bifurcations.\n');
+            if Opt.pauseOnError
+                aux.printLine(Opt,['---> ',exceptionBifurcationTrace.message]);
+                input('Press [ENTER] to continue...');
+            end
         end
     elseif Opt.bifurcation.parameterTrace
         try
             delete(Plot.plCurr);
             Path = bifurcation.parameterTrace(Opt,Path,Bifurcation,Info,fun);
             Jacobian.last = [];
-        catch
+        catch exceptionBifurcationParameterTrace
             aux.printLine(Opt,'--> Failed to trace bifurcation parameter.\n');
+            if Opt.pauseOnError
+                aux.printLine(Opt,['---> ',exceptionBifurcationParameterTrace.message]);
+                input('Press [ENTER] to continue...');
+            end
         end
     end
     %
@@ -467,8 +493,12 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
             if isfield(Plot,'plCurr')
                 delete(Plot.plCurr);
             end
-        catch
+        catch exceptionPlotFinal
             aux.printLine(Opt,'--> The plot update has failed.\n');
+            if Opt.pauseOnError
+                aux.printLine(Opt,['---> ',exceptionPlotFinal.message]);
+                input('Press [ENTER] to continue...');
+            end
         end
         drawnow;
     end

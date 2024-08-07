@@ -10,23 +10,17 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
     xDeflation = xSolution;
     if Is.valid
         %% valid result
-        if isempty(Plus.x)
-            Path.varAll = [Path.varAll,xSolution(1:end-1)];
-            Path.lAll = [Path.lAll,xSolution(end)];
-            Path.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-1);Path.lAll(end-1)])];
-            if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue = [Path.biftestValue,Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info)];
-            end
-            if OptIsSet.pathInfoFunction
-                Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end))];
-            end
-            if Opt.jacobianOut.full
-                if numel(Jacobian.solver(1,:))==(Info.nv+1)
-                    Jacobian.all = cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1)));
-                else
-                    Jacobian.all = cat(3,Jacobian.all,[Jacobian.solver,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funSolution,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)]);
-                end
-            end
+        optAddPointArgs = {};
+        if OptIsSet.bifAdditionalTestfunction
+            optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
+            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
+        end
+        if OptIsSet.pathInfoFunction
+            optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
+            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end));
+        end
+        Path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),Jacobian.solver,optAddPointArgs{:});
+        if ~Path.plus
             % update stepsize information
             % measure speed
             %
@@ -56,18 +50,6 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Jacobian.last = Jacobian.solver;
             Counter.validStepback = 0;
         else
-            Path.varAll = [Path.varAll,xSolution(1:end-1),Plus.x(1:end-1)];
-            Path.lAll = [Path.lAll,xSolution(end),Plus.x(end)];
-            Path.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-2);Path.lAll(end-2)])*[1,1]+norm(Plus.x-xSolution)*[0,1]];
-            if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue = [Path.biftestValue,Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info),Plus.biftestValue];
-            end
-            if OptIsSet.pathInfoFunction
-                Path.pathInfoValue = [Path.pathInfoValue,Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end)),Plus.pathInfoValue];
-            end
-            if Opt.jacobianOut.full
-                Jacobian.all = cat(3,cat(3,Jacobian.all,Jacobian.solver(1:Info.nv,1:(Info.nv+1))),Plus.jacobian(1:Info.nv,1:(Info.nv+1)));
-            end
             if StepsizeOptions.predictor
                 Temp.predictor = [Temp.predictor, xPredictor, Plus.xPredictor];
                 Plus.xPredictor = [];
@@ -85,6 +67,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Jacobian.last = Plus.jacobian;
             Plus.jacobian = [];
             Counter.validStepback = Counter.validStepback+1;
+            Path.toggleStepback();
         end
         Do.deflate = false;
         Do.homotopy = false;
@@ -113,11 +96,11 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
         end
         if ((Counter.error==Opt.stepbackErrorCounter) || Do.stepbackManually) && (numel(Path.lAll)>1)
             %% stepback
+            Path.toggleStepback();
             if Counter.validStepback<Opt.stepbackErrorCounter
                 Do.stepback = true;
-                Plus.x = [Path.varAll(:,end);Path.lAll(end)];
                 if OptIsSet.bifAdditionalTestfunction
-                    Plus.biftestValue = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
+                    Plus.bifTestValue = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
                 end
                 if OptIsSet.pathInfoFunction
                     Plus.pathInfoValue = Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end));
@@ -138,7 +121,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Path.lAll(end) = [];
             Path.sAll(end) = [];
             if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue(end) = [];
+                Path.bifTestValue(end) = [];
             end
             if OptIsSet.pathInfoFunction
                 Path.pathInfoValue(:,end) = [];
@@ -160,16 +143,8 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Jacobian.last = Jacobian.previous;
         elseif (Counter.error==Opt.stepbackErrorCounter+1) && (numel(Path.lAll)>1)
             %% undo stepback
+            Path.toggleStepback();
             if ~isempty(Plus.x)
-                Path.varAll = [Path.varAll,Plus.x(1:end-1)];
-                Path.lAll = [Path.lAll,Plus.x(end)];
-                Path.sAll = [Path.sAll,Path.sAll(end)+norm([Path.varAll(:,end);Path.lAll(end)]-[Path.varAll(:,end-1);Path.lAll(end-1)])];
-                if OptIsSet.bifAdditionalTestfunction
-                    Path.biftestValue = [Path.biftestValue,Plus.biftestValue];
-                end
-                if OptIsSet.pathInfoFunction
-                    Path.pathInfoValue = [Path.pathInfoValue,Plus.pathInfoValue];
-                end
                 if Opt.jacobianOut.full
                     Jacobian.all = cat(3,Jacobian.all,Plus.jacobian(1:Info.nv,:));
                 end
@@ -188,30 +163,21 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Do.suspend = false;
         elseif (Counter.error==Opt.suspendContinuationErrorCounter) && (numel(Path.lAll)>1)
             %% suspend
+            Path.suspend();
             Plus = aux.clearStruct(Plus);
             Do.stepback = false;
             Do.suspend = true;
         elseif logical(Opt.removeErrorCounter) && ((Counter.error==Opt.removeErrorCounter) && (numel(Path.lAll)>1))
             %% remove
-            nPath = numel(Path.lAll);
+            nPath = Path.nAll;
             Remove.s = Path.sAll(nPath);
             nRmv = min([2*Opt.removeErrorCounter,nPath-1]);
             Opt.dsMax = max([mean(diff(Path.sAll(nPath+((-ceil(nRmv/2)+1):0))))*0.75,Opt.dsMin,Opt.dsMin*10]);
-            Path.varAll(:,nPath+((-nRmv+1):0)) = [];
-            Path.lAll(nPath+((-nRmv+1):0)) = [];
-            Path.sAll(nPath+((-nRmv+1):0)) = [];
-            if OptIsSet.bifAdditionalTestfunction
-                Path.biftestValue(nPath+((-nRmv+1):0)) = [];
-            end
-            if OptIsSet.pathInfoFunction
-                Path.pathInfoValue(:,nPath+((-nRmv+1):0)) = [];
-            end
-            if Opt.jacobianOut.full
-                Jacobian.all(:,:,nPath+((-nRmv+1):0)) = [];
-            end
+            Path.remove(nPath+((-nRmv+1):0));
             Remove.ds = Remove.s-Path.sAll(end);
             dscaleRmv = aux.getDscale(Opt,Path);
-            residualFixedValueRmv = @(v) aux.residualFixedValue(func,v,Path.lAll(end),Opt);
+            lRmv = Path.lAll(end);
+            residualFixedValueRmv = @(v) aux.residualFixedValue(func,v,lRmv,Opt);
             [varRmv,funRmv,~,~,rmvJacobian] = Solver.main(residualFixedValueRmv,Path.varAll(:,end),dscaleRmv(1:end-1));
             if ~isempty(Bifurcation.bif) && numel(Bifurcation.bif(1,:))>0
                 nBifsRmv = sum(sum(Bifurcation.bif(1,:)'==(nPath+((-nRmv+1):0))));
@@ -220,7 +186,18 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                     Jacobian.signDetRed = Jacobian.signDetRed*(-1)^(nBifsRmv);
                 end
             end
-            Path.varAll(:,end) = varRmv;
+            Path.remove(Path.nAll);
+            xRmv = [varRmv;lRmv];
+            optAddPointArgs = {};
+            if OptIsSet.bifAdditionalTestfunction
+                optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
+                optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xRmv,rmvJacobian,Path,Info);
+            end
+            if OptIsSet.pathInfoFunction
+                optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
+                optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,rmvJacobian,xRmv(1:(end-1)),xRmv(end));
+            end
+            Path.addPointAtEnd(varRmv,lRmv,rmvJacobian,optAddPointArgs{:});
             Jacobian.last = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
             if Opt.jacobianOut.full
                 Jacobian.all(:,:,end) = Jacobian.last;

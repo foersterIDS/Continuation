@@ -164,7 +164,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
         % reset values
         Path.speedOfContinuation = [];
         Path.xPredictor = [];
-        Path.biftestValue = [];
+        Path.bifTestValue = [];
         Path.pathInfoValue = [];
         Jacobian.last = [];
         Jacobian.previous = [];
@@ -188,7 +188,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
             % reset values
             Path.speedOfContinuation = [];
             Path.xPredictor = [];
-            Path.biftestValue = [];
+            Path.bifTestValue = [];
             Path.pathInfoValue = [];
             Jacobian.last = [];
             Jacobian.previous = [];

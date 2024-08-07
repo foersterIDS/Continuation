@@ -91,7 +91,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                     Path.varAll = [Path.varAll(:,1:end-1),xBif(1:end-1),Path.varAll(:,end)];
                     Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
                     if OptIsSet.bifAdditionalTestfunction
-                        Path.biftestValue=[Path.biftestValue Opt.bifAdditionalTestfunction(func,xBif,Jacobian,Path,Info)];
+                        Path.bifTestValue=[Path.bifTestValue Opt.bifAdditionalTestfunction(func,xBif,Jacobian,Path,Info)];
                     end
                     % 
                     % get type of bifurcation
@@ -129,7 +129,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
     if OptIsSet.bifAdditionalTestfunction && bifFound==0
         if Opt.bifurcation.mark
             %% mark bifurcations:
-            if Path.biftestValue(end-1)*Path.biftestValue(end)<=0
+            if Path.bifTestValue(end-1)*Path.bifTestValue(end)<=0
                 bifFound=1;
                 bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
                 Bifurcation.bif = [Bifurcation.bif,[numel(Path.lAll);bifType]];
@@ -143,7 +143,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
             [bifSolver,defaultBifSolverOutput] = continuation.solver(OptBif,0);
             detSolverJacobianRed = det(lastJacobianRed);
             Bifurcation.scaling = [Bifurcation.scaling,1/detSolverJacobianRed];
-            if Path.biftestValue(end-1)*Path.biftestValue(end)<=0
+            if Path.bifTestValue(end-1)*Path.bifTestValue(end)<=0
                 bifFound=1;
                 residualBif = @(x) bifurcation.residualAdditionalTestfunction(func,x,Opt,Jacobian,Path,Info);
                 %% find exact point:
@@ -165,7 +165,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                         Path.lAll = [Path.lAll(1:end-1),xBif(end),Path.lAll(end)];
                         % jacobian for xBif
                         Jacobianbif.solver=aux.numericJacobian(@(x)func(x(1:end-1),x(end)), xBif,'diffquot', Opt.diffquot); 
-                        Path.biftestValue=[Path.biftestValue(1:end-1) Opt.bifAdditionalTestfunction(func,xBif,Jacobianbif,Path,Info),Path.biftestValue(end)];
+                        Path.bifTestValue=[Path.bifTestValue(1:end-1) Opt.bifAdditionalTestfunction(func,xBif,Jacobianbif,Path,Info),Path.bifTestValue(end)];
                         % 
                         % get type of bifurcation
                         bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown

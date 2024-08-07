@@ -25,4 +25,4 @@ addpath('../examples/testCases/testfun02_aux/');
 testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( Om * t )
 % Solve:
 [varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
-    continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere');
+    continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere','pauseOnError',true);
