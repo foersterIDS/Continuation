@@ -224,7 +224,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         Counter.loop = Counter.loop+1;
         Is.currentJacobian = false;
         Counter.catchOld = Counter.catch;
-        PathStepsizeInfo = stepSize.updateTemp(Path,Solver,StepsizeOptions,PathStepsizeInfo);
+        PathStepsizeInfo = stepSize.updatePathStepsizeInfo(Path,Solver,StepsizeOptions,PathStepsizeInfo);
         %
         %% residual
         %
