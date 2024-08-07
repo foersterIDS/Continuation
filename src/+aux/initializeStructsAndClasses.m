@@ -5,7 +5,7 @@
 %   16.09.2021 - Alwin Förster
 %   06.08.2022 - Anna Lefken
 %
-function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,StepsizeInformation] = initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,outputFlag)
+function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo] = initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,outputFlag)
     %% Bifurcation
     %
     Bifurcation = struct('bif',zeros(2,0),...
@@ -129,9 +129,9 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
                     'predictor',predictorSolver,...
                     'temp',[]);
     %
-    %% StepsizeInformation
+    %% CurrentStepsizeInfo
     %
-    StepsizeInformation = struct('rateOfContraction',NaN,...
+    CurrentStepsizeInfo = struct('rateOfContraction',NaN,...
                                  'speedOfContinuation',NaN);
     %
     %% Temp

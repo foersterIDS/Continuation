@@ -5,8 +5,8 @@
 %   28.03.2022 - Alwin Förster
 %   12.08.2022 - Anna Lefken
 %
-function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt] = ...
-    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet)
+function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt] = ...
+    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt,OptIsSet)
     xDeflation = xSolution;
     if Is.valid
         %% valid result
@@ -26,18 +26,18 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             %
             if StepsizeOptions.speedOfContinuation
                 if ~isempty(Temp.speedOfContinuation)
-                    Temp.speedOfContinuation = [Temp.speedOfContinuation, StepsizeInformation.speedOfContinuation];
+                    Temp.speedOfContinuation = [Temp.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation];
                 else
-                    Temp.speedOfContinuation = StepsizeInformation.speedOfContinuation;
+                    Temp.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
                 end
             end
             %
             % measure rate of contraction
             if StepsizeOptions.rateOfContraction
                 if ~isempty(Temp.rateOfContraction)
-                    Temp.rateOfContraction = [Temp.rateOfContraction, StepsizeInformation.rateOfContraction];
+                    Temp.rateOfContraction = [Temp.rateOfContraction, CurrentStepsizeInfo.rateOfContraction];
                 else
-                    Temp.rateOfContraction = StepsizeInformation.rateOfContraction;
+                    Temp.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
                 end
             end
             %
@@ -55,11 +55,11 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 Plus.xPredictor = [];
             end
             if StepsizeOptions.speedOfContinuation
-                Temp.speedOfContinuation = [Temp.speedOfContinuation, StepsizeInformation.speedOfContinuation, Plus.speedOfContinuation];
+                Temp.speedOfContinuation = [Temp.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
                 Plus.speedOfContinuation = [];
             end
             if StepsizeOptions.rateOfContraction
-                Temp.rateOfContraction = [Temp.rateOfContraction, StepsizeInformation.rateOfContraction, Plus.rateOfContraction];
+                Temp.rateOfContraction = [Temp.rateOfContraction, CurrentStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
                 Plus.rateOfContraction = [];
             end
             Plus.x = [];
@@ -109,10 +109,10 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                     Plus.xPredictor = xPredictor;
                 end
                 if StepsizeOptions.speedOfContinuation
-                    Plus.speedOfContinuation = StepsizeInformation.speedOfContinuation;
+                    Plus.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
                 end
                 if StepsizeOptions.rateOfContraction
-                    Plus.rateOfContraction = StepsizeInformation.rateOfContraction;
+                    Plus.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
                 end
             else
                 Do.stepback = false;

@@ -144,7 +144,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     if StepsizeOptions.rateOfContraction
         global solverStepsizes;
     end
-    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,StepsizeInformation,Temp] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,StepsizeOptions.rateOfContraction);
+    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,Temp] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,StepsizeOptions.rateOfContraction);
     clear('var0','lStart','lEnd','ds0');
     resCorr = continuation.corrector(fun,Opt);
     ds = Info.ds0;
@@ -340,15 +340,15 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         %
         if StepsizeOptions.speedOfContinuation
             timeNeeded = toc(timeNeeded);
-            StepsizeInformation.speedOfContinuation = ds/timeNeeded; 
+            CurrentStepsizeInfo.speedOfContinuation = ds/timeNeeded; 
         end
         %
         % measure rate of contraction
         if StepsizeOptions.rateOfContraction
             if size(solverStepsizes, 1) < 3
-                StepsizeInformation.rateOfContraction = Opt.optimalContractionRate;
+                CurrentStepsizeInfo.rateOfContraction = Opt.optimalContractionRate;
             else
-                StepsizeInformation.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
+                CurrentStepsizeInfo.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
             end
         end
         %
@@ -370,8 +370,8 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         [invPoiStr,Counter,Do,Is,Opt] = ...
             aux.validateResult(xSolution,Plus,funSolution,Path,ds,Solver,Jacobian,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         % confirm result:
-        [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt] = ...
-            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,StepsizeInformation,StepsizeOptions,Temp,Opt,OptIsSet);
+        [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt] = ...
+            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt,OptIsSet);
         %
         %% Bifurcations
         %
