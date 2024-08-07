@@ -1,11 +1,11 @@
-%% path continuation - aux.initializeStructs
+%% path continuation - aux.initializeStructsAndClasses
 %
 %   Institute of Dynamics and Vibration Research
 %   Leibniz University Hannover
 %   16.09.2021 - Alwin Förster
 %   06.08.2022 - Anna Lefken
 %
-function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,StepsizeInformation,Temp] = initializeStructs(var0,lStart,lEnd,ds0,Opt,outputFlag)
+function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,StepsizeInformation] = initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,outputFlag)
     %% Bifurcation
     %
     Bifurcation = struct('bif',zeros(2,0),...
