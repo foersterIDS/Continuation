@@ -144,7 +144,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     if StepsizeOptions.rateOfContraction
         global solverStepsizes;
     end
-    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,Temp] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,StepsizeOptions.rateOfContraction);
+    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,PathStepsizeInfo] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,StepsizeOptions.rateOfContraction);
     clear('var0','lStart','lEnd','ds0');
     resCorr = continuation.corrector(fun,Opt);
     ds = Info.ds0;
@@ -224,7 +224,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         Counter.loop = Counter.loop+1;
         Is.currentJacobian = false;
         Counter.catchOld = Counter.catch;
-        Temp = stepSize.updateTemp(Path,Solver,StepsizeOptions,Temp);
+        PathStepsizeInfo = stepSize.updateTemp(Path,Solver,StepsizeOptions,PathStepsizeInfo);
         %
         %% residual
         %
@@ -353,10 +353,10 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         end
         %
         if StepsizeOptions.iterations
-            if ~isempty(Temp.iterations)
-                Temp.iterations = [Temp.iterations, Solver.output.iterations];
+            if ~isempty(PathStepsizeInfo.iterations)
+                PathStepsizeInfo.iterations = [PathStepsizeInfo.iterations, Solver.output.iterations];
             else
-                Temp.iterations = Solver.output.iterations;
+                PathStepsizeInfo.iterations = Solver.output.iterations;
             end
         end
         %
@@ -370,8 +370,8 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         [invPoiStr,Counter,Do,Is,Opt] = ...
             aux.validateResult(xSolution,Plus,funSolution,Path,ds,Solver,Jacobian,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
         % confirm result:
-        [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt] = ...
-            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt,OptIsSet);
+        [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt] = ...
+            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt,OptIsSet);
         %
         %% Bifurcations
         %
@@ -401,7 +401,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         % save latest stepsize:
         dsim1 = ds;
         % save step size data:
-        [Solver,Path] = aux.updateStepsizeData(StepsizeOptions,Temp,Solver,Path);
+        [Solver,Path] = aux.updateStepsizeData(StepsizeOptions,PathStepsizeInfo,Solver,Path);
         % adjust stepsize:
         [ds,Counter,event,Opt] = stepSize.control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event,Initial);
         %

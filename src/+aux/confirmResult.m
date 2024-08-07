@@ -5,8 +5,8 @@
 %   28.03.2022 - Alwin Förster
 %   12.08.2022 - Anna Lefken
 %
-function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt] = ...
-    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,Temp,Opt,OptIsSet)
+function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt] = ...
+    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt,OptIsSet)
     xDeflation = xSolution;
     if Is.valid
         %% valid result
@@ -25,25 +25,25 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             % measure speed
             %
             if StepsizeOptions.speedOfContinuation
-                if ~isempty(Temp.speedOfContinuation)
-                    Temp.speedOfContinuation = [Temp.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation];
+                if ~isempty(PathStepsizeInfo.speedOfContinuation)
+                    PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation];
                 else
-                    Temp.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
+                    PathStepsizeInfo.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
                 end
             end
             %
             % measure rate of contraction
             if StepsizeOptions.rateOfContraction
-                if ~isempty(Temp.rateOfContraction)
-                    Temp.rateOfContraction = [Temp.rateOfContraction, CurrentStepsizeInfo.rateOfContraction];
+                if ~isempty(PathStepsizeInfo.rateOfContraction)
+                    PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, CurrentStepsizeInfo.rateOfContraction];
                 else
-                    Temp.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
+                    PathStepsizeInfo.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
                 end
             end
             %
             if StepsizeOptions.predictor
-                if ~isempty(Temp.predictor)
-                    Temp.predictor = [Temp.predictor, xPredictor];
+                if ~isempty(PathStepsizeInfo.predictor)
+                    PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, xPredictor];
                 end
             end
             Jacobian.previous = Jacobian.last;
@@ -51,15 +51,15 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             Counter.validStepback = 0;
         else
             if StepsizeOptions.predictor
-                Temp.predictor = [Temp.predictor, xPredictor, Plus.xPredictor];
+                PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, xPredictor, Plus.xPredictor];
                 Plus.xPredictor = [];
             end
             if StepsizeOptions.speedOfContinuation
-                Temp.speedOfContinuation = [Temp.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
+                PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
                 Plus.speedOfContinuation = [];
             end
             if StepsizeOptions.rateOfContraction
-                Temp.rateOfContraction = [Temp.rateOfContraction, CurrentStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
+                PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, CurrentStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
                 Plus.rateOfContraction = [];
             end
             Plus.x = [];
@@ -127,17 +127,17 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 Path.pathInfoValue(:,end) = [];
             end
             if StepsizeOptions.predictor
-                if ~isempty(Temp.predictor)
-                    Temp.predictor(:,end) = [];
+                if ~isempty(PathStepsizeInfo.predictor)
+                    PathStepsizeInfo.predictor(:,end) = [];
                 else
-                    Temp.predictor = [];
+                    PathStepsizeInfo.predictor = [];
                 end
             end
-            if StepsizeOptions.speedOfContinuation && ~isempty(Temp.speedOfContinuation)
-                Temp.speedOfContinuation(end) = [];
+            if StepsizeOptions.speedOfContinuation && ~isempty(PathStepsizeInfo.speedOfContinuation)
+                PathStepsizeInfo.speedOfContinuation(end) = [];
             end
-            if StepsizeOptions.rateOfContraction && ~isempty(Temp.rateOfContraction)
-                Temp.rateOfContraction(end) = [];
+            if StepsizeOptions.rateOfContraction && ~isempty(PathStepsizeInfo.rateOfContraction)
+                PathStepsizeInfo.rateOfContraction(end) = [];
             end
             Plus.jacobian = Jacobian.last;
             Jacobian.last = Jacobian.previous;
@@ -149,13 +149,13 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                     Jacobian.all = cat(3,Jacobian.all,Plus.jacobian(1:Info.nv,:));
                 end
                 if StepsizeOptions.predictor
-                    Temp.predictor = [Temp.predictor, Plus.xPredictor];
+                    PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, Plus.xPredictor];
                 end
                 if StepsizeOptions.speedOfContinuation
-                    Temp.speedOfContinuation = [Temp.speedOfContinuation, Plus.speedOfContinuation];
+                    PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
                 end
                 if StepsizeOptions.rateOfContraction
-                    Temp.rateOfContraction = [Temp.rateOfContraction, Plus.rateOfContraction];
+                    PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
                 end
                 Plus = aux.clearStruct(Plus);
             end
@@ -204,23 +204,23 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
             end
             if StepsizeOptions.predictor
                 if nRmv >= 3
-                    Temp.predictor = xPredictor;
+                    PathStepsizeInfo.predictor = xPredictor;
                 else
-                    Temp.predictor = Temp.predictor(:,1:end-nRmv);
+                    PathStepsizeInfo.predictor = PathStepsizeInfo.predictor(:,1:end-nRmv);
                 end
             end
             if StepsizeOptions.speedOfContinuation
                 if nRmv >= 3
-                    Temp.speedOfContinuation = [];
+                    PathStepsizeInfo.speedOfContinuation = [];
                 else
-                    Temp.speedOfContinuation = Temp.speedOfContinuation(1:end-nRmv);
+                    PathStepsizeInfo.speedOfContinuation = PathStepsizeInfo.speedOfContinuation(1:end-nRmv);
                 end
             end
             if StepsizeOptions.rateOfContraction
                 if nRmv >= 3
-                    Temp.rateOfContraction = [];
+                    PathStepsizeInfo.rateOfContraction = [];
                 else
-                    Temp.rateOfContraction = Temp.rateOfContraction(1:end-nRmv);
+                    PathStepsizeInfo.rateOfContraction = PathStepsizeInfo.rateOfContraction(1:end-nRmv);
                 end
             end
             Plus = aux.clearStruct(Plus);
