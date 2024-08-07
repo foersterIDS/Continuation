@@ -12,13 +12,16 @@ classdef Path < handle
         lAll
         nL
         nVar
-        outputFormat
         pathInfoValue
         sAll
         saveAllJacobian
         signDetJAll
         speedOfContinuation
         varAll
+    end
+
+    properties (Access = public)
+        outputFormat
         xPredictor
     end
 
@@ -26,7 +29,8 @@ classdef Path < handle
         nAll
         xAll
     end
-    %% methods
+
+    %% public methods
     methods
         %% constructor
         function obj = Path(nVar,nL,NameValueArgs)
@@ -50,7 +54,7 @@ classdef Path < handle
             obj.signDetJAll = zeros(1,0);
             obj.speedOfContinuation = zeros(1,0);
             obj.varAll = zeros(nVar,0);
-            obj.xPredictor = zeros(nVar+nL,0);
+            obj.xPredictor = zeros(nVar+nL,1);
             obj.resetOutput();
         end
 
@@ -66,38 +70,75 @@ classdef Path < handle
         %% setter
         function set.outputFormat(obj,oF)
             arguments
-                obj (1,1) Path
+                obj (1,1) continuation.Path
                 oF (1,:) char {mustBeMember(oF,{'singleValueForL','full'})}
             end
             obj.outputFormat = oF;
+        end
+
+        function set.xPredictor(obj,xP)
+            arguments
+                obj (1,1) continuation.Path
+                xP (1,:) double {mustBeVector}
+            end
+            xP = xP(:);
+            validateattributes(xP,{'double'},{'size',[obj.nVar+1,1]});
+            obj.xPredictor = xP;
         end
 
         %% general methods
         function addPoint(obj,var,l,J,pos,NameValueArgs)
             %% arguments
             arguments
-                obj (1,1) Path
+                obj (1,1) continuation.Path
                 var (:,1) double
                 l (1,1) double
                 J (:,:) double
                 pos (1,1) double {mustBeInteger,mustBeGreaterThan(pos,0)} = obj.nAll+1
                 NameValueArgs.biftestValue (1,1) double
             end
-            %% init.
-            nAll = obj.nAll;
-            if pos==nAll+1
-                doInsert = false;
-            elseif pos>0 && pos<=nAll
-                doInsert = true;
-            else
-                error('pos must be a scalar double between 1 and nAll+1.');
-            end
+            validateattributes(var,{'numeric'},{'size',[obj.nVar,1]});
+            validateattributes(l,{'numeric'},{'size',[obj.nL,1]});
             %% add/insert
+            obj.varAll = [obj.varAll(:,1:(pos-1)),var,obj.varAll(:,pos:end)];
+            obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
+            obj.sAll = [0,cumsum(sqrt(sum(diff(obj.xAll,1,2).^2,1)))];
+            if ~obj.saveAllJacobian
+                obj.JAll{3} = obj.JAll{2};
+                obj.JAll{2} = J;
+            end
+            obj.signDetJAll = [obj.signDetJAll(:,1:(pos-1)),sign(det(J(1:obj.nVar,1:obj.nVar))),obj.signDetJAll(:,pos:end)];
+            if isfield(NameValueArgs,'biftestValue')
+                obj.biftestValue = [obj.biftestValue(:,1:(pos-1)),NameValueArgs.biftestValue,obj.biftestValue(:,pos:end)];
+            end
             % ... TODO!
+%             obj.biftestValue = zeros(1,0);
+%             obj.pathInfoValue = zeros(1,0);
+%             obj.speedOfContinuation = zeros(1,0);
+        end
+
+        function addPointAtEnd(obj,var,l,J,NameValueArgs)
+            %% arguments
+            arguments
+                obj (1,1) continuation.Path
+                var (:,1) double
+                l (1,1) double
+                J (:,:) double
+                NameValueArgs.biftestValue (1,1) double
+            end
+            %% pass to addPoint(...)
+            pos = obj.nAll+1;
+            nva = aux.struct2cellPreserveFieldnames(NameValueArgs);
+            obj.addPoint(var,l,J,pos,nva{:});
         end
 
         function resetOutput(obj)
             obj.outputFormat = 'singleValueForL';
         end
+    end
+
+    %% private methods
+    methods (Access = private)
+        % ...
     end
 end
