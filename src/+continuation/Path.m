@@ -13,15 +13,16 @@ classdef Path < handle
         nL
         nVar
         pathInfoValue
+        plus = false
         sAll
         saveAllJacobian
         signDetJAll
-        speedOfContinuation
         varAll
     end
 
     properties (Access = public)
         outputFormat
+        speedOfContinuation
         xPredictor
     end
 
@@ -87,6 +88,21 @@ classdef Path < handle
         end
 
         %% general methods
+        function togglePlus(obj)
+            %% arguments
+            arguments
+                obj (1,1) continuation.Path
+            end
+            %% toggle plus
+            if plus
+                % todo...
+                % xPlus löschen und wieder hinten an Pfad anfügen
+            else
+                % todo...
+                % xPlus befüllen und von Pfad entfernen
+            end
+        end
+
         function addPoint(obj,var,l,J,pos,NameValueArgs)
             %% arguments
             arguments
@@ -132,8 +148,35 @@ classdef Path < handle
             obj.addPoint(var,l,J,pos,nva{:});
         end
 
+        function li = lIndex(obj,index)
+            arguments
+                obj (1,1) continuation.Path
+                index (1,:) double {mustBeInteger,mustBeGreaterThanOrEqual(index,1)}
+            end
+            validateattributes(index,{'double'},'<=',obj.nAll);
+            li = obj.lAll(:,index);
+        end
+
         function resetOutput(obj)
             obj.outputFormat = 'singleValueForL';
+        end
+
+        function vari = varIndex(obj,index)
+            arguments
+                obj (1,1) continuation.Path
+                index (1,:) double {mustBeInteger,mustBeGreaterThanOrEqual(index,1)}
+            end
+            validateattributes(index,{'double'},'<=',obj.nAll);
+            vari = obj.varAll(:,index);
+        end
+
+        function xi = xIndex(obj,index)
+            arguments
+                obj (1,1) continuation.Path
+                index (1,:) double {mustBeInteger,mustBeGreaterThanOrEqual(index,1)}
+            end
+            validateattributes(index,{'double'},'<=',obj.nAll);
+            xi = obj.xAll(:,index);
         end
     end
 
