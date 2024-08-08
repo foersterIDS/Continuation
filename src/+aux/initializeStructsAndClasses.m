@@ -5,7 +5,7 @@
 %   16.09.2021 - Alwin Förster
 %   06.08.2022 - Anna Lefken
 %
-function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,PathStepsizeInfo] = initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,outputFlag)
+function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,PathStepsizeInfo] = initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,OptIsSet,StepsizeOptions)
     %% Bifurcation
     %
     Bifurcation = struct('bif',zeros(2,0),...
@@ -85,7 +85,7 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
     %
     %% Path
     %
-    Path = continuation.Path(Info.nv,1,'saveAllJacobian',Opt.jacobianOut.full);
+    Path = continuation.Path(Info.nv,1,Opt,OptIsSet,StepsizeOptions);
 	%
     %% Plot
     %
@@ -120,7 +120,7 @@ function [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus
     %
     %% Solver
     %
-    [solver,predictorSolver,numJacSolver,defaultSolverOutput] = continuation.solver(Opt,outputFlag);
+    [solver,predictorSolver,numJacSolver,defaultSolverOutput] = continuation.solver(Opt,StepsizeOptions.rateOfContraction);
     Solver = struct('defaultOutput',defaultSolverOutput,...
                     'exitflag',-2,...
                     'main',solver,...

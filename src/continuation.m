@@ -144,7 +144,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     if StepsizeOptions.rateOfContraction
         global solverStepsizes;
     end
-    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,PathStepsizeInfo] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,StepsizeOptions.rateOfContraction);
+    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Jacobian,Path,Plot,Plus,Remove,Solver,CurrentStepsizeInfo,PathStepsizeInfo] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,OptIsSet,StepsizeOptions);
     clear('var0','lStart','lEnd','ds0');
     resCorr = continuation.corrector(fun,Opt);
     ds = Info.ds0;

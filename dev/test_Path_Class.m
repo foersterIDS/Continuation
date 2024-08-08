@@ -1,16 +1,36 @@
 clear;
+close all;
 clc;
+addpath('../src/')
 %% run class test
-p = continuation.Path(3,1,"saveAllJacobian",true);
+Opt = struct('jacobianOut','full'); % full/basic
+OptIsSet = struct('pathInfoFunction',false,...
+                  'bifAdditionalTestfunction',false);
+StepsizeOptions = struct('iterations',true,...
+                         'predictor',true,...
+                         'rateOfContraction',true,...
+                         'speedOfContinuation',true);
 
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
-p.addPointAtEnd(randn(3,1),randn,randn(3,4));
+p = continuation.Path(3,1,Opt,OptIsSet,StepsizeOptions);
+
+p.addPointAtEnd(randn(3,1),1,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),2,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),3,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.toggleStepback();
+p.addPointAtEnd(randn(3,1),4,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.toggleStepback();
+p.addPointAtEnd(randn(3,1),5,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.remove(5);
+p.addPointAtEnd(randn(3,1),6,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),7,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.remove(5:6);
+p.addPointAtEnd(randn(3,1),8,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),9,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),10,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.addPointAtEnd(randn(3,1),11,randn(3,4),'iterations',round(1+10*rand),'predictor',randn(3,1),'rateOfContraction',rand,'speedOfContinuation',rand);
+p.remove(1:2);
+
+% 4,3,8,9,10,11
 
 p.xAll
 
