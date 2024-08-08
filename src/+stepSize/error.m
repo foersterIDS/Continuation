@@ -46,7 +46,7 @@ function [xi] = error(Solver,Path,Opt)
     %
     K = Opt.stepSizeErrorPd;
     %
-    if length(Path.lAll) > 1 && ~isempty(Path.speedOfContinuation) && K(2) > 0
+    if Path.nAll > 1 && ~isempty(Path.speedOfContinuation) && K(2) > 0
         EIM1 = calcError(Solver,Path,Opt,1);
     else
         EIM1 = 0;
@@ -66,14 +66,14 @@ function EI = calcError(Solver,Path,Opt,previous)
     %
     %
     % determine length
-    lengthPath = length(Path.lAll);
+    lengthPath = Path.nAll;
     lengthIterations = length(Solver.output.iterations);
     if weights(3) ~= 0
         lengthArrays = length(Path.speedOfContinuation);
     elseif weights(4) ~= 0
         lengthArrays = length(Solver.output.rateOfConvergence);
     elseif weights(5) ~= 0
-        lengthArrays = length(Path.xPredictor(1,:));
+        lengthArrays = length(Path.xPredictorAll(1,:));
     else
         lengthArrays = 1;
     end
@@ -165,12 +165,12 @@ function EI = calcError(Solver,Path,Opt,previous)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0 && ~isempty(Path.xPredictor)
+    if weights(5) ~= 0 && ~isempty(Path.xPredictorAll)
         if norm(xAll(:,lengthPath)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictor(:,endOfArray) - xAll(:,lengthPath)) / norm(xAll(:,lengthPath));
+            relDistanceOfPredictor = norm(Path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(xAll(:,lengthPath));
             wDist = relDistanceOfPredictor;
-        elseif norm(Path.xPredictor(:,endOfArray)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictor(:,endOfArray) - xAll(:,lengthPath)) / norm(Path.xPredictor(:,endOfArray));
+        elseif norm(Path.xPredictorAll(:,endOfArray)) > 1e-6
+            relDistanceOfPredictor = norm(Path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(Path.xPredictorAll(:,endOfArray));
             wDist = relDistanceOfPredictor;
         else
             wDist = wTarget(5);

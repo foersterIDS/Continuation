@@ -4,14 +4,13 @@
 %   Leibniz University Hannover
 %   25.01.2024 - Alwin Förster
 %
-function [Info,Solver] = checkJacobian(fun,f0,x0,Info,Jacobian,Opt,Solver)
+function [Info,Solver] = checkJacobian(fun,f0,x0,Info,Opt,Solver)
     %% arguments
     arguments
         fun (1,1) function_handle
         f0 (:,1) double
         x0 (:,1) double
         Info (1,1) struct
-        Jacobian (1,1) struct
         Opt (1,1) struct
         Solver (1,1) struct
     end
@@ -23,11 +22,11 @@ function [Info,Solver] = checkJacobian(fun,f0,x0,Info,Jacobian,Opt,Solver)
             % numeric Jacobian
             jacobianNum = aux.numericJacobian(@(xt) fun(xt),x0,'centralValue',f0,'diffquot',Opt.diffquot);
             % compare with user provided Jacobian
-            [na1,na2] = size(Jacobian.solver);
+            [na1,na2] = size(Solver.jacobian);
             [nn1,nn2] = size(jacobianNum);
             n1 = min(na1,nn1);
             n2 = min(na2,nn2);
-            dJrel = abs(Jacobian.solver(1:n1,1:n2)-jacobianNum(1:n1,1:n2))./round(abs(Jacobian.solver(1:n1,1:n2)),8);
+            dJrel = abs(Solver.jacobian(1:n1,1:n2)-jacobianNum(1:n1,1:n2))./round(abs(Solver.jacobian(1:n1,1:n2)),8);
             err = norm(dJrel(logical((~isinf(dJrel)).*(~isnan(dJrel)))));
             valid = err<10^-3;
         else

@@ -7,7 +7,7 @@
 function [vp,lp,funPredictor,sp,ds] = predictor(Path,ds,solverJacobian,func,resCorr,Solver,Opt)
     %% get funPredictor:
     if Opt.predictor.polynomial
-        if numel(Path.lAll)==1
+        if Path.nAll==1
             funPredictor = @(s) predictor.initial(Path,s,Opt);
         else
             [nt,nf] = predictor.adaptive(Path,Opt);
@@ -15,7 +15,7 @@ function [vp,lp,funPredictor,sp,ds] = predictor(Path,ds,solverJacobian,func,resC
             funPredictor = @(s) aux.fncHndToVal(s,fpt,Jpt);
         end
     elseif Opt.predictor.tangential
-        if numel(Path.lAll)==1
+        if Path.nAll==1
             funPredictor = @(s) predictor.initial(Path,s,Opt);
         else
             funPredictor = @(s) predictor.ode(Path,s,solverJacobian,func,Opt);
@@ -53,7 +53,7 @@ function [vp,lp,funPredictor,sp,ds] = predictor(Path,ds,solverJacobian,func,resC
     %% get predictor:
     xip1 = funPredictor(sp);
     %% correctPredictor:
-    if Opt.correctPredictor && numel(Path.lAll)>1
+    if Opt.correctPredictor && Path.nAll>1
         dxi = [Path.varAll(:,end);Path.lAll(end)]-[Path.varAll(:,end-1);Path.lAll(end-1)];
         dxip1 = xip1-[Path.varAll(:,end);Path.lAll(end)];
         if dot(dxip1,dxi)<0 && ~sum(ds<0)

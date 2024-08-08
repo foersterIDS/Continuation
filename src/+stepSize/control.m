@@ -26,7 +26,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobian,Opt,Info,event,Initial)
+function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Opt,Info,event,Initial)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
@@ -40,7 +40,6 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         event.variables.Counter = Counter;
                         event.variables.Solver = Solver;
                         event.variables.Path = Path;
-                        event.variables.Jacobian = Jacobian;
                     else
                         % after creating eventObj, read out names of
                         % needed variables with method and save them in
@@ -85,7 +84,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if length(Path.lAll) > 3
+                        if Path.nAll > 3
                             xi = stepSize.angleChange(Solver,Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -98,7 +97,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if length(Path.lAll) > 2
+                        if Path.nAll > 2
                             xi = stepSize.angleCustom(Solver,Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -126,8 +125,8 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if length(Path.lAll) > 2
-                            xi = stepSize.fayezioghani(ds,Solver,Path,Jacobian.last,Opt);
+                        if Path.nAll > 2
+                            xi = stepSize.fayezioghani(ds,Solver,Path,Path.getJacobianByName('last'),Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
                         end
@@ -164,7 +163,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if length(Path.lAll) > 4
+                        if Path.nAll > 4
                             xi = stepSize.pidCustom(Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -177,7 +176,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if length(Path.lAll) > 4
+                        if Path.nAll > 4
                             xi = stepSize.pidValli(Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -186,7 +185,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                     % szyszkowski
                     %
                     elseif Opt.stepSizeControl.szyszkowski
-                        if length(Path.lAll) > 3
+                        if Path.nAll > 3
                             xi = stepSize.szyszkowski(Solver,Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -195,7 +194,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
                     % yoon
                     %
                     elseif Opt.stepSizeControl.yoon
-                        if length(Path.lAll) > 3
+                        if Path.nAll > 3
                             xi = stepSize.yoon(Solver,Path,Opt);
                         else
                             xi = stepSize.iterationsPolynomial(Solver,Opt);
@@ -231,7 +230,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Jacobi
             dsn = Info.ds0;
         else
             xe = [Path.varAll(:,end);Path.lAll(end)];
-            dsn = norm(Plus.x-xe)/2;
+            dsn = norm(Path-xe)/2;
         end
     end
 end

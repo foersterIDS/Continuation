@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   04.04.2022 - Alwin Förster
 %
-function [Path,dpaPoints] = checkResidual(fun,dpaPoints,Opt,Path,Solver)
+function [dpaPoints] = checkResidual(fun,dpaPoints,Opt,Path,Solver)
     %% check dpaResidual
-    n = numel(Path.lAll);
+    n = Path.nAll;
     nv = numel(Path.varAll(:,1));
     isZero = 0;
     if n==2

@@ -5,15 +5,15 @@
 %   05.10.2020 - Alwin Förster
 %
 function [funPredictor,JacPredictor] = taylor(Path,no,nf)
-    no = min([length(Path.lAll)-1,no]);
-    ns = min([length(Path.lAll),no+1+nf]);
+    no = min([Path.nAll-1,no]);
+    ns = min([Path.nAll,no+1+nf]);
     xAll = [Path.varAll;Path.lAll];
     nd = length(xAll(:,end));
     %% calc scaling:
     dscMin = 10^-15;
     xBasis = xAll(:,end-ns+1);
     sBasis = Path.sAll(end-ns+1);
-    if length(Path.lAll)>2
+    if Path.nAll>2
         dscX = max([mean(diff(abs(xAll(:,end+((-ns+1):0))-xBasis),1,2),2),ones(nd,1)*dscMin]')';
         dscS = max([mean(diff(abs(Path.sAll(end+((-ns+1):0))-sBasis),1,2),2),dscMin]);
     else

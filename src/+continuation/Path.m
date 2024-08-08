@@ -16,7 +16,7 @@ classdef Path < handle
         pathInfoValue
         plus = false
         rateOfContraction
-        signDetJAll
+        signDetJRedAll
         speedOfContinuation
         varAll
         xPredictorAll
@@ -61,16 +61,15 @@ classdef Path < handle
             obj.Opt = Opt;
             obj.OptIsSet = OptIsSet;
             obj.StepsizeOptions = StepsizeOptions;
-            switch obj.Opt.jacobianOut
-                case 'basic'
-                    obj.JAll = cell(1,3); % initial, last, previous
-                case 'full'
-                    obj.JAll = {};
-                otherwise
-                    error('jacobianOut must be full or basic!');
+            if obj.Opt.jacobianOut.basic
+                obj.JAll = cell(1,3); % initial, last, previous
+            elseif obj.Opt.jacobianOut.full
+                obj.JAll = {};
+            else
+                error('jacobianOut must be full or basic!');
             end
             obj.lAll = zeros(nL,0);
-            obj.signDetJAll = zeros(1,0);
+            obj.signDetJRedAll = zeros(1,0);
             obj.varAll = zeros(nVar,0);
             obj.xPredictor = zeros(nVar+nL,1);
             obj.resetOutput();
@@ -129,19 +128,18 @@ classdef Path < handle
         end
 
         %% general methods
-        function addPoint(obj,var,l,J,pos,NameValueArgs)
+        function addPoint(obj,var,l,J,Solver,pos,NameValueArgs)
             %% arguments
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
                 l (1,1) double
                 J (:,:) double
+                Solver (1,1) struct
                 pos (1,1) double {mustBeInteger,mustBeGreaterThan(pos,0)} = obj.nAll+1
                 NameValueArgs.bifTestValue (1,1) double
-                NameValueArgs.iterations (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.iterations,0)}
                 NameValueArgs.pathInfoValue (1,1) double
                 NameValueArgs.predictor (:,1) double
-                NameValueArgs.rateOfContraction (1,1) double
                 NameValueArgs.speedOfContinuation (1,1) double
             end
             validateattributes(var,{'numeric'},{'size',[obj.nVar,1]});
@@ -150,89 +148,104 @@ classdef Path < handle
             %% add/insert
             obj.varAll = [obj.varAll(:,1:(pos-1)),var,obj.varAll(:,pos:end)];
             obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
-            switch obj.Opt.jacobianOut
-                case 'basic'
-                    obj.JAll{3} = obj.JAll{2};
-                    obj.JAll{2} = J;
-                case 'full'
-                    obj.JAll = [obj.JAll(:,1:(pos-1)),J,obj.JAll(:,pos:end)];
-                otherwise
-                    error('jacobianOut must be full or basic!');
+            if obj.Opt.jacobianOut.basic
+                obj.JAll{3} = obj.JAll{2};
+                obj.JAll{2} = J;
+            elseif obj.Opt.jacobianOut.full
+                obj.JAll = [obj.JAll(:,1:(pos-1)),J,obj.JAll(:,pos:end)];
+            else
+                error('jacobianOut must be full or basic!');
             end
-            obj.signDetJAll = [obj.signDetJAll(:,1:(pos-1)),sign(det(J(1:obj.nVar,1:obj.nVar))),obj.signDetJAll(:,pos:end)];
-            if isfield(NameValueArgs,'bifTestValue')
+            obj.signDetJRedAll = [obj.signDetJRedAll(:,1:(pos-1)),sign(det(J(1:obj.nVar,1:obj.nVar))),obj.signDetJRedAll(:,pos:end)];
+            if obj.OptIsSet.bifAdditionalTestfunction
                 obj.bifTestValue = [obj.bifTestValue(:,1:(pos-1)),NameValueArgs.bifTestValue,obj.bifTestValue(:,pos:end)];
             end
-            if isfield(NameValueArgs,'iterations')
-                obj.iterations = [obj.iterations(:,1:(pos-1)),NameValueArgs.iterations,obj.iterations(:,pos:end)];
+            if obj.StepsizeOptions.iterations
+                obj.iterations = [obj.iterations(:,1:(pos-1)),Solver.output.iterations,obj.iterations(:,pos:end)];
             end
-            if isfield(NameValueArgs,'pathInfoValue')
+            if obj.OptIsSet.pathInfoFunction
                 obj.pathInfoValue = [obj.pathInfoValue(:,1:(pos-1)),NameValueArgs.pathInfoValue,obj.pathInfoValue(:,pos:end)];
             end
-            if isfield(NameValueArgs,'predictor')
+            if obj.StepsizeOptions.predictor
                 obj.xPredictorAll = [obj.xPredictorAll(:,1:(pos-1)),NameValueArgs.predictor,obj.xPredictorAll(:,pos:end)];
             end
-            if isfield(NameValueArgs,'rateOfContraction')
-                obj.rateOfContraction = [obj.rateOfContraction(:,1:(pos-1)),NameValueArgs.rateOfContraction,obj.rateOfContraction(:,pos:end)];
+            if obj.StepsizeOptions.rateOfContraction
+                obj.rateOfContraction = [obj.rateOfContraction(:,1:(pos-1)),Solver.output.rateOfContraction,obj.rateOfContraction(:,pos:end)];
             end
-            if isfield(NameValueArgs,'speedOfContinuation')
+            if obj.StepsizeOptions.speedOfContinuation
                 obj.speedOfContinuation = [obj.speedOfContinuation(:,1:(pos-1)),NameValueArgs.speedOfContinuation,obj.speedOfContinuation(:,pos:end)];
             end
         end
 
-        function addPointAtEnd(obj,var,l,J,NameValueArgs)
+        function addPointAtEnd(obj,var,l,J,Solver,NameValueArgs)
             %% arguments
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
                 l (1,1) double
                 J (:,:) double
+                Solver (1,1) struct
                 NameValueArgs.bifTestValue (1,1) double
-                NameValueArgs.iterations (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.iterations,0)}
                 NameValueArgs.pathInfoValue (1,1) double
                 NameValueArgs.predictor (:,1) double
-                NameValueArgs.rateOfContraction (1,1) double
                 NameValueArgs.speedOfContinuation (1,1) double
             end
             obj.checkInputOptions(NameValueArgs);
             %% pass to addPoint(...)
             pos = obj.nAll+1;
             nva = aux.struct2cellPreserveFieldnames(NameValueArgs);
-            obj.addPoint(var,l,J,pos,nva{:});
+            obj.addPoint(var,l,J,Solver,pos,nva{:});
         end
 
-        function J = getJacobianByName(obj,jacName)
+        function J = getJacobianByName(obj,jacName,idx1,idx2)
             %% arguments
             arguments
                 obj (1,1) continuation.Path
                 jacName (1,:) char {mustBeMember(jacName,{'last','previous','initial','plus'})}
+                idx1 (1,:) double {mustBeInteger,mustBeGreaterThan(idx1,0)} = 1:obj.nVar
+                idx2 (1,:) double {mustBeInteger,mustBeGreaterThan(idx2,0)} = 1:(obj.nVar+obj.nL)
             end
             %% get jacobian
-            switch obj.Opt.jacobianOut
-                case 'basic'
-                    switch jacName
-                        case 'initial'
-                            J = obj.JAll{1};
-                        case 'last'
+            if obj.Opt.jacobianOut.basic
+                switch jacName
+                    case 'initial'
+                        J = obj.JAll{1};
+                    case 'last'
+                        J = obj.JAll{2};
+                    case 'plus'
+                        J = obj.plusStruct.J;
+                    case 'previous'
+                        if obj.nAll==1
                             J = obj.JAll{2};
-                        case 'plus'
-                            J = obj.plusStruct.J;
-                        case 'previous'
+                        else
                             J = obj.JAll{3};
-                    end
-                case 'full'
-                    switch jacName
-                        case 'initial'
-                            J = obj.JAll{1};
-                        case 'last'
+                        end
+                end
+            elseif obj.Opt.jacobianOut.full
+                switch jacName
+                    case 'initial'
+                        J = obj.JAll{1};
+                    case 'last'
+                        J = obj.JAll{end};
+                    case 'plus'
+                        J = obj.plusStruct.J;
+                    case 'previous'
+                        if obj.nAll==1
                             J = obj.JAll{end};
-                        case 'plus'
-                            J = obj.plusStruct.J;
-                        case 'previous'
+                        else
                             J = obj.JAll{end-1};
-                    end
-                otherwise
-                    error('jacobianOut must be full or basic!');
+                        end
+                end
+            else
+                error('jacobianOut must be full or basic!');
+            end
+            if ~isinf(idx1)
+                idx1(logical((idx1>size(J,1))+(idx1<1))) = [];
+                J = J(idx1,:);
+            end
+            if ~isinf(idx2)
+                idx2(logical((idx2>size(J,2))+(idx2<1))) = [];
+                J = J(:,idx2);
             end
         end
 
@@ -252,29 +265,28 @@ classdef Path < handle
                 idxRmv (1,:) double {mustBeInteger,mustBeGreaterThan(idxRmv,0)}
             end
             %% remove
-            switch obj.Opt.jacobianOut
-                case 'basic'
-                    if sum(idxRmv==obj.nAll)
-                        if sum(idxRmv==obj.nAll-1)
-                            obj.JAll{2} = [];
-                            obj.JAll{3} = [];
-                        else
-                            obj.JAll{2} = obj.JAll{3};
-                            obj.JAll{3} = [];
-                        end
-                    elseif sum(idxRmv==obj.nAll-1)
+            if obj.Opt.jacobianOut.basic
+                if sum(idxRmv==obj.nAll)
+                    if sum(idxRmv==obj.nAll-1)
+                        obj.JAll{2} = [];
+                        obj.JAll{3} = [];
+                    else
+                        obj.JAll{2} = obj.JAll{3};
                         obj.JAll{3} = [];
                     end
-                    if sum(idxRmv==1)
-                        obj.JAll{1} = [];
-                    end
-                case 'full'
-                    obj.JAll(idxRmv) = [];
-                otherwise
-                    error('jacobianOut must be full or basic!');
+                elseif sum(idxRmv==obj.nAll-1)
+                    obj.JAll{3} = [];
+                end
+                if sum(idxRmv==1)
+                    obj.JAll{1} = [];
+                end
+            elseif obj.Opt.jacobianOut.full
+                obj.JAll(idxRmv) = [];
+            else
+                error('jacobianOut must be full or basic!');
             end
             obj.lAll(:,idxRmv) = [];
-            obj.signDetJAll(:,idxRmv) = [];
+            obj.signDetJRedAll(:,idxRmv) = [];
             obj.varAll(:,idxRmv) = [];
             obj.xPredictor = [];
             if obj.OptIsSet.bifAdditionalTestfunction
@@ -309,31 +321,30 @@ classdef Path < handle
                 jacName (1,:) char {mustBeMember(jacName,{'last','previous','initial','plus'})}
             end
             %% get jacobian
-            switch obj.Opt.jacobianOut
-                case 'basic'
-                    switch jacName
-                        case 'initial'
-                            obj.JAll{1} = J;
-                        case 'last'
-                            obj.JAll{2} = J;
-                        case 'plus'
-                            obj.plusStruct.J = J;
-                        case 'previous'
-                            obj.JAll{3} = J;
-                    end
-                case 'full'
-                    switch jacName
-                        case 'initial'
-                            obj.JAll{1} = J;
-                        case 'last'
-                            obj.JAll{end} = J;
-                        case 'plus'
-                            obj.plusStruct.J = J;
-                        case 'previous'
-                            obj.JAll{end-1} = J;
-                    end
-                otherwise
-                    error('jacobianOut must be full or basic!');
+            if obj.Opt.jacobianOut.basic
+                switch jacName
+                    case 'initial'
+                        obj.JAll{1} = J;
+                    case 'last'
+                        obj.JAll{2} = J;
+                    case 'plus'
+                        obj.plusStruct.J = J;
+                    case 'previous'
+                        obj.JAll{3} = J;
+                end
+            elseif obj.Opt.jacobianOut.full
+                switch jacName
+                    case 'initial'
+                        obj.JAll{1} = J;
+                    case 'last'
+                        obj.JAll{end} = J;
+                    case 'plus'
+                        obj.plusStruct.J = J;
+                    case 'previous'
+                        obj.JAll{end-1} = J;
+                end
+            else
+                error('jacobianOut must be full or basic!');
             end
         end
 
@@ -350,18 +361,17 @@ classdef Path < handle
             if obj.plus
                 %% add plus
                 obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
-                switch obj.Opt.jacobianOut
-                    case 'basic'
-                        obj.JAll{3} = obj.JAll{2};
-                        obj.JAll{2} = obj.plusStruct.J;
-                    case 'full'
-                        obj.JAll{end+1} = obj.plusStruct.J;
-                    otherwise
-                        error('jacobianOut must be full or basic!');
+                if obj.Opt.jacobianOut.basic
+                    obj.JAll{3} = obj.JAll{2};
+                    obj.JAll{2} = obj.plusStruct.J;
+                elseif obj.Opt.jacobianOut.full
+                    obj.JAll{end+1} = obj.plusStruct.J;
+                else
+                    error('jacobianOut must be full or basic!');
                 end
                 obj.lAll = [obj.lAll,obj.plusStruct.l];
                 obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
-                obj.signDetJAll = [obj.signDetJAll,obj.plusStruct.signDetJ];
+                obj.signDetJRedAll = [obj.signDetJRedAll,obj.plusStruct.signDetJRed];
                 obj.varAll = [obj.varAll,obj.plusStruct.var];
                 obj.xPredictor = obj.plusStruct.xPredictor;
                 if obj.OptIsSet.bifAdditionalTestfunction
@@ -391,16 +401,15 @@ classdef Path < handle
                     error("Path must have at least two entries to use 'plus'.");
                 end
                 %% fill plus
-                switch obj.Opt.jacobianOut
-                    case 'basic'
-                        obj.plusStruct.J = obj.JAll{2};
-                    case 'full'
-                        obj.plusStruct.J = obj.JAll{end};
-                    otherwise
-                        error('jacobianOut must be full or basic!');
+                if obj.Opt.jacobianOut.basic
+                    obj.plusStruct.J = obj.JAll{2};
+                elseif obj.Opt.jacobianOut.full
+                    obj.plusStruct.J = obj.JAll{end};
+                else
+                    error('jacobianOut must be full or basic!');
                 end
                 obj.plusStruct.l = obj.lAll(:,end);
-                obj.plusStruct.signDetJ = obj.signDetJAll(:,end);
+                obj.plusStruct.signDetJRed = obj.signDetJRedAll(:,end);
                 obj.plusStruct.var = obj.varAll(:,end);
                 if obj.OptIsSet.bifAdditionalTestfunction
                     obj.plusStruct.bifTestValue = obj.bifTestValue(:,end);
@@ -421,17 +430,16 @@ classdef Path < handle
                     obj.plusStruct.speedOfContinuation = obj.speedOfContinuation(:,end);
                 end
                 %% cut all
-                switch obj.Opt.jacobianOut
-                    case 'basic'
-                        obj.JAll{2} = obj.JAll{3};
-                        obj.JAll{3} = [];
-                    case 'full'
-                        obj.JAll = obj.JAll(1:(end-1));
-                    otherwise
-                        error('jacobianOut must be full or basic!');
+                if obj.Opt.jacobianOut.basic
+                    obj.JAll{2} = obj.JAll{3};
+                    obj.JAll{3} = [];
+                elseif obj.Opt.jacobianOut.full
+                    obj.JAll = obj.JAll(1:(end-1));
+                else
+                    error('jacobianOut must be full or basic!');
                 end
                 obj.lAll = obj.lAll(:,1:(end-1));
-                obj.signDetJAll = obj.signDetJAll(:,1:(end-1));
+                obj.signDetJRedAll = obj.signDetJRedAll(:,1:(end-1));
                 obj.varAll = obj.varAll(:,1:(end-1));
                 obj.xPredictor = [];
                 if obj.OptIsSet.bifAdditionalTestfunction
@@ -454,6 +462,50 @@ classdef Path < handle
                 end
                 %% toggle plus
                 obj.plus = true;
+            end
+        end
+
+        function turn(obj)
+            %% arguments
+            arguments
+                obj (1,1) continuation.Path
+            end
+            %% deactivate stepback
+            obj.plus = false;
+            obj.clearPlusStruct();
+            %% turn path
+            idxTurn = obj.nAll:-1:1;
+            if obj.Opt.jacobianOut.basic
+                JLastTemp = obj.JAll{2};
+                obj.JAll{2} = obj.JAll{1};
+                obj.JAll{3} = [];
+                obj.JAll{1} = JLastTemp;
+            elseif obj.Opt.jacobianOut.full
+                obj.JAll = obj.JAll(idxTurn);
+            else
+                error('jacobianOut must be full or basic!');
+            end
+            obj.lAll = obj.lAll(:,idxTurn);
+            obj.signDetJRedAll = obj.signDetJRedAll(:,idxTurn);
+            obj.varAll = obj.varAll(:,idxTurn);
+            obj.xPredictor = [];
+            if obj.OptIsSet.bifAdditionalTestfunction
+                obj.bifTestValue = obj.bifTestValue(:,idxTurn);
+            end
+            if obj.StepsizeOptions.iterations
+                obj.iterations = obj.iterations(:,idxTurn);
+            end
+            if obj.OptIsSet.pathInfoFunction
+                obj.pathInfoValue = obj.pathInfoValue(:,idxTurn);
+            end
+            if obj.StepsizeOptions.predictor
+                obj.xPredictorAll = obj.xPredictorAll(:,idxTurn);
+            end
+            if obj.StepsizeOptions.rateOfContraction
+                obj.rateOfContraction = obj.rateOfContraction(:,idxTurn);
+            end
+            if obj.StepsizeOptions.speedOfContinuation
+                obj.speedOfContinuation = obj.speedOfContinuation(:,idxTurn);
             end
         end
 
@@ -485,17 +537,11 @@ classdef Path < handle
             if obj.OptIsSet.bifAdditionalTestfunction && ~isfield(nvaStruct,'bifTestValue')
                 error('A bifTestValue must be passed if a bifAdditionalTestfunction is set.')
             end
-            if obj.StepsizeOptions.iterations && ~isfield(nvaStruct,'iterations')
-                error('A iterations must be passed if a iterations is set.')
-            end
             if obj.StepsizeOptions.predictor && ~isfield(nvaStruct,'predictor')
-                error('A predictor must be passed if a predictor is set.')
-            end
-            if obj.StepsizeOptions.rateOfContraction && ~isfield(nvaStruct,'rateOfContraction')
-                error('A rateOfContraction must be passed if a rateOfContraction is set.')
+                error('predictor must be passed if predictor is set.')
             end
             if obj.StepsizeOptions.speedOfContinuation && ~isfield(nvaStruct,'speedOfContinuation')
-                error('A speedOfContinuation must be passed if a speedOfContinuation is set.')
+                error('speedOfContinuation must be passed if speedOfContinuation is set.')
             end
         end
 
@@ -506,7 +552,7 @@ classdef Path < handle
             obj.plusStruct.l = [];
             obj.plusStruct.pathInfoValue = [];
             obj.plusStruct.rateOfContraction = [];
-            obj.plusStruct.signDetJ = [];
+            obj.plusStruct.signDetJRed = [];
             obj.plusStruct.speedOfContinuation = [];
             obj.plusStruct.var = [];
             obj.plusStruct.xPredictor = [];

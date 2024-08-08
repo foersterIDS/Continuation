@@ -4,13 +4,13 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSolution,Path,ds,Solver,Jacobian,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
+function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,funSolution,Path,ds,Solver,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt)
     %% automated validation
     %
     Is.reverse = false;
     Is.catch = 0;
     invPoiStr = '                          ';
-    nPath = numel(Path.lAll);
+    nPath = Path.nAll;
     if Solver.exitflag>0
         try
             if ~Opt.checkResidual || (norm(funSolution)<=Opt.solverTol*10)
@@ -47,7 +47,7 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
                         alpha = acos(((xSolution-xi)'*(xi-xim1))/(sqrt((xSolution-xi)'*(xSolution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
                         if alpha<Opt.alphaReverse
                             if aux.ison(Opt.bifurcation) && ~Opt.bifurcation.mark
-                                if sign(det(Jacobian.solver(1:Info.nv,1:Info.nv)))*Jacobian.signDetRed<0 && Counter.bifStepsizeRed<2
+                                if sign(det(Solver.jacobian(1:Info.nv,1:Info.nv)))*Path.signDetJRedAll(:,end)<0 && Counter.bifStepsizeRed<2
                                     Is.valid = false;
                                     Do.stepbackManually = true;
                                     Counter.bifStepsizeRed = Counter.bifStepsizeRed+1;
@@ -101,16 +101,6 @@ function [invPoiStr,Counter,Do,Is,Opt] = validateResult(xSolution,Plus,funSoluti
         Opt.approveManually = true;
         if nPath>1
             try
-                PathApp = Path;
-                if isempty(Plus.x)
-                    PathApp.varAll = [Path.varAll,xSolution(1:end-1)];
-                    PathApp.lAll = [Path.lAll,xSolution(end)];
-                    PathApp.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-1);Path.lAll(end-1)])];
-                else
-                    PathApp.varAll = [Path.varAll,xSolution(1:end-1),Plus.x(1:end-1)];
-                    PathApp.lAll = [Path.lAll,xSolution(end),Plus.x(end)];
-                    PathApp.sAll = [Path.sAll,Path.sAll(end)+norm(xSolution-[Path.varAll(:,end-2);Path.lAll(end-2)])*[1,1]+norm(Plus.x-xSolution)*[0,1]];
-                end
                 [Plot, Opt] = livePlot(Opt, Info, Path, ds, ds, Solver.output.iterations, Counter, funPredictor, sPredictor, Plot, Bifurcation);
             catch
                 aux.printLine(Opt,'--> The plot update for approval has failed.\n');

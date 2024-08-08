@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [Path] = parameterTrace(Opt,Path,Bifurcation,Info,fun)
+function parameterTrace(Opt,Path,Bifurcation,Info,fun)
     %% settings for dpa:
     bifTrace = Bifurcation.bif(1,:);
     nbif = numel(bifTrace);

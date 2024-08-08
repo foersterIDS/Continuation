@@ -84,7 +84,7 @@ function [xi] = multiplicativeAlt(Solver,Path,Opt)
     %
     % Check if there are enough solution points
     %
-    if weights(4) ~= 0 && length(Path.lAll) > 3 
+    if weights(4) ~= 0 && Path.nAll > 3 
         %
         % calculate connecting vectors
         %
@@ -110,12 +110,12 @@ function [xi] = multiplicativeAlt(Solver,Path,Opt)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0 && ~isempty(Path.xPredictor)
+    if weights(5) ~= 0 && ~isempty(Path.xPredictorAll)
         if norm(xAll(:,end)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictor(:,end) - xAll(:,end)) / norm(xAll(:,end));
+            relDistanceOfPredictor = norm(Path.xPredictorAll(:,end) - xAll(:,end)) / norm(xAll(:,end));
             wDist = relDistanceOfPredictor;
-        elseif norm(Path.xPredictor(:,end)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictor(:,end) - xAll(:,end)) / norm(Path.xPredictor(:,end));
+        elseif norm(Path.xPredictorAll(:,end)) > 1e-6
+            relDistanceOfPredictor = norm(Path.xPredictorAll(:,end) - xAll(:,end)) / norm(Path.xPredictorAll(:,end));
             wDist = relDistanceOfPredictor;
         else
             wDist = 1;

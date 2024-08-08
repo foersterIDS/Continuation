@@ -6,14 +6,14 @@
 %   02.07.2021 - Tido Kubatschek
 %   25.05.2023 - Anna Lefken
 %
-function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info,resCorr,Solver,Opt,OptIsSet)
+function [Bifurcation] = check(func,Path,Bifurcation,Info,resCorr,Solver,Opt,OptIsSet)
     Bifurcation.flag = 0;
-    lastJacobianRed = Jacobian.last(1:Info.nv,1:Info.nv);
+    lastJacobianRed = Path.getJacobianByName('last',1:Info.nv,1:Info.nv);
     lastJacobianRed = full(lastJacobianRed);
     bifFound=0;    % skip additional testfunction, when det(jac)=0
-    if aux.ison(Opt.bifurcation) && numel(Path.lAll)>=3
+    if aux.ison(Opt.bifurcation) && Path.nAll>=3
         basicFoldDetection = (sign(diff(Path.lAll(end+[-1,0]))*diff(Path.lAll(end+[-2,-1])))<0);
-        if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==numel(Path.lAll)-1
+        if ~isempty(Bifurcation.bif) && Bifurcation.bif(1,end)==Path.nAll-1
             basicFoldDetection = false;
         end
     else
@@ -22,13 +22,10 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
     if Opt.bifurcation.mark
         %% mark bifurcations:
         signDetCurrentJacobianRed = sign(det(lastJacobianRed));
-        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0 && all(size(Jacobian.previous)==size(Jacobian.last))) || basicFoldDetection
+        if (signDetCurrentJacobianRed*Path.signDetJRedAll(end-1)<=0 && all(size(Path.getJacobianByName('previous'))==size(Path.getJacobianByName('last')))) || basicFoldDetection
             bifFound=1;
-            signDetCurrentJacobian = sign(det(Jacobian.last));
-            bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
-            Bifurcation.bif = [Bifurcation.bif,[numel(Path.lAll);bifType]];
-            Jacobian.signDetRed = signDetCurrentJacobianRed;
-            Jacobian.signDet = signDetCurrentJacobian;
+            bifType = (sign(det(Path.getJacobianByName('previous',1:Path.nVar,1:Path.nVar)))==sign(det(Path.getJacobianByName('last',1:Path.nVar,1:Path.nVar)))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+            Bifurcation.bif = [Bifurcation.bif,[Path.nAll;bifType]];
             Bifurcation.flag = 1;
             Bifurcation.scaling = [Bifurcation.scaling,1];
         end
@@ -41,18 +38,18 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
         Bifurcation.scaling = [Bifurcation.scaling,1/detSolverJacobianRed];
         residualBif = @(x) bifurcation.residual(func,x,Opt,Info,Bifurcation.scaling(end));
         signDetCurrentJacobianRed = sign(detSolverJacobianRed);
-        if (signDetCurrentJacobianRed*Jacobian.signDetRed<=0) || basicFoldDetection
+        if (signDetCurrentJacobianRed*Path.signDetJRedAll(end-1)<=0) || basicFoldDetection
             bifFound=1;
             %% find exact point:
             nds = 1000;
-            indBif = length(Path.lAll);
+            indBif = Path.nAll;
             bifType = NaN;
             nv = numel(Path.varAll(:,1));
             
-            if signDetCurrentJacobianRed*Jacobian.signDetRed<=0
+            if signDetCurrentJacobianRed*Path.signDetJRedAll(end-1)<=0
                 dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
-                detLeft = det(Jacobian.previous(1:nv,1:nv));
-                detRight = det(Jacobian.last(1:nv,1:nv));
+                detLeft = det(Path.getJacobianByName('previous',1:nv,1:nv));
+                detRight = det(Path.getJacobianByName('last',1:nv,1:nv));
                 startDsp = detRight/(detRight-detLeft)*(dss(1)-dss(end));     % estimated bifurcation point
                 indStart = find(dss>startDsp,1);                                % index of estimated bifurcation point
             else
@@ -95,7 +92,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                     end
                     % 
                     % get type of bifurcation
-                    bifType = (sign(det(Jacobian.previous))==sign(det(Jacobian.last))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+                    bifType = (sign(det(Path.getJacobianByName('previous')))==sign(det(Path.getJacobianByName('last')))); % 1: fold bif.; 0: branch point bif; NaN: unknown
                     %
                     % if bifType = 0 (branch point) calculate directions
                     % of paths by null() and save to Bifurcation.dirs cell array
@@ -119,7 +116,6 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                 end
             end
             Bifurcation.bif = [Bifurcation.bif,[indBif;bifType]];
-            Jacobian.signDetRed = signDetCurrentJacobianRed;
             Bifurcation.flag = 1;
         end
     else
@@ -132,7 +128,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
             if Path.bifTestValue(end-1)*Path.bifTestValue(end)<=0
                 bifFound=1;
                 bifType = 2; % 2: additional; 1: fold bif.; 0: branch point bif; NaN: unknown
-                Bifurcation.bif = [Bifurcation.bif,[numel(Path.lAll);bifType]];
+                Bifurcation.bif = [Bifurcation.bif,[Path.nAll;bifType]];
                 Bifurcation.flag = 1;
                 Bifurcation.scaling = [Bifurcation.scaling,1];
             end
@@ -150,7 +146,7 @@ function [Bifurcation,Jacobian,Path] = check(func,Jacobian,Path,Bifurcation,Info
                 nds = 11;
                 dss = linspace(Path.sAll(end-1)-Path.sAll(end),0,nds);
                 dss = dss([6,7,5,8,4,9,3,10,2,11,1]);
-                indBif = length(Path.lAll);
+                indBif = Path.nAll;
                 bifType = NaN;
                 for ii=1:nds
                     dsp = dss(ii);

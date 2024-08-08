@@ -5,7 +5,7 @@
 %   28.10.2020 - Alwin Förster
 %   02.07.2021 - Tido Kubatschek
 %
-function [Path,Bifurcation] = trace(Opt,OptIsSet,Path,Bifurcation,Solver,Info,func,resCorr)
+function [Bifurcation] = trace(Opt,OptIsSet,Path,Bifurcation,Solver,Info,func,resCorr)
     bifTrace = Bifurcation.bif(:,Bifurcation.bif(2,:) == 0);
     nbif = numel(bifTrace(1,:));
     OptSphere = Opt;

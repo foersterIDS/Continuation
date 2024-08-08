@@ -18,7 +18,7 @@ function [lco,vco] = drawCorrector( Path, dsim1, Opt )
     if Opt.corrector.sphere
         %% sphere
         %
-        if numel(Path.lAll)==1
+        if Path.nAll==1
             lc = Path.lAll;
             vc = Path.varAll;
             rpro = dsim1*ones(nv,1);
@@ -36,8 +36,8 @@ function [lco,vco] = drawCorrector( Path, dsim1, Opt )
     elseif Opt.corrector.orthogonal
         %% orthogonal
         %
-        if numel(Path.lAll)>1
-            if numel(Path.lAll)==2
+        if Path.nAll>1
+            if Path.nAll==2
                 if numel(Opt.direction)==1
                     sec = [zeros(nv,1);1];
                 else
@@ -67,7 +67,7 @@ function [lco,vco] = drawCorrector( Path, dsim1, Opt )
     elseif Opt.corrector.unique
         %% unique
         %
-        if numel(Path.lAll)==1
+        if Path.nAll==1
             lc = Path.lAll;
             vc = Path.varAll;
         else

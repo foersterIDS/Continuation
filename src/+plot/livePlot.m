@@ -8,7 +8,7 @@
 function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, funPredictor, sPredictor, Plot, Bifurcation, dpaPoints)
     lLu = [min([Info.lStart,Info.lEnd]),max([Info.lStart,Info.lEnd])];
     lMax = [min(Path.lAll),max(Path.lAll)];
-    if numel(Path.lAll)>=2
+    if Path.nAll>=2
         dl0 = abs(max(Path.lAll)-min(Path.lAll))*0.2;
     else
         dl0 = abs(Info.lEnd-Info.lStart);
@@ -110,7 +110,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             %
             %% add third information to plot (current step)
             for k = 1:length(Opt.plotVarsIndex)
-                row = dataTipTextRow('Step',0:(length(Path.lAll)-1),'%d');
+                row = dataTipTextRow('Step',0:(Path.nAll-1),'%d');
                 Plot.pl(k).DataTipTemplate.DataTipRows(end+1) = row;
             end
             %
@@ -337,7 +337,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
             %
             %% add third information to plot (current step)
             for k = 1:length(Opt.plotVarsIndex)
-                row = dataTipTextRow('Step',0:(length(Path.lAll)-1),'%d');
+                row = dataTipTextRow('Step',0:(Path.nAll-1),'%d');
                 Plot.pl(k).DataTipTemplate.DataTipRows(end+1) = row;
             end
             %
@@ -561,7 +561,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
 %             set(Plot.plCurr, {'XData'}, newXDataCurr, {'YData'},  newYDataCurr);
             %
             %% add third information to plot (current step)
-            row = dataTipTextRow('Step',0:(length(Path.lAll)-1),'%d');
+            row = dataTipTextRow('Step',0:(Path.nAll-1),'%d');
             Plot.pl.DataTipTemplate.DataTipRows(end+1) = row;
             %
             %% adjust x axis
@@ -715,7 +715,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
 %             set(Plot.plCurr, {'XData'}, newXDataCurr, {'YData'},  newYDataCurr);
             %
             %% add third information to plot (current step)
-            row = dataTipTextRow('Step',0:(length(Path.lAll)-1),'%d');
+            row = dataTipTextRow('Step',0:(Path.nAll-1),'%d');
             for ii=1:numel(Plot.pl)
                 Plot.pl(ii).DataTipTemplate.DataTipRows(end+1) = row;
             end
@@ -808,7 +808,7 @@ function [Plot,Opt] = livePlot(Opt, Info, Path, ds, dsim1, iterations, Counter, 
         aux.printLine(Opt,'Press any key to continue or press Ctrl+c to stop...');
         pause
         aux.printLine(Opt,repmat('\b',1,52));
-    elseif numel(Path.lAll) >= Opt.plotPause && ~islogical(Opt.plotPause)
+    elseif Path.nAll >= Opt.plotPause && ~islogical(Opt.plotPause)
         aux.printLine(Opt,'Press any key to continue or press Ctrl+c to stop...');
         pause
         aux.printLine(Opt,repmat('\b',1,52));

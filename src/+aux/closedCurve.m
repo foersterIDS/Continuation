@@ -12,7 +12,7 @@ function [isClosed, Opt, Counter] = closedCurve(Opt,Path,ds,Counter)
     epsPol = 2.5e-2;
     dsTol = 1.1;
     nu = 1+np/2;
-    ns = numel(Path.lAll);
+    ns = Path.nAll;
     if ns > n+nu
         xAll = [Path.varAll; Path.lAll];
         epsDistX = min([dsTol*norm(xAll(1:(end-1),end)-xAll(1:(end-1),end-1)),dsTol*ds,Opt.dsMax]);

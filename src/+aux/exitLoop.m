@@ -5,12 +5,12 @@
 %   03.11.2020 - Tido Kubatschek
 %   21.02.2021 - Alwin Förster
 %
-function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial, Is, Path, Opt, Counter, Bifurcation, ds, funSolution, Jacobian, breakFunOut)
+function [Do,Info,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info, Initial, Is, Path, Opt, Solver, Counter, Bifurcation, ds, funSolution, breakFunOut)
     %% eval. break function:
     %
     try
         if Is.valid
-            [bfun,breakFunOut] = Opt.breakFunction(funSolution,Jacobian.solver,Path.varAll,Path.lAll,breakFunOut);
+            [bfun,breakFunOut] = Opt.breakFunction(funSolution,Solver.jacobian,Path.varAll,Path.lAll,breakFunOut);
         else
             bfun = false;
         end
@@ -92,12 +92,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
     if Bifurcation.flag>0 && Opt.stopOnBifurcation
         Do.continuation = false;
         Info.exitflag = 3;
-        Path.varAll = Path.varAll(:,1:Bifurcation.bif(1,end));
-        Path.lAll = Path.lAll(1:Bifurcation.bif(1,end));
-        Path.sAll = Path.sAll(1:Bifurcation.bif(1,end));
-        if Opt.jacobianOut.full
-            Jacobian.all(:,:,1:Bifurcation.bif(1,end))
-        end
+        Path.remove((Bifurcation.bif(1,end)+1):Path.nAll);
         Info.exitMsg = '--> continuation completed: bifurcation reached';
     end
     %
@@ -133,12 +128,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
     if Bifurcation.flag>0 && Opt.stopOnCrossing && Bifurcation.bif(2,end)==0
         Do.continuation = false;
         Info.exitflag = 7;
-        Path.varAll = Path.varAll(:,1:Bifurcation.bif(1,end));
-        Path.lAll = Path.lAll(1:Bifurcation.bif(1,end));
-        Path.sAll = Path.sAll(1:Bifurcation.bif(1,end));
-        if Opt.jacobianOut.full
-            Jacobian.all(:,:,1:Bifurcation.bif(1,end))
-        end
+        Path.remove((Bifurcation.bif(1,end)+1):Path.nAll);
         Info.exitMsg = '--> continuation completed: bifurcation reached';
     end
     %
@@ -148,12 +138,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
         Info.biDirRuns = Info.biDirRuns+1;
         Do.continuation = true;
         % turn path
-        Path.varAll = Path.varAll(:,end:-1:1);
-        Path.lAll = Path.lAll(end:-1:1);
-        Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
-        if Opt.jacobianOut.full
-            Jacobian.all = Jacobian.all(:,:,end:-1:1);
-        end
+        Path.turn();
         if Opt.lTarget==Info.lEnd
             Opt.lTarget = Info.lStart;
             Opt.direction = -Opt.direction;
@@ -162,14 +147,7 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
             Info.lEnd = lStartTemp;
         end
         % reset values
-        Path.speedOfContinuation = [];
-        Path.xPredictor = [];
-        Path.bifTestValue = [];
-        Path.pathInfoValue = [];
-        Jacobian.last = [];
-        Jacobian.previous = [];
-        Jacobian.signDet = sign(det(Jacobian.initial));
-        Jacobian.solver = [];
+        Solver.jacobian = [];
         % set step size
         if numel(Path.sAll)>1
             ds = Path.sAll(end)-Path.sAll(end-1);
@@ -179,21 +157,9 @@ function [Do,Info,Path,Jacobian,breakFunOut,Opt,Counter,ds] = exitLoop(Do, Info,
     elseif ~Do.continuation && Opt.bidirectional && (Info.biDirRuns>0)
         if Initial.lStart~=Info.lStart
             % turn path
-            Path.varAll = Path.varAll(:,end:-1:1);
-            Path.lAll = Path.lAll(end:-1:1);
-            Path.sAll = Path.sAll(end)-Path.sAll(end:-1:1);
-            if Opt.jacobianOut.full
-                Jacobian.all = Jacobian.all(:,:,end:-1:1);
-            end
+            Path.turn();
             % reset values
-            Path.speedOfContinuation = [];
-            Path.xPredictor = [];
-            Path.bifTestValue = [];
-            Path.pathInfoValue = [];
-            Jacobian.last = [];
-            Jacobian.previous = [];
-            Jacobian.signDet = sign(det(Jacobian.initial));
-            Jacobian.solver = [];
+            Solver.jacobian = [];
         end
     end
     %

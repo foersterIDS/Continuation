@@ -5,67 +5,34 @@
 %   28.03.2022 - Alwin Förster
 %   12.08.2022 - Anna Lefken
 %
-function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt] = ...
-    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,Remove,Solver,CurrentStepsizeInfo,StepsizeOptions,PathStepsizeInfo,Opt,OptIsSet)
+function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Remove,Solver,StepsizeOptions,Opt] = ...
+    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Path,Remove,Solver,speedOfContinuation,StepsizeOptions,Opt,OptIsSet)
     xDeflation = xSolution;
     if Is.valid
         %% valid result
+        % Add point
         optAddPointArgs = {};
         if OptIsSet.bifAdditionalTestfunction
             optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
-            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
+            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xSolution,Path,Info);
         end
         if OptIsSet.pathInfoFunction
             optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
-            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end));
+            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,Solver.jacobian,xSolution(1:(end-1)),xSolution(end));
         end
-        Path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),Jacobian.solver,optAddPointArgs{:});
+        if StepsizeOptions.predictor
+            optAddPointArgs{numel(optAddPointArgs)+1} = 'predictor';
+            optAddPointArgs{numel(optAddPointArgs)+1} = xPredictor;
+        end
+        if StepsizeOptions.speedOfContinuation
+            optAddPointArgs{numel(optAddPointArgs)+1} = 'speedOfContinuation';
+            optAddPointArgs{numel(optAddPointArgs)+1} = speedOfContinuation;
+        end
+        Path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),Solver.jacobian,Solver,optAddPointArgs{:});
+        % set structs
         if ~Path.plus
-            % update stepsize information
-            % measure speed
-            %
-            if StepsizeOptions.speedOfContinuation
-                if ~isempty(PathStepsizeInfo.speedOfContinuation)
-                    PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation];
-                else
-                    PathStepsizeInfo.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
-                end
-            end
-            %
-            % measure rate of contraction
-            if StepsizeOptions.rateOfContraction
-                if ~isempty(PathStepsizeInfo.rateOfContraction)
-                    PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, CurrentStepsizeInfo.rateOfContraction];
-                else
-                    PathStepsizeInfo.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
-                end
-            end
-            %
-            if StepsizeOptions.predictor
-                if ~isempty(PathStepsizeInfo.predictor)
-                    PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, xPredictor];
-                end
-            end
-            Jacobian.previous = Jacobian.last;
-            Jacobian.last = Jacobian.solver;
             Counter.validStepback = 0;
         else
-            if StepsizeOptions.predictor
-                PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, xPredictor, Plus.xPredictor];
-                Plus.xPredictor = [];
-            end
-            if StepsizeOptions.speedOfContinuation
-                PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, CurrentStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
-                Plus.speedOfContinuation = [];
-            end
-            if StepsizeOptions.rateOfContraction
-                PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, CurrentStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
-                Plus.rateOfContraction = [];
-            end
-            Plus.x = [];
-            Jacobian.previous = Jacobian.solver;
-            Jacobian.last = Plus.jacobian;
-            Plus.jacobian = [];
             Counter.validStepback = Counter.validStepback+1;
             Path.toggleStepback();
         end
@@ -75,9 +42,6 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
         Do.suspend = false;
         Counter.error = 0;
         Counter.step = Counter.step + 1;
-        if Do.convergeToTarget
-            Jacobian.last = aux.getJacobian(func,Path.varAll(:,end),Path.lAll(end),Opt);
-        end
         if Do.remove
             if Path.sAll(end)>(Remove.s+Remove.ds)
                 Opt.dsMax = Initial.dsMax;
@@ -94,80 +58,25 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
         else
             Do.deflate = false;
         end
-        if ((Counter.error==Opt.stepbackErrorCounter) || Do.stepbackManually) && (numel(Path.lAll)>1)
+        if ((Counter.error==Opt.stepbackErrorCounter) || Do.stepbackManually) && (Path.nAll>1)
             %% stepback
             Path.toggleStepback();
             if Counter.validStepback<Opt.stepbackErrorCounter
                 Do.stepback = true;
-                if OptIsSet.bifAdditionalTestfunction
-                    Plus.bifTestValue = Opt.bifAdditionalTestfunction(func,xSolution,Jacobian,Path,Info);
-                end
-                if OptIsSet.pathInfoFunction
-                    Plus.pathInfoValue = Opt.pathInfoFunction(func,Jacobian.solver,xSolution(1:(end-1)),xSolution(end));
-                end
-                if StepsizeOptions.predictor
-                    Plus.xPredictor = xPredictor;
-                end
-                if StepsizeOptions.speedOfContinuation
-                    Plus.speedOfContinuation = CurrentStepsizeInfo.speedOfContinuation;
-                end
-                if StepsizeOptions.rateOfContraction
-                    Plus.rateOfContraction = CurrentStepsizeInfo.rateOfContraction;
-                end
             else
                 Do.stepback = false;
             end
-            Path.varAll(:,end) = [];
-            Path.lAll(end) = [];
-            Path.sAll(end) = [];
-            if OptIsSet.bifAdditionalTestfunction
-                Path.bifTestValue(end) = [];
-            end
-            if OptIsSet.pathInfoFunction
-                Path.pathInfoValue(:,end) = [];
-            end
-            if StepsizeOptions.predictor
-                if ~isempty(PathStepsizeInfo.predictor)
-                    PathStepsizeInfo.predictor(:,end) = [];
-                else
-                    PathStepsizeInfo.predictor = [];
-                end
-            end
-            if StepsizeOptions.speedOfContinuation && ~isempty(PathStepsizeInfo.speedOfContinuation)
-                PathStepsizeInfo.speedOfContinuation(end) = [];
-            end
-            if StepsizeOptions.rateOfContraction && ~isempty(PathStepsizeInfo.rateOfContraction)
-                PathStepsizeInfo.rateOfContraction(end) = [];
-            end
-            Plus.jacobian = Jacobian.last;
-            Jacobian.last = Jacobian.previous;
-        elseif (Counter.error==Opt.stepbackErrorCounter+1) && (numel(Path.lAll)>1)
+        elseif (Counter.error==Opt.stepbackErrorCounter+1) && (Path.nAll>1)
             %% undo stepback
             Path.toggleStepback();
-            if ~isempty(Plus.x)
-                if Opt.jacobianOut.full
-                    Jacobian.all = cat(3,Jacobian.all,Plus.jacobian(1:Info.nv,:));
-                end
-                if StepsizeOptions.predictor
-                    PathStepsizeInfo.predictor = [PathStepsizeInfo.predictor, Plus.xPredictor];
-                end
-                if StepsizeOptions.speedOfContinuation
-                    PathStepsizeInfo.speedOfContinuation = [PathStepsizeInfo.speedOfContinuation, Plus.speedOfContinuation];
-                end
-                if StepsizeOptions.rateOfContraction
-                    PathStepsizeInfo.rateOfContraction = [PathStepsizeInfo.rateOfContraction, Plus.rateOfContraction];
-                end
-                Plus = aux.clearStruct(Plus);
-            end
             Do.stepback = false;
             Do.suspend = false;
-        elseif (Counter.error==Opt.suspendContinuationErrorCounter) && (numel(Path.lAll)>1)
+        elseif (Counter.error==Opt.suspendContinuationErrorCounter) && (Path.nAll>1)
             %% suspend
             Path.suspend();
-            Plus = aux.clearStruct(Plus);
             Do.stepback = false;
             Do.suspend = true;
-        elseif logical(Opt.removeErrorCounter) && ((Counter.error==Opt.removeErrorCounter) && (numel(Path.lAll)>1))
+        elseif logical(Opt.removeErrorCounter) && ((Counter.error==Opt.removeErrorCounter) && (Path.nAll>1))
             %% remove
             nPath = Path.nAll;
             Remove.s = Path.sAll(nPath);
@@ -183,7 +92,6 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 nBifsRmv = sum(sum(Bifurcation.bif(1,:)'==(nPath+((-nRmv+1):0))));
                 if nBifsRmv>0
                     Bifurcation.bif(:,end+((1-nBifsRmv):0)) = [];
-                    Jacobian.signDetRed = Jacobian.signDetRed*(-1)^(nBifsRmv);
                 end
             end
             Path.remove(Path.nAll);
@@ -197,46 +105,20 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Jacobian,Path,Plus,R
                 optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
                 optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,rmvJacobian,xRmv(1:(end-1)),xRmv(end));
             end
+            rmvJacobian = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
             Path.addPointAtEnd(varRmv,lRmv,rmvJacobian,optAddPointArgs{:});
-            Jacobian.last = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
-            if Opt.jacobianOut.full
-                Jacobian.all(:,:,end) = Jacobian.last;
-            end
-            if StepsizeOptions.predictor
-                if nRmv >= 3
-                    PathStepsizeInfo.predictor = xPredictor;
-                else
-                    PathStepsizeInfo.predictor = PathStepsizeInfo.predictor(:,1:end-nRmv);
-                end
-            end
-            if StepsizeOptions.speedOfContinuation
-                if nRmv >= 3
-                    PathStepsizeInfo.speedOfContinuation = [];
-                else
-                    PathStepsizeInfo.speedOfContinuation = PathStepsizeInfo.speedOfContinuation(1:end-nRmv);
-                end
-            end
-            if StepsizeOptions.rateOfContraction
-                if nRmv >= 3
-                    PathStepsizeInfo.rateOfContraction = [];
-                else
-                    PathStepsizeInfo.rateOfContraction = PathStepsizeInfo.rateOfContraction(1:end-nRmv);
-                end
-            end
-            Plus = aux.clearStruct(Plus);
             Do.stepback = false;
             Do.suspend = false;
             Do.remove = true;
             Counter.remove = Counter.remove+1;
         else
             %% else
-            Plus = aux.clearStruct(Plus);
             Do.stepback = false;
             Do.suspend = false;
             Do.remove = false;
         end
         if Opt.includeReverse && Is.reverse && Solver.exitflag>0
-            [Path,Jacobian] = aux.includeReverse(xSolution,Path,Jacobian);
+            aux.includeReverse(xSolution,Path,Solver);
         end
         if aux.ison(Opt.homotopy) && Counter.error>=Opt.homotopyErrorCounter
             Do.homotopy = true;

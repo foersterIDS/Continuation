@@ -4,7 +4,7 @@
 %   Leibniz University Hannover
 %   04.04.2022 - Alwin Förster
 %
-function [Path] = trace(fun,dpaPoints,Info,Opt,Path)
+function trace(fun,dpaPoints,Info,Opt,Path)
     %% settings for dpa:
     dpaTrace = dpaPoints;
     npoints = numel(dpaTrace);
