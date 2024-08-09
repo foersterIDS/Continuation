@@ -6,11 +6,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations.
-%       Opt           -- contains user inputs, such as optimal number of
-%                        iterations, accessible by 'nIterOpt' and the
-%                        exponent, accessible by 'stepSizeIterationsBeta'
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -26,15 +22,15 @@
 %   08.10.2020 - Alwin Förster
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = iterationsPolynomial(Solver,Opt)
+function [xi] = iterationsPolynomial(oih)
     % correct number of iterations
-    if Opt.dsMax==inf
-        iter = max(Solver.output.iterations(end),1);
+    if oih.opt.dsMax==inf
+        iter = max(oih.solver.output.iterations(end),1);
     else
-        iter = Solver.output.iterations(end);
+        iter = oih.solver.output.iterations(end);
     end
     % calculate step size adaption factor
-    xi = (Opt.nIterOpt/iter)^Opt.stepSizeIterationsBeta;
+    xi = (oih.opt.nIterOpt/iter)^oih.opt.stepSizeIterationsBeta;
 end
 
 

@@ -16,12 +16,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations and rate of contraction.
-%       Path          -- contains the solution points of the path and the
-%                        predictors.
-%       Opt           -- contains user inputs, such as values and the
-%                        weights, accessible by 'weightsMultiplicative'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -34,10 +29,10 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = multiplicative(Solver,Path,Opt)
-    % create vector with Path.varAll and Path.lAll
+function [xi] = multiplicative(oih)
+    % create vector with oih.path.varAll and oih.path.lAll
     %
-    xAll = [Path.varAll;Path.lAll];
+    xAll = [oih.path.varAll;oih.path.lAll];
     %
     %% define target values
     %
@@ -45,20 +40,20 @@ function [xi] = multiplicative(Solver,Path,Opt)
     %          optimal speed of continuation, optimal change of curvature,
     %          optimal distance of predictor
     %
-    wTarget = [Opt.nIterOpt, Opt.optimalContractionRate,...
-        Opt.speedOfContinuation, 1, Opt.predictorDistance];
+    wTarget = [oih.opt.nIterOpt, oih.opt.optimalContractionRate,...
+        oih.opt.speedOfContinuation, 1, oih.opt.predictorDistance];
     %
     %% Weigths
     %
-    weights = Opt.weightsMultiplicative;
+    weights = oih.opt.weightsMultiplicative;
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(Solver.output.iterations)
-        if Opt.dsMax==inf
-            wIter = max(Solver.output.iterations(end),1);
+    if weights(1) ~= 0 && ~isempty(oih.solver.output.iterations)
+        if oih.opt.dsMax==inf
+            wIter = max(oih.solver.output.iterations(end),1);
         else
-            wIter = Solver.output.iterations(end);
+            wIter = oih.solver.output.iterations(end);
         end
     else
         wIter = wTarget(1);
@@ -66,16 +61,16 @@ function [xi] = multiplicative(Solver,Path,Opt)
     %
     %% Factor by contraction rate
     %
-    if weights(2) ~= 0 && ~isempty(Solver.output.rateOfContraction)
-        wContr = Solver.output.rateOfContraction(end);
+    if weights(2) ~= 0 && ~isempty(oih.solver.output.rateOfContraction)
+        wContr = oih.solver.output.rateOfContraction(end);
     else
         wContr = wTarget(2);
     end
     %
     %% Factor by speed of continuation
     %
-    if weights(3) ~= 0 && ~isempty(Path.speedOfContinuation)
-        wSpeed = Path.speedOfContinuation(end);
+    if weights(3) ~= 0 && ~isempty(oih.path.speedOfContinuation)
+        wSpeed = oih.path.speedOfContinuation(end);
     else
         wSpeed = wTarget(3);
     end
@@ -84,11 +79,11 @@ function [xi] = multiplicative(Solver,Path,Opt)
     %
     % Check if there are enough solution points
     %
-    if weights(4) ~= 0 && Path.nAll > 3 
+    if weights(4) ~= 0 && oih.path.nAll > 3 
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
-        deltaS = Path.sAll(end:-1:end-2) - Path.sAll(end-1:-1:end-3);
+        deltaS = oih.path.sAll(end:-1:end-2) - oih.path.sAll(end-1:-1:end-3);
         %
         rPp1 = 1/(deltaS(1))^2 * (xAll(:,end) - (1 + deltaS(1)/deltaS(2))*xAll(:,end-1) + deltaS(1)/deltaS(2) * xAll(:,end-2));
         rPp2 = 1/(deltaS(2))^2 * (xAll(:,end-1) - (1 + deltaS(2)/deltaS(3))*xAll(:,end-2) + deltaS(2)/deltaS(3) * xAll(:,end-3));
@@ -100,7 +95,7 @@ function [xi] = multiplicative(Solver,Path,Opt)
         %
         % calculate change of curvature
         %
-        if kappaPrevious <= Opt.solverTol || kappaCurrent <= Opt.solverTol
+        if kappaPrevious <= oih.opt.solverTol || kappaCurrent <= oih.opt.solverTol
             wCurv = 1;
         else
             wCurv = kappaCurrent/kappaPrevious;
@@ -111,12 +106,12 @@ function [xi] = multiplicative(Solver,Path,Opt)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0 && ~isempty(Path.xPredictorAll)
+    if weights(5) ~= 0 && ~isempty(oih.path.xPredictorAll)
         if norm(xAll(:,end)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictorAll(:,end) - xAll(:,end)) / norm(xAll(:,end));
+            relDistanceOfPredictor = norm(oih.path.xPredictorAll(:,end) - xAll(:,end)) / norm(xAll(:,end));
             wDist = relDistanceOfPredictor;
-        elseif norm(Path.xPredictorAll(:,end)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictorAll(:,end) - xAll(:,end)) / norm(Path.xPredictorAll(:,end));
+        elseif norm(oih.path.xPredictorAll(:,end)) > 1e-6
+            relDistanceOfPredictor = norm(oih.path.xPredictorAll(:,end) - xAll(:,end)) / norm(oih.path.xPredictorAll(:,end));
             wDist = relDistanceOfPredictor;
         else
             wDist = 1;

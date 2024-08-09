@@ -7,12 +7,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations.
-%       Path          -- contains the solution points of the path
-%       Opt           -- contains user inputs, such as optimal number of
-%                        iterations, accessible by 'nIterOpt' and the
-%                        weights, accessible by 'weightsSzyszkowski'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -27,13 +22,13 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = szyszkowski(Solver,Path,Opt)
+function [xi] = szyszkowski(oih)
     %% Method of Szyszkowski and Husband
     %
     % collect needed data of Path
     %
-    varNeeded = Path.varAll(:,end-3:end);
-    lNeeded = Path.lAll(end-3:end);
+    varNeeded = oih.path.varAll(:,end-3:end);
+    lNeeded = oih.path.lAll(end-3:end);
     zNeeded = [varNeeded; lNeeded];
     %
     % calculate connecting vectors
@@ -53,23 +48,23 @@ function [xi] = szyszkowski(Solver,Path,Opt)
     %
     % check if angle is too large
     %
-    if angle > Opt.stepSizeAngle || angleP1 > Opt.stepSizeAngle
+    if angle > oih.opt.stepSizeAngle || angleP1 > oih.opt.stepSizeAngle
         xi = 0.5;
     else
         % correct number of iterations
         %
-        if Opt.dsMax==inf
-            iter = max(Solver.output.iterations(end),1);
+        if oih.opt.dsMax==inf
+            iter = max(oih.solver.output.iterations(end),1);
         else
-            iter = Solver.output.iterations(end);
+            iter = oih.solver.output.iterations(end);
         end
         %
         % calculate deviation of iterations
         %
-        deviationOfIterations = Opt.nIterOpt/iter;
+        deviationOfIterations = oih.opt.nIterOpt/iter;
         %
         % get weigths
-        weights = Opt.weightsSzyszkowski;
+        weights = oih.opt.weightsSzyszkowski;
         %
         % calculate new step size
         %

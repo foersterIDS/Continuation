@@ -4,16 +4,16 @@
 %   Leibniz University Hannover
 %   29.12.2021 - Alwin Förster
 %
-function [residual,jacobian] = residualParaboloid(x,xAll,ds,Opt)
+function [residual,jacobian] = residualParaboloid(x,xAll,ds,oih)
     [b,a] = size(xAll);    
     %% approximate tangent with secant
     %
     if a == 1
-        if numel(Opt.direction)==1
+        if numel(oih.opt.direction)==1
             sec = [zeros(b-1,1);1];
-            sec = Opt.direction * ds * sec;
+            sec = oih.opt.direction * ds * sec;
         else
-            sec = Opt.direction * ds;
+            sec = oih.opt.direction * ds;
         end
         xip1 = xAll(:,end) + sec;
     else

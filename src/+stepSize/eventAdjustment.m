@@ -7,7 +7,7 @@
 %   Leibniz University Hannover
 %   08.11.2022 - Tido Kubatschek
 %
-function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,variables)
+function [dsNew,eventObj,changed] = eventAdjustment(ds,eventObj,oih,variables)
     %
     % check if eventObject has already been defined
     if isempty(eventObj)
@@ -18,7 +18,7 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
         %
         % get information by user
         %
-        len = length(Opt.eventUserInput);
+        len = length(oih.opt.eventUserInput);
         %
         % check len
         %
@@ -30,19 +30,19 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
             %
             % get inputs
             %
-            condition = Opt.eventUserInput{k}.condition;
-            neededParameters = Opt.eventUserInput{k}.neededParameters;
-            dsMin = Opt.eventUserInput{k}.dsMin;
-            dsMax = Opt.eventUserInput{k}.dsMax;
+            condition = oih.opt.eventUserInput{k}.condition;
+            neededParameters = oih.opt.eventUserInput{k}.neededParameters;
+            dsMin = oih.opt.eventUserInput{k}.dsMin;
+            dsMax = oih.opt.eventUserInput{k}.dsMax;
             
-            if isfield(Opt.eventUserInput{k},'counterMax')
-                counterMax = Opt.eventUserInput{k}.counterMax;
+            if isfield(oih.opt.eventUserInput{k},'counterMax')
+                counterMax = oih.opt.eventUserInput{k}.counterMax;
             else
                 counterMax = [];
             end
 
-            if isfield(Opt.eventUserInput{k},'dsAfter')
-                dsAfter = Opt.eventUserInput{k}.dsAfter;
+            if isfield(oih.opt.eventUserInput{k},'dsAfter')
+                dsAfter = oih.opt.eventUserInput{k}.dsAfter;
             else
                 dsAfter = [];
             end
@@ -55,7 +55,7 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
         %
         % set initial dsMin and dsMax
         %
-        eventObj.setInitial(Initial);
+        eventObj.setInitial(oih.initial);
         %
     end
     %
@@ -64,7 +64,7 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
     %
     % set current dsMax and dsMin
     %
-    eventObj.setCurrent(Opt.dsMax,Opt.dsMin); % ist hier Opt richtig?
+    eventObj.setCurrent(oih.opt.dsMax,oih.opt.dsMin); % ist hier Opt richtig?
     %
     % fill value struct
     numOfVars = length(neededParameters);
@@ -80,8 +80,8 @@ function [dsNew,eventObj,changed,Opt] = eventAdjustment(ds,eventObj,Opt,Initial,
     %
     if ~isempty(newStepsizes.dsMax)
         eventObj.setCurrent(newStepsizes.dsMax,newStepsizes.dsMin);
-        Opt.dsMax = newStepsizes.dsMax;
-        Opt.dsMin = newStepsizes.dsMin;
+        oih.opt.dsMax = newStepsizes.dsMax;
+        oih.opt.dsMin = newStepsizes.dsMin;
     end
     if changed
         dsNew = newStepsizes.ds;

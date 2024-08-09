@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   19.01.2022 - Alwin Förster
 %
-function [] = printLine(Opt,str,varargin)
-    if Opt.display
+function [] = printLine(oih,str,varargin)
+    if oih.opt.display
         fprintf(str,varargin{:});
     end
 end

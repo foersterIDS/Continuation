@@ -9,13 +9,7 @@
 %
 %   Inputs:
 %       ds            -- latest used stepsize
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations.
-%       Path          -- contains the solution points of the path
-%       Jac           -- current Jacobian to calculate tangent
-%       Opt           -- contains user inputs, such as optimal number of
-%                        iterations, accessible by 'nIterOpt' and the
-%                        weights, accessible by 'weightsFayezioghani'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -30,20 +24,21 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = fayezioghani(ds,Solver,Path,Jac,Opt)
+function [xi] = fayezioghani(ds,oih)
     %% Method of Fayezioghani et al.
     %
     % collect needed data of Path
     %
-    varNeeded = Path.varAll(:,end-1:end);
-    lNeeded = Path.lAll(end-1:end);
+    varNeeded = oih.path.varAll(:,end-1:end);
+    lNeeded = oih.path.lAll(end-1:end);
     zNeeded = [varNeeded; lNeeded];
     %
     % calculate connecting vector and tangent
     %
+    jac = oih.path.getJacobianByName('last');
     v = zNeeded(:,end) - zNeeded(:,end-1);
-    if diff(size(Jac)) == 0 && size(Jac,1) == (size(varNeeded,1) + 1)
-        [~,tangent] = predictor.ode(Path,ds,Jac,[],Opt);
+    if diff(size(jac)) == 0 && size(jac,1) == (size(varNeeded,1) + 1)
+        [~,tangent] = predictor.ode(oih,ds,jac,[]);
     else
         tangent = v;
     end
@@ -54,18 +49,18 @@ function [xi] = fayezioghani(ds,Solver,Path,Jac,Opt)
     %
     % get weigths
     %
-    weights = Opt.weightsFayezioghani;
+    weights = oih.opt.weightsFayezioghani;
     %
     % correct number of iterations
     %
-    if Opt.dsMax==inf
-        iter = max(Solver.output.iterations(end),1);
+    if oih.opt.dsMax==inf
+        iter = max(oih.solver.output.iterations(end),1);
     else
-        iter = Solver.output.iterations(end);
+        iter = oih.solver.output.iterations(end);
     end
     %
     % calculate new step size
     %
-    xi = (Opt.nIterOpt / iter)^weights(1)*...
-        ((cos(angle) + 1) / (cos(Opt.stepSizeAngle) + 1))^weights(2);
+    xi = (oih.opt.nIterOpt / iter)^weights(1)*...
+        ((cos(angle) + 1) / (cos(oih.opt.stepSizeAngle) + 1))^weights(2);
 end

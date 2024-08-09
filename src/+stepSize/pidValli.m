@@ -8,11 +8,7 @@
 %
 %
 %   Inputs:
-%       Path    -- contains information the path, such as the the values of
-%                  lamdba and the variables
-%       Opt     -- contains user inputs, such as PID constants, accessible
-%                  by 'stepSizePidParams' and the tolerance, accessible
-%                  by 'stepSizePidTol'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -28,10 +24,10 @@
 %   Leibniz University Hannover
 %   21.10.2020 - Tido Kubatschek
 % 
-function [xi] = pidValli(Path,Opt)
+function [xi] = pidValli(oih)
     % define function handle for finite difference calculation
     %
-    dvarsdl = @(k) (Path.varAll(:,end+k) - Path.varAll(:,end+k-1)) / (Path.lAll(end+k) - Path.lAll(end+k-1));
+    dvarsdl = @(k) (oih.path.varAll(:,end+k) - oih.path.varAll(:,end+k-1)) / (oih.path.lAll(end+k) - oih.path.lAll(end+k-1));
     %
     % define function handle for eTilde
     %
@@ -39,8 +35,8 @@ function [xi] = pidValli(Path,Opt)
     %
     % parameters of pid control 
     %
-    PID = Opt.stepSizePidParams;
-    pidTol = Opt.stepSizePidTol;
+    PID = oih.opt.stepSizePidParams;
+    pidTol = oih.opt.stepSizePidTol;
     %
     % calculate needed relative changes
     %

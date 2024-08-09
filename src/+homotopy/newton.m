@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   19.05.2020 - Alwin Förster
 %
-function [varargout] = newton(R,x,Rx0,Opt)
-    if Opt.jacobian
+function [varargout] = newton(R,x,Rx0,oih)
+    if oih.opt.jacobian
         [Rx,Jx] = R(x);
         Jx = Jx(1:numel(Rx),1:numel(x));
         varargout{1} = Rx-Rx0;

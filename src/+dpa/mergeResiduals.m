@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [varargout] = mergeResiduals(Opt,fun,resDpa,x,g)
+function [varargout] = mergeResiduals(oih,fun,resDpa,x,g)
     nv = numel(x)-1;
     v = x(1:nv);
     l = x(nv+1);
     z = [x;g];
-    if Opt.jacobian
+    if oih.opt.jacobian
         [Rv,Jfi] = fun(v,l,g);
         [nc,ny] = size(Jfi);
         if nc~=nv

@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function [R] = resBif(fun,x,g,Opt,scale)
-    if Opt.jacobian
+function [R] = resBif(fun,x,g,oih,scale)
+    if oih.opt.jacobian
         [~,J1] = fun(x(1:end-1),x(end),g);
         if diff(size(J1))
             J1 = J1(:,1:end-1);

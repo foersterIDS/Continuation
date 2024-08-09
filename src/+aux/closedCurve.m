@@ -5,18 +5,18 @@
 %   03.11.2020 - Tido Kubatschek
 %   09.11.2020 - Alwin Förster
 %
-function [isClosed, Opt, Counter] = closedCurve(Opt,Path,ds,Counter)
+function [isClosed] = closedCurve(oih,ds)
     isClosed = 0;
     n = 5;
     np = 4; % polynomial order (np = 2*k with k in N)
     epsPol = 2.5e-2;
     dsTol = 1.1;
     nu = 1+np/2;
-    ns = Path.nAll;
+    ns = oih.path.nAll;
     if ns > n+nu
-        xAll = [Path.varAll; Path.lAll];
-        epsDistX = min([dsTol*norm(xAll(1:(end-1),end)-xAll(1:(end-1),end-1)),dsTol*ds,Opt.dsMax]);
-        epsDistL = min([dsTol*norm(xAll(end,end)-xAll(end,end-1)),dsTol*ds,Opt.dsMax]);
+        xAll = [oih.path.varAll; oih.path.lAll];
+        epsDistX = min([dsTol*norm(xAll(1:(end-1),end)-xAll(1:(end-1),end-1)),dsTol*ds,oih.opt.dsMax]);
+        epsDistL = min([dsTol*norm(xAll(end,end)-xAll(end,end-1)),dsTol*ds,oih.opt.dsMax]);
         epsAng = 0.5*(2*pi / 360);
         epsDir = 1e-3;
         %% exclude points before current points which are too close
@@ -47,14 +47,14 @@ function [isClosed, Opt, Counter] = closedCurve(Opt,Path,ds,Counter)
             for i=1:numel(kFlags)
                 %% polynomials
                 % centered polynomial to matching point
-                s0F = Path.sAll(kFlags(i));
-                pF = poly.fitn(Path.sAll(kFlags(i)+(-np/2:np/2))-s0F,xAll(:,kFlags(i)+(-np/2:np/2)),np);
+                s0F = oih.path.sAll(kFlags(i));
+                pF = poly.fitn(oih.path.sAll(kFlags(i)+(-np/2:np/2))-s0F,xAll(:,kFlags(i)+(-np/2:np/2)),np);
                 % arclength correction
                 dsc = distX(kFlags(i)-nu+1);
                 % centered polynomials to last point
-                s0C = Path.sAll(end);
-                pCP = poly.fitn(Path.sAll(end+(-np:0))-s0C+dsc,xAll(:,end+(-np:0)),np);
-                pCM = poly.fitn(Path.sAll(end+(-np:0))-s0C-dsc,xAll(:,end+(-np:0)),np);
+                s0C = oih.path.sAll(end);
+                pCP = poly.fitn(oih.path.sAll(end+(-np:0))-s0C+dsc,xAll(:,end+(-np:0)),np);
+                pCM = poly.fitn(oih.path.sAll(end+(-np:0))-s0C-dsc,xAll(:,end+(-np:0)),np);
                 % check polyinomials
                 if min([norm(pF-pCP),norm(pF-pCM)]/norm(pF)) <= epsPol
                     countFlag = 1;
@@ -75,11 +75,11 @@ function [isClosed, Opt, Counter] = closedCurve(Opt,Path,ds,Counter)
             end
         end
         if countFlag
-            Counter.closedCurve = Counter.closedCurve + 1;
-        elseif Counter.closedCurve > 0
-            Counter.closedCurve = Counter.closedCurve - 1;
+            oih.counter.closedCurve = oih.counter.closedCurve + 1;
+        elseif oih.counter.closedCurve > 0
+            oih.counter.closedCurve = oih.counter.closedCurve - 1;
         end
-        if Counter.closedCurve == Opt.maxClosedCounter
+        if oih.counter.closedCurve == oih.opt.maxClosedCounter
             isClosed = 1;
         end
     end

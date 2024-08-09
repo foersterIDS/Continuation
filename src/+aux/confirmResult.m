@@ -5,128 +5,127 @@
 %   28.03.2022 - Alwin Förster
 %   12.08.2022 - Anna Lefken
 %
-function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Remove,Solver,StepsizeOptions,Opt] = ...
-    confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Path,Remove,Solver,speedOfContinuation,StepsizeOptions,Opt,OptIsSet)
+function [xDeflation] = confirmResult(func,funSolution,xSolution,xPredictor,oih,speedOfContinuation)
     xDeflation = xSolution;
-    if Is.valid
+    if oih.is.valid
         %% valid result
         % Add point
         optAddPointArgs = {};
-        if OptIsSet.bifAdditionalTestfunction
+        if oih.optIsSet.bifAdditionalTestfunction
             optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
-            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xSolution,Path,Info);
+            optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.bifAdditionalTestfunction(func,xSolution,oih.path,oih.info);
         end
-        if OptIsSet.pathInfoFunction
+        if oih.optIsSet.pathInfoFunction
             optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
-            optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,Solver.jacobian,xSolution(1:(end-1)),xSolution(end));
+            optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.pathInfoFunction(func,oih.solver.jacobian,xSolution(1:(end-1)),xSolution(end));
         end
-        if StepsizeOptions.predictor
+        if oih.stepsizeOptions.predictor
             optAddPointArgs{numel(optAddPointArgs)+1} = 'predictor';
             optAddPointArgs{numel(optAddPointArgs)+1} = xPredictor;
         end
-        if StepsizeOptions.speedOfContinuation
+        if oih.stepsizeOptions.speedOfContinuation
             optAddPointArgs{numel(optAddPointArgs)+1} = 'speedOfContinuation';
             optAddPointArgs{numel(optAddPointArgs)+1} = speedOfContinuation;
         end
-        Path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),Solver.jacobian,Solver,optAddPointArgs{:});
+        oih.path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),oih.solver.jacobian,oih,optAddPointArgs{:});
         % set structs
-        if ~Path.stepBackStatus
-            Counter.validStepback = 0;
+        if ~oih.path.stepBackStatus
+            oih.counter.validStepback = 0;
         else
-            Counter.validStepback = Counter.validStepback+1;
-            Path.toggleStepback();
+            oih.counter.validStepback = oih.counter.validStepback+1;
+            oih.path.toggleStepback();
         end
-        Do.deflate = false;
-        Do.homotopy = false;
-        Do.stepback = false;
-        Do.suspend = false;
-        Counter.error = 0;
-        Counter.step = Counter.step + 1;
-        if Do.remove
-            if Path.sAll(end)>(Remove.s+Remove.ds)
-                Opt.dsMax = Initial.dsMax;
-                Do.remove = false;
-                Counter.remove = 0;
+        oih.do.deflate = false;
+        oih.do.homotopy = false;
+        oih.do.stepback = false;
+        oih.do.suspend = false;
+        oih.counter.error = 0;
+        oih.counter.step = oih.counter.step + 1;
+        if oih.do.remove
+            if oih.path.sAll(end)>(oih.remove.s+oih.remove.ds)
+                oih.opt.dsMax = oih.initial.dsMax;
+                oih.do.remove = false;
+                oih.counter.remove = 0;
             end
         end
     else
         %% invalid result
-        Counter.error = Counter.error+1;
-        if Opt.deflation && ~Do.deflate && ~isnan(sum(xSolution(:,end))) && Is.reverse && Counter.error>=Opt.deflationErrorCounter
-            Do.deflate = true;
+        oih.counter.error = oih.counter.error+1;
+        if oih.opt.deflation && ~oih.do.deflate && ~isnan(sum(xSolution(:,end))) && oih.is.reverse && oih.counter.error>=oih.opt.deflationErrorCounter
+            oih.do.deflate = true;
             xDeflation = xSolution;
         else
-            Do.deflate = false;
+            oih.do.deflate = false;
         end
-        if ((Counter.error==Opt.stepbackErrorCounter) || Do.stepbackManually) && (Path.nAll>1)
+        if ((oih.counter.error==oih.opt.stepbackErrorCounter) || oih.do.stepbackManually) && (oih.path.nAll>1)
             %% stepback
-            Path.toggleStepback();
-            if Counter.validStepback<Opt.stepbackErrorCounter
-                Do.stepback = true;
+            oih.path.toggleStepback();
+            if oih.counter.validStepback<oih.opt.stepbackErrorCounter
+                oih.do.stepback = true;
             else
-                Do.stepback = false;
+                oih.do.stepback = false;
             end
-        elseif (Counter.error==Opt.stepbackErrorCounter+1) && (Path.nAll>1)
+        elseif (oih.counter.error==oih.opt.stepbackErrorCounter+1) && (oih.path.nAll>1)
             %% undo stepback
-            Path.toggleStepback();
-            Do.stepback = false;
-            Do.suspend = false;
-        elseif (Counter.error==Opt.suspendContinuationErrorCounter) && (Path.nAll>1)
+            oih.path.toggleStepback();
+            oih.do.stepback = false;
+            oih.do.suspend = false;
+        elseif (oih.counter.error==oih.opt.suspendContinuationErrorCounter) && (oih.path.nAll>1)
             %% suspend
-            Path.suspend();
-            Do.stepback = false;
-            Do.suspend = true;
-        elseif logical(Opt.removeErrorCounter) && ((Counter.error==Opt.removeErrorCounter) && (Path.nAll>1))
+            oih.path.suspend();
+            oih.do.stepback = false;
+            oih.do.suspend = true;
+        elseif logical(oih.opt.removeErrorCounter) && ((oih.counter.error==oih.opt.removeErrorCounter) && (oih.path.nAll>1))
             %% remove
-            nPath = Path.nAll;
-            Remove.s = Path.sAll(nPath);
-            nRmv = min([2*Opt.removeErrorCounter,nPath-1]);
-            Opt.dsMax = max([mean(diff(Path.sAll(nPath+((-ceil(nRmv/2)+1):0))))*0.75,Opt.dsMin,Opt.dsMin*10]);
-            Path.remove(nPath+((-nRmv+1):0));
-            Remove.ds = Remove.s-Path.sAll(end);
-            dscaleRmv = aux.getDscale(Opt,Path);
-            lRmv = Path.lAll(end);
-            residualFixedValueRmv = @(v) aux.residualFixedValue(func,v,lRmv,Opt);
-            [varRmv,funRmv,~,~,rmvJacobian] = Solver.main(residualFixedValueRmv,Path.varAll(:,end),dscaleRmv(1:end-1));
-            if ~isempty(Bifurcation.bif) && numel(Bifurcation.bif(1,:))>0
-                nBifsRmv = sum(sum(Bifurcation.bif(1,:)'==(nPath+((-nRmv+1):0))));
+            nPath = oih.path.nAll;
+            oih.remove.s = oih.path.sAll(nPath);
+            nRmv = min([2*oih.opt.removeErrorCounter,nPath-1]);
+            oih.opt.dsMax = max([mean(diff(oih.path.sAll(nPath+((-ceil(nRmv/2)+1):0))))*0.75,oih.opt.dsMin,oih.opt.dsMin*10]);
+            oih.path.remove(nPath+((-nRmv+1):0));
+            oih.remove.ds = oih.remove.s-oih.path.sAll(end);
+            dscaleRmv = aux.getDscale(oih);
+            lRmv = oih.path.lAll(end);
+            residualFixedValueRmv = @(v) aux.residualFixedValue(func,v,lRmv,oih);
+            [varRmv,funRmv,~,~,rmvJacobian] = oih.solver.main(residualFixedValueRmv,oih.path.varAll(:,end),dscaleRmv(1:end-1));
+            if ~isempty(oih.bifurcation.bif) && numel(oih.bifurcation.bif(1,:))>0
+                nBifsRmv = sum(sum(oih.bifurcation.bif(1,:)'==(nPath+((-nRmv+1):0))));
                 if nBifsRmv>0
-                    Bifurcation.bif(:,end+((1-nBifsRmv):0)) = [];
+                    oih.bifurcation.bif(:,end+((1-nBifsRmv):0)) = [];
                 end
             end
-            Path.remove(Path.nAll);
+            oih.path.remove(oih.path.nAll);
             xRmv = [varRmv;lRmv];
             optAddPointArgs = {};
-            if OptIsSet.bifAdditionalTestfunction
+            if oih.optIsSet.bifAdditionalTestfunction
                 optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
-                optAddPointArgs{numel(optAddPointArgs)+1} = Opt.bifAdditionalTestfunction(func,xRmv,rmvJacobian,Path,Info);
+                optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.bifAdditionalTestfunction(func,xRmv,rmvJacobian,oih.path,oih.info);
             end
-            if OptIsSet.pathInfoFunction
+            if oih.optIsSet.pathInfoFunction
                 optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
-                optAddPointArgs{numel(optAddPointArgs)+1} = Opt.pathInfoFunction(func,rmvJacobian,xRmv(1:(end-1)),xRmv(end));
+                optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.pathInfoFunction(func,rmvJacobian,xRmv(1:(end-1)),xRmv(end));
             end
-            rmvJacobian = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[Path.varAll(:,end);Path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
-            Path.addPointAtEnd(varRmv,lRmv,rmvJacobian,optAddPointArgs{:});
-            Do.stepback = false;
-            Do.suspend = false;
-            Do.remove = true;
-            Counter.remove = Counter.remove+1;
+            rmvJacobian = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+1)),[oih.path.varAll(:,end);oih.path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',oih.info.nv+1,'diffquot',oih.opt.diffquot)];
+            oih.path.addPointAtEnd(varRmv,lRmv,rmvJacobian,optAddPointArgs{:});
+            oih.do.stepback = false;
+            oih.do.suspend = false;
+            oih.do.remove = true;
+            oih.counter.remove = oih.counter.remove+1;
         else
             %% else
-            Do.stepback = false;
-            Do.suspend = false;
-            Do.remove = false;
+            oih.do.stepback = false;
+            oih.do.suspend = false;
+            oih.do.remove = false;
         end
-        if Opt.includeReverse && Is.reverse && Solver.exitflag>0
-            aux.includeReverse(xSolution,Path,Solver);
+        if oih.opt.includeReverse && oih.is.reverse && oih.solver.exitflag>0
+            aux.includeReverse(xSolution,oih);
         end
-        if aux.ison(Opt.homotopy) && Counter.error>=Opt.homotopyErrorCounter
-            Do.homotopy = true;
+        if aux.ison(oih.opt.homotopy) && oih.counter.error>=oih.opt.homotopyErrorCounter
+            oih.do.homotopy = true;
         else
-            Do.homotopy = false;
+            oih.do.homotopy = false;
         end
-        if Is.catch
-            Counter.catch = Counter.catch + 1;
+        if oih.is.catch
+            oih.counter.catch = oih.counter.catch + 1;
         end
     end
 end

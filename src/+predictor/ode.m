@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   12.11.2020 - Alwin Förster
 %
-function [funPredictor,JacPredictor] = ode(Path,s,solverJacobian,fun,Opt)
-    xAll = [Path.varAll;Path.lAll];
+function [funPredictor,JacPredictor] = ode(oih,s,solverJacobian,fun)
+    xAll = oih.path.xAll;
     xi = xAll(:,end);
     nd = length(xi);
     %% check jacobian:
@@ -14,10 +14,10 @@ function [funPredictor,JacPredictor] = ode(Path,s,solverJacobian,fun,Opt)
         if nj2==nd
             jac = solverJacobian(1:nd-1,1:nd);
         else
-            jac = [solverJacobian(1:nd-1,1:nj2),numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivativeDimensions',(nj2+1):nd,'diffquot',Opt.diffquot)];
+            jac = [solverJacobian(1:nd-1,1:nj2),numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivativeDimensions',(nj2+1):nd,'diffquot',oih.opt.diffquot)];
         end
     else
-        jac = aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',Opt.diffquot);
+        jac = aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',oih.opt.diffquot);
     end
     %% build system of equations:
     [~,m] = max(abs(diff(xAll(:,end+(-1:0)),1,2)));

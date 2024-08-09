@@ -4,10 +4,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        rate of contraction.
-%       Opt           -- contains user inputs, such as the optimal contraction
-%                        rate specified in 'optimalContractionRate'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -20,19 +17,19 @@
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
 %
-function [xi] = contraction(Solver,Opt)
-    if ~isempty(Solver.output.rateOfContraction)
+function [xi] = contraction(oih)
+    if ~isempty(oih.solver.output.rateOfContraction)
         % get rates of contraction
         %
         % current rate
         %
-        currentRate = Solver.output.rateOfContraction(end);
+        currentRate = oih.solver.output.rateOfContraction(end);
         %
         % if there is more than one rate accessible also get previous rate
         % and calculate relative difference
         %
-        if length(Solver.output.rateOfContraction) > 1
-            previousRate = Solver.output.rateOfContraction(end-1);
+        if length(oih.solver.output.rateOfContraction) > 1
+            previousRate = oih.solver.output.rateOfContraction(end-1);
             relDifference = abs(currentRate - previousRate) / abs(previousRate);
         else
             relDifference = inf;
@@ -40,7 +37,7 @@ function [xi] = contraction(Solver,Opt)
         % 
         % optimal rate
         %
-        qOpt = Opt.optimalContractionRate;
+        qOpt = oih.opt.optimalContractionRate;
         %
         if currentRate > qOpt && relDifference > 0.01
             % only decrease if there was a difference

@@ -5,22 +5,22 @@
 %   08.05.2020 - Alwin Förster
 %   17.09.2020 - Tido Kubatschek
 %
-function [residual] = corrector(fun,Opt)
-    if Opt.corrector.orthogonal
-        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal(x,xAll,ds,Jac,Opt);
-    elseif Opt.corrector.orthogonal2
-        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal2(x,xAll,ds,fun,Jac,Opt);
-    elseif Opt.corrector.sphere
+function [residual] = corrector(fun,oih)
+    if oih.opt.corrector.orthogonal
+        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal(x,xAll,ds,Jac,oih);
+    elseif oih.opt.corrector.orthogonal2
+        residual = @(x,xAll,ds,Jac) corrector.residualOrthogonal2(x,xAll,ds,fun,Jac,oih);
+    elseif oih.opt.corrector.sphere
         residual = @(x,xAll,ds,Jac) corrector.residualSphere(x,xAll,ds);
-    elseif Opt.corrector.ellipsoid
+    elseif oih.opt.corrector.ellipsoid
         RnR = corrector.RnRotation([1;0]);
         residual = @(x,xAll,ds,Jac) corrector.residualEllipsoid(x,xAll,ds,RnR);
-    elseif Opt.corrector.ellipsoid2
+    elseif oih.opt.corrector.ellipsoid2
         residual = @(x,xAll,ds,Jac) corrector.residualEllipsoid2(x,xAll,ds);
-    elseif Opt.corrector.unique
-        residual = @(x,xAll,ds,Jac) corrector.residualUnique(x,xAll,ds,Opt);
-    elseif Opt.corrector.paraboloid
-        residual = @(x,xAll,ds,Jac) corrector.residualParaboloid(x,xAll,ds,Opt);
+    elseif oih.opt.corrector.unique
+        residual = @(x,xAll,ds,Jac) corrector.residualUnique(x,xAll,ds,oih);
+    elseif oih.opt.corrector.paraboloid
+        residual = @(x,xAll,ds,Jac) corrector.residualParaboloid(x,xAll,ds,oih);
     else
         error('No such corrector-method');
     end

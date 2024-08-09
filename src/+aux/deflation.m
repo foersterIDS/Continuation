@@ -4,13 +4,13 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [ varargout ] = deflation( R, xDeflation, x, Opt )
+function [ varargout ] = deflation( R, xDeflation, x, hasJacobian )
     %% Deflation
     %
     p = 2;
     sigma = 10^-15;
     G = (1/sqrt((x-xDeflation)'*(x-xDeflation))^p+sigma);
-    if Opt.jacobian
+    if hasJacobian
         [Rx,Jx] = R(x);
         JG = -p*(x-xDeflation)'*((x-xDeflation)'*(x-xDeflation))^(-p/2-1);
         varargout{1} = Rx*G;

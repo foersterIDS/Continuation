@@ -11,8 +11,8 @@ classdef StepSizeEventManager < handle
         allEvents;
         anyActive = false;
         activeEvents = [];
-        Initial;
-        Current;
+        initial;
+        current;
         changed = false;
         allParams = [];
     end
@@ -76,8 +76,8 @@ classdef StepSizeEventManager < handle
                 %
                 % set dsMax and dsMin to initial values
                 %
-                dsNew.dsMin = obj.Initial.dsMin;
-                dsNew.dsMax = obj.Initial.dsMax;
+                dsNew.dsMin = obj.initial.dsMin;
+                dsNew.dsMax = obj.initial.dsMax;
                 %
                 % currently no event is active
                 obj.anyActive = false;
@@ -134,13 +134,13 @@ classdef StepSizeEventManager < handle
             output = obj.allParams;
         end
 
-        function obj = setInitial(obj,Initial)
-            obj.Initial = Initial;
+        function obj = setInitial(obj,initial)
+            obj.initial = initial;
         end
 
         function obj = setCurrent(obj,dsMax,dsMin)
-            obj.Current.dsMax = dsMax;
-            obj.Current.dsMin = dsMin;
+            obj.current.dsMax = dsMax;
+            obj.current.dsMin = dsMin;
         end
     end
     methods (Access = private)
@@ -155,7 +155,7 @@ classdef StepSizeEventManager < handle
                 % if any is active and its stepsize is lower than the
                 % previous saved value and it wasn't active in the latest step
                 % save its value
-                if isActive(k) && ~obj.allEvents{k}.get('lastActive') && obj.allEvents{k}.get('dsMax') < obj.Current.dsMax
+                if isActive(k) && ~obj.allEvents{k}.get('lastActive') && obj.allEvents{k}.get('dsMax') < obj.current.dsMax
                     obj.changed = true;
                     ds = obj.allEvents{k}.get('dsMax');
                     obj.allEvents{k}.set('lastActive',true);

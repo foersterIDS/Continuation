@@ -28,7 +28,7 @@
 % http://www.gnu.org/licenses or gpl-3.0.txt.
 %
 %%
-function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut] = ...
+function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStruct] = ...
     continuation(fun,var0,lStart,lEnd,ds0,NameValueArgs)
     %% arguments
     %
@@ -65,7 +65,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.dpaGammaVar {validation.scalarLogical} % #scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
         NameValueArgs.dpaResidual (1,1) function_handle % #nargin:3
         NameValueArgs.dsMax (:,1) double {mustBeGreaterThan(NameValueArgs.dsMax,0)} % #scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
-        NameValueArgs.dsMin (1,1) double {mustBeGreaterThan(NameValueArgs.dsMin,0)} % #scalar#double#positive#smaller:norm(Opt.dsMax)
+        NameValueArgs.dsMin (1,1) double {mustBeGreaterThan(NameValueArgs.dsMin,0)} % #scalar#double#positive#smaller:norm(oih.opt.dsMax)
         NameValueArgs.dsTol (1,2) double {mustBePositive} % #array#positive#double#increasing#size:[1,2]
         NameValueArgs.dscale0 (:,1) double {mustBeGreaterThan(NameValueArgs.dscale0,0)} % #array#positive#nonzero#double#size:[numel(var0)+1,1]
         NameValueArgs.dscaleMin (:,1) double {mustBeGreaterThan(NameValueArgs.dscaleMin,0)} % #scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
@@ -74,7 +74,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.g0 (1,1) double
         NameValueArgs.gTarget (1,1) double
         NameValueArgs.homotopy (1,:) char {mustBeMember(NameValueArgs.homotopy,{'on','off','f2','fix','fixnt','newton','squared'})}
-        NameValueArgs.homotopyErrorCounter (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.homotopyErrorCounter,0)} % #neq:Opt.deflationErrorCounter
+        NameValueArgs.homotopyErrorCounter (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.homotopyErrorCounter,0)} % #neq:oih.opt.deflationErrorCounter
         NameValueArgs.includeReverse {validation.scalarLogical}
         NameValueArgs.initialDeflationPoints (1,1) double
         NameValueArgs.jacobian {validation.scalarLogical}
@@ -103,7 +103,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.predictorPolynomialFit (1,1) double {mustBeInteger,mustBePositive}
         NameValueArgs.predictorPolynomialDegree (1,1) double {mustBeGreaterThan(NameValueArgs.predictorPolynomialDegree,0)}
         NameValueArgs.predictorSolver {validation.scalarLogical}
-        NameValueArgs.removeErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter#neq:Opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
+        NameValueArgs.removeErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:oih.opt.stepbackErrorCounter+1#neq:oih.opt.homotopyErrorCounter#neq:oih.opt.deflationErrorCounter#neq:oih.opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
         NameValueArgs.reverse  (1,:) char {mustBeMember(NameValueArgs.reverse,{'angle','jacobian'})}
         NameValueArgs.scaling (1,:) char {mustBeMember(NameValueArgs.scaling,{'dynamicdscale','staticdscale'})}
         NameValueArgs.solver (1,:) char {mustBeMember(NameValueArgs.solver,{'fsolve','lsqnonlin','newton'})}
@@ -111,7 +111,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.solverMaxIterations (1,1) double {mustBeGreaterThan(NameValueArgs.solverMaxIterations,0),mustBeInteger}
         NameValueArgs.solverTol (1,1) double {mustBeGreaterThan(NameValueArgs.solverTol,0)}
         NameValueArgs.speedOfContinuation (1,1) double {mustBeGreaterThan(NameValueArgs.speedOfContinuation,0)}
-        NameValueArgs.stepbackErrorCounter (1,1) double {mustBePositive,mustBeInteger,mustBeGreaterThan(NameValueArgs.stepbackErrorCounter,0)} % #neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+        NameValueArgs.stepbackErrorCounter (1,1) double {mustBePositive,mustBeInteger,mustBeGreaterThan(NameValueArgs.stepbackErrorCounter,0)} % #neq:oih.opt.homotopyErrorCounter#neq:oih.opt.deflationErrorCounter
         NameValueArgs.stepSizeAngle (1,1) double {mustBePositive}
         NameValueArgs.stepSizeControl (1,:) char {mustBeMember(NameValueArgs.stepSizeControl,{'angleChange','angleCustom','contraction','error','errorAlt','fayezioghani','fix','iterationsExponential','iterationsPolynomial','multiplicative','multiplicativeAlt','pidCustom','pidValli','szyszkowski','yoon'})}
         NameValueArgs.stepSizeErrorMax (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeErrorMax,0)}
@@ -123,7 +123,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.stepSizePidTol (1,1) double {mustBePositive}
         NameValueArgs.stopOnBifurcation {validation.scalarLogical} % #ison:bifurcation
         NameValueArgs.stopOnCrossing {validation.scalarLogical} % #ison:bifurcation
-        NameValueArgs.suspendContinuationErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+        NameValueArgs.suspendContinuationErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:oih.opt.stepbackErrorCounter+1#neq:oih.opt.homotopyErrorCounter#neq:oih.opt.deflationErrorCounter
         NameValueArgs.targetTol (1,1) double {mustBePositive}
 		NameValueArgs.timeLimit (1,1) double {mustBePositive,mustBeGreaterThan(NameValueArgs.timeLimit,0)}
         NameValueArgs.weightsAngleCustom (1,2) double {mustBePositive}
@@ -140,20 +140,20 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %% initialize
     %
     warning on;
-    [Opt,ds0,OptIsSet,func] = continuation.input(nameValueArgsCell,fun,var0,lStart,lEnd,ds0);
-    [Opt,ds0,StepsizeOptions] = stepSize.initialize(Opt,var0,lStart,lEnd,ds0);
-    if StepsizeOptions.rateOfContraction
+    [oih,ds0,func] = continuation.input(nameValueArgsCell,fun,var0,lStart,lEnd,ds0);
+    ds0 = stepSize.initialize(oih,var0,lStart,lEnd,ds0);
+    if oih.stepsizeOptions.rateOfContraction
         global solverStepsizes;
     end
-    [Bifurcation,Counter,Do,Info,InfoOut,Initial,Is,Path,Plot,Remove,Solver] = aux.initializeStructsAndClasses(var0,lStart,lEnd,ds0,Opt,OptIsSet,StepsizeOptions);
+    oih.initializeStructsAndClasses(var0,lStart,lEnd,ds0);
     clear('var0','lStart','lEnd','ds0');
-    resCorr = continuation.corrector(fun,Opt);
-    ds = Info.ds0;
-    if ~Opt.jacobian
-        aux.printLine(Opt,'Using finite differences to calculate Jacobian...\n');
+    resCorr = continuation.corrector(fun,oih);
+    ds = oih.info.ds0;
+    if ~oih.opt.jacobian
+        aux.printLine(oih,'Using finite differences to calculate Jacobian...\n');
     end
-    aux.printLine(Opt,'Starting path continuation...\n');
-    if Opt.dpaGammaVar
+    aux.printLine(oih,'Starting path continuation...\n');
+    if oih.opt.dpaGammaVar
         paraName = 'g';
     else
         paraName = 'l';
@@ -162,216 +162,214 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     %% find initial solution
     %
-    residualInitial = @(v) aux.residualFixedValue(func,v,Opt.l0,Opt);
-    [varInitial,funInitial,initialExitflag,Solver.output,jacobianInitial] = Solver.main(residualInitial,Info.var0,Opt.dscale0(1:end-1));
-    Solver.jacobian = jacobianInitial;
-    [Info,Solver] = aux.checkJacobian(residualInitial,funInitial,varInitial,Info,Opt,Solver);
+    residualInitial = @(v) aux.residualFixedValue(func,v,oih.opt.l0,oih);
+    [varInitial,funInitial,initialExitflag,oih.solver.output,jacobianInitial] = oih.solver.main(residualInitial,oih.info.var0,oih.opt.dscale0(1:end-1));
+    oih.solver.jacobian = jacobianInitial;
+    aux.checkJacobian(residualInitial,funInitial,varInitial,oih);
     breakFunOut = [];
     event.eventObj = [];
     if initialExitflag>=0
-        Do.continuation = true;
-        Do.loop = true;
+        oih.do.continuation = true;
+        oih.do.loop = true;
         dpaPoints = [];
-        Solver.jacobian = [Solver.jacobian,aux.numericJacobian(@(x) func(x(1:Info.nv),x(Info.nv+1)),[varInitial;Info.lStart],'centralValue',funInitial,'derivativeDimensions',Info.nv+1,'diffquot',Opt.diffquot)];
-        [~,breakFunOut] = Opt.breakFunction(funInitial,Solver.jacobian,varInitial,Info.lStart,breakFunOut);
-        aux.printLine(Opt,'Initial solution at %s = %.2e\n',paraName,Opt.l0);
-        if StepsizeOptions.rateOfContraction
+        oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+1)),[varInitial;oih.info.lStart],'centralValue',funInitial,'derivativeDimensions',oih.info.nv+1,'diffquot',oih.opt.diffquot)];
+        [~,breakFunOut] = oih.opt.breakFunction(funInitial,oih.solver.jacobian,varInitial,oih.info.lStart,breakFunOut);
+        aux.printLine(oih,'Initial solution at %s = %.2e\n',paraName,oih.opt.l0);
+        if oih.stepsizeOptions.rateOfContraction
             if size(solverStepsizes, 1) < 3
-                Solver.output.rateOfContraction = Opt.optimalContractionRate;
+                oih.solver.output.rateOfContraction = oih.opt.optimalContractionRate;
             else
-                Solver.output.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
+                oih.solver.output.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
             end
         end
         %% at initial point to path
         optArgsAddPoint = {};
-        if OptIsSet.bifAdditionalTestfunction
+        if oih.optIsSet.bifAdditionalTestfunction
             optArgsAddPoint = [optArgsAddPoint,'bifTestValue',1];
         end
-        if OptIsSet.pathInfoFunction
-            optArgsAddPoint = [optArgsAddPoint,'pathInfoValue',Opt.pathInfoFunction(func,Path,varInitial,Opt.l0)];
+        if oih.optIsSet.pathInfoFunction
+            optArgsAddPoint = [optArgsAddPoint,'pathInfoValue',oih.opt.pathInfoFunction(func,oih.path,varInitial,oih.opt.l0)];
         end
-        if StepsizeOptions.predictor
-            optArgsAddPoint = [optArgsAddPoint,'predictor',[Info.var0;Info.lStart]];
+        if oih.stepsizeOptions.predictor
+            optArgsAddPoint = [optArgsAddPoint,'predictor',[oih.info.var0;oih.info.lStart]];
         end
-        if StepsizeOptions.speedOfContinuation
-            optArgsAddPoint = [optArgsAddPoint,'speedOfContinuation',Opt.speedOfContinuation];
+        if oih.stepsizeOptions.speedOfContinuation
+            optArgsAddPoint = [optArgsAddPoint,'speedOfContinuation',oih.opt.speedOfContinuation];
         end
-        Path.addPointAtEnd(varInitial,Opt.l0,Solver.jacobian,Solver,optArgsAddPoint{:});
+        oih.path.addPointAtEnd(varInitial,oih.opt.l0,oih.solver.jacobian,oih,optArgsAddPoint{:});
         %% init. plot
-        if aux.ison(Opt.plot)
-            [Plot, Opt] = plot.livePlot(Opt, Info, Path, Info.ds0, Info.ds0, Solver.output.iterations(end), Counter);
+        if aux.ison(oih.opt.plot)
+            plot.livePlot(oih, oih.info.ds0, oih.info.ds0, oih.solver.output.iterations(end));
         end
-    elseif Info.validJacobian
-        Info.exitflag = -2;
-        Do.continuation = false;
-        aux.printLine(Opt,'No initial solution found.\n');
+    elseif oih.info.validJacobian
+        oih.info.exitflag = -2;
+        oih.do.continuation = false;
+        aux.printLine(oih,'No initial solution found.\n');
     else
-        aux.printLine(Opt,'Provided Jacobian is corrupted.\n');
+        aux.printLine(oih,'Provided Jacobian is corrupted.\n');
     end
     %
     %% continuation
     %
-    while Do.continuation
+    while oih.do.continuation
         %% initialize loop
         %
-        Counter.loop = Counter.loop+1;
-        Is.currentJacobian = false;
-        Counter.catchOld = Counter.catch;
+        oih.counter.loop = oih.counter.loop+1;
+        oih.is.currentJacobian = false;
+        oih.counter.catchOld = oih.counter.catch;
         %
         %% residual
         %
-        if Do.deflate
+        if oih.do.deflate
             try
-                residual = @(x) aux.deflation(residual,xDeflation,x,Opt);
+                residual = @(x) aux.deflation(residual,xDeflation,x,oih.opt.jacobian);
             catch exceptionDeflation
-                aux.printLine(Opt,'---> deflation: catch!\n');
-                if Opt.pauseOnError
-                    aux.printLine(Opt,['----> ',exceptionDeflation.message]);
+                aux.printLine(oih,'---> deflation: catch!\n');
+                if oih.opt.pauseOnError
+                    aux.printLine(oih,['----> ',exceptionDeflation.message]);
                     input('Press [ENTER] to continue...');
                 end
-                Counter.catch = Counter.catch + 1;
+                oih.counter.catch = oih.counter.catch + 1;
             end
-        elseif Do.suspend
-            residual = @(v,lFix) aux.residualSuspendContinuation(func,v,lFix,Opt);
+        elseif oih.do.suspend
+            residual = @(v,lFix) aux.residualSuspendContinuation(func,v,lFix,oih);
         else
-            residual = @(x) aux.mergeResiduals(func,resCorr,x,[Path.varAll;Path.lAll],ds,Path.getJacobianByName('last'),Opt);
+            residual = @(x) aux.mergeResiduals(func,resCorr,x,oih.path.xAll,ds,oih.path.getJacobianByName('last'),oih);
         end
-        if Path.nAll==1 && ~isempty(Opt.initialDeflationPoints)
-            for ii=1:numel(Opt.initialDeflationPoints(1,:))
-                residual = @(x) aux.deflation(residual,Opt.initialDeflationPoints(:,ii),x,Opt);
+        if oih.path.nAll==1 && ~isempty(oih.opt.initialDeflationPoints)
+            for ii=1:numel(oih.opt.initialDeflationPoints(1,:))
+                residual = @(x) aux.deflation(residual,oih.opt.initialDeflationPoints(:,ii),x,oih.opt.jacobian);
             end
         end
         %
         %% predictor
         %
-        if StepsizeOptions.speedOfContinuation
+        if oih.stepsizeOptions.speedOfContinuation
             timeNeeded = tic;
         end
         %
         try
-            if Do.homotopy
+            if oih.do.homotopy
                 %% Homotopy
-                xPredictor = homotopy.hContinuation(residual,[Path.varAll(:,end);Path.lAll(end)],Opt);
+                xPredictor = homotopy.hContinuation(residual,[oih.path.varAll(:,end);oih.path.lAll(end)],oih);
                 varPredictor = xPredictor(1:end-1);
                 lPredictor = xPredictor(end);
             else
                 %% calc. predictor
-                [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(Path,ds,Path.getJacobianByName('last'),func,resCorr,Solver,Opt);
+                [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(oih,ds,oih.path.getJacobianByName('last'),func,resCorr);
                 xPredictor = [varPredictor;lPredictor];
             end
         catch exceptionPredictor
-            [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(Path,ds,Path.getJacobianByName('last'),func,resCorr,Solver,Opt);
+            [varPredictor,lPredictor,funPredictor,sPredictor,ds] = continuation.predictor(oih,ds,oih.path.getJacobianByName('last'),func,resCorr);
             xPredictor = [varPredictor;lPredictor];
-            aux.printLine(Opt,'---> predictor: catch!\n');
-            if Opt.pauseOnError
-                aux.printLine(Opt,['----> ',exceptionPredictor.message]);
+            aux.printLine(oih,'---> predictor: catch!\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['----> ',exceptionPredictor.message]);
                 input('Press [ENTER] to continue...');
             end
-            Counter.catch = Counter.catch + 1;
+            oih.counter.catch = oih.counter.catch + 1;
         end
         % replace xPredictor with xTarget?:
-        if OptIsSet.xTarget && norm(xPredictor-[Path.varAll(:,end);Path.lAll(end)])*1.1>norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)])
-            xPredictor = Opt.xTarget;
-            ds = norm(Opt.xTarget-[Path.varAll(:,end);Path.lAll(end)]);
-            Do.convergeToxTarget = true;
-            residual = @(x) aux.mergeResiduals(func,resCorr,x,[Path.varAll;Path.lAll],ds,Path.getJacobianByName('last'),Opt);
+        if oih.optIsSet.xTarget && norm(xPredictor-[oih.path.varAll(:,end);oih.path.lAll(end)])*1.1>norm(oih.opt.xTarget-[oih.path.varAll(:,end);oih.path.lAll(end)])
+            xPredictor = oih.opt.xTarget;
+            ds = norm(oih.opt.xTarget-[oih.path.varAll(:,end);oih.path.lAll(end)]);
+            oih.do.convergeToxTarget = true;
+            residual = @(x) aux.mergeResiduals(func,resCorr,x,oih.path.xAll,ds,oih.path.getJacobianByName('last'),oih);
         end
         %
         %% solve
         %
         try
-            dscale = aux.getDscale(Opt,Path);
-            if sign(Path.lAll(end)-Opt.lTarget)*sign(lPredictor*(1+Opt.targetTol)-Opt.lTarget)<=0
+            dscale = aux.getDscale(oih);
+            if sign(oih.path.lAll(end)-oih.opt.lTarget)*sign(lPredictor*(1+oih.opt.targetTol)-oih.opt.lTarget)<=0
                 %% try to converge to target
-                residualTarget = @(v) aux.residualFixedValue(func,v,Opt.lTarget,Opt);
-                varPredictorCtt = (varPredictor - Path.varAll(:,end))*(abs(Opt.lTarget-Path.lAll(end))/abs(lPredictor-Path.lAll(end)))+Path.varAll(:,end);
-                [varSolution,funSolution,Solver.exitflag,Solver.output,Solver.jacobian] = Solver.main(residualTarget,varPredictorCtt,dscale(1:end-1));
-                xSolution = [varSolution;Opt.lTarget];
-                Do.convergeToTarget = true;
-                [Info,Solver] = aux.checkJacobian(residualTarget,funSolution,varSolution,Info,Opt,Solver);
+                residualTarget = @(v) aux.residualFixedValue(func,v,oih.opt.lTarget,oih);
+                varPredictorCtt = (varPredictor - oih.path.varAll(:,end))*(abs(oih.opt.lTarget-oih.path.lAll(end))/abs(lPredictor-oih.path.lAll(end)))+oih.path.varAll(:,end);
+                [varSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(residualTarget,varPredictorCtt,dscale(1:end-1));
+                xSolution = [varSolution;oih.opt.lTarget];
+                oih.do.convergeToTarget = true;
+                aux.checkJacobian(residualTarget,funSolution,varSolution,oih);
             else
                 %% regular solver
                 %            
-                if Opt.solver.fsolve && Opt.solverForce1it
-                    [xSolution,funSolution,Solver.exitflag,Solver.output,Solver.jacobian] = Solver.main(residual,xPredictor,dscale);
-                    if Solver.output.iterations(end) < 1
+                if oih.opt.solver.fsolve && oih.opt.solverForce1it
+                    [xSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(residual,xPredictor,dscale);
+                    if oih.solver.output.iterations(end) < 1
                         % perturbate initial solution by tolerance of
                         % solver
-                        pert = Opt.solverTol * ones(numel(xPredictor),1) / numel(xPredictor);
-                        [xSolution,funSolution,Solver.exitflag,Solver.output,Solver.jacobian] = Solver.main(residual,xPredictor + pert,dscale);
+                        pert = oih.opt.solverTol * ones(numel(xPredictor),1) / numel(xPredictor);
+                        [xSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(residual,xPredictor + pert,dscale);
                     end
                 else
-                    if Do.suspend
-                        [vSolution,funSolution,Solver.exitflag,Solver.output,Solver.jacobian] = Solver.main(@(v) residual(v,xPredictor(end)),xPredictor(1:(end-1)),dscale(1:(end-1)));
+                    if oih.do.suspend
+                        [vSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(@(v) residual(v,xPredictor(end)),xPredictor(1:(end-1)),dscale(1:(end-1)));
                         xSolution = [vSolution;xPredictor(end)];
                     else
-                        [xSolution,funSolution,Solver.exitflag,Solver.output,Solver.jacobian] = Solver.main(residual,xPredictor,dscale);
+                        [xSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(residual,xPredictor,dscale);
                     end
                 end
-                Do.convergeToTarget = false;
-                [Info,Solver] = aux.checkJacobian(residual,funSolution,xSolution,Info,Opt,Solver);
+                oih.do.convergeToTarget = false;
+                aux.checkJacobian(residual,funSolution,xSolution,oih);
             end
-            Is.currentJacobian = true;
+            oih.is.currentJacobian = true;
         catch exceptionSolve
             xSolution = NaN(size(xPredictor));
             funSolution = inf(size(xPredictor));
-            Solver.exitflag = -2;
-            Solver.output = Solver.defaultOutput;
-            Do.convergeToTarget = false;
-            aux.printLine(Opt,'---> solve: catch!\n');
-            if Opt.pauseOnError
-                aux.printLine(Opt,['----> ',exceptionSolve.message]);
+            oih.solver.exitflag = -2;
+            oih.solver.output = oih.solver.defaultOutput;
+            oih.do.convergeToTarget = false;
+            aux.printLine(oih,'---> solve: catch!\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['----> ',exceptionSolve.message]);
                 input('Press [ENTER] to continue...');
             end
-            Counter.catch = Counter.catch + 1;
+            oih.counter.catch = oih.counter.catch + 1;
         end
         %
         %% calc stepsize information
         %
         % measure speed
         %
-        if StepsizeOptions.speedOfContinuation
+        if oih.stepsizeOptions.speedOfContinuation
             timeNeeded = toc(timeNeeded);
             speedOfContinuation = ds/timeNeeded; 
         end
         %
         % measure rate of contraction
-        if StepsizeOptions.rateOfContraction
+        if oih.stepsizeOptions.rateOfContraction
             if size(solverStepsizes, 1) < 3
-                Solver.output.rateOfContraction = Opt.optimalContractionRate;
+                oih.solver.output.rateOfContraction = oih.opt.optimalContractionRate;
             else
-                Solver.output.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
+                oih.solver.output.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
             end
         end
         %
         %% adaptive corrector
         %
-        [Do,Opt,corrInfo] = corrector.adapt(Do,Opt,Path,Solver,func,xPredictor,dscale,Path.getJacobianByName('last'),ds);
+        corrInfo = corrector.adapt(oih,func,xPredictor,dscale,oih.path.getJacobianByName('last'),ds);
         %
         %% check result
         %
         % check result:
-        [invPoiStr,Counter,Do,Is,Opt] = ...
-            aux.validateResult(xSolution,funSolution,Path,ds,Solver,funPredictor,sPredictor,Do,Bifurcation,Info,Is,Counter,Plot,Opt);
+        invPoiStr = aux.validateResult(xSolution,funSolution,oih,ds,funPredictor,sPredictor);
         % confirm result:
-        [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Remove,Solver,StepsizeOptions,Opt] = ...
-            aux.confirmResult(func,funSolution,xSolution,xPredictor,Bifurcation,Counter,Do,Info,Initial,Is,Path,Remove,Solver,speedOfContinuation,StepsizeOptions,Opt,OptIsSet);
+        xDeflation = aux.confirmResult(func,funSolution,xSolution,xPredictor,oih,speedOfContinuation);
         %
         %% Bifurcations
         %
-        Bifurcation.flag = 0;
-        if aux.ison(Opt.bifurcation) && Is.valid && ~Do.homotopy && Path.nAll>2
-            if ~Is.currentJacobian
+        oih.bifurcation.flag = 0;
+        if aux.ison(oih.opt.bifurcation) && oih.is.valid && ~oih.do.homotopy && oih.path.nAll>2
+            if ~oih.is.currentJacobian
                 %% get jacobian if not current
-                Solver.jacobian = aux.getJacobian(func,Path.varAll(:,end),Path.lAll(end),Opt);
+                oih.solver.jacobian = aux.getJacobian(func,oih.path.varAll(:,end),oih.path.lAll(end),oih);
             end
-            [Bifurcation] = bifurcation.check(func,Path,Bifurcation,Info,resCorr,Solver,Opt,OptIsSet);
+            bifurcation.check(func,oih,resCorr);
         end
         %
         %% DPA points
         %
-        if Opt.dpa && OptIsSet.dpa && ~Opt.dpaGammaVar
-            [dpaPoints] = dpa.checkResidual(fun,dpaPoints,Opt,Path,Solver);
+        if oih.opt.dpa && oih.optIsSet.dpa && ~oih.opt.dpaGammaVar
+            [dpaPoints] = dpa.checkResidual(fun,dpaPoints,oih);
         end
         %
         %% step size control
@@ -379,40 +377,40 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         % save latest stepsize:
         dsim1 = ds;
         % adjust stepsize:
-        [ds,Counter,event,Opt] = stepSize.control(ds,Counter,Solver,Do,Path,Opt,Info,event,Initial);
+        [ds,event] = stepSize.control(ds,oih,event);
         %
         %% end loop
         %
-        if Is.valid
-            if ~isempty(Solver.output.iterations)
-                aux.printLine(Opt,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',paraName,Path.lAll(end),ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.nIterOpt);
+        if oih.is.valid
+            if ~isempty(oih.solver.output.iterations)
+                aux.printLine(oih,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt);
             else
-                aux.printLine(Opt,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',paraName,Path.lAll(end),ds,Counter.loop,Counter.step,[],Opt.nIterOpt);
+                aux.printLine(oih,'-----> continued at %s = %.4e\t|\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt);
             end
         else
-            if ~isempty(Solver.output.iterations)
-                aux.printLine(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,Counter.loop,Counter.step,Solver.output.iterations(end),Opt.nIterOpt);
+            if ~isempty(oih.solver.output.iterations)
+                aux.printLine(oih,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt);
             else
-                aux.printLine(Opt,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,Counter.loop,Counter.step,[],Opt.nIterOpt);
+                aux.printLine(oih,'-----> invalid point %s |\tnew step size: ds = %.2e\t|\tloop counter = %d\t|\tstep = %d\t|\titerations = %d/%d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt);
             end
         end
-        [Do,Info,breakFunOut,Opt,Counter,ds] = aux.exitLoop(Do,Info,Initial,Is,Path,Opt,Solver,Counter,Bifurcation,ds,funSolution,breakFunOut);
-        if Do.changeCorrector
-            Opt = aux.seton(Opt,'corrector',corrInfo);
-            resCorr = continuation.corrector(fun,Opt);
-            Do.changeCorrector = false;
+        [breakFunOut,ds] = aux.exitLoop(oih,ds,funSolution,breakFunOut);
+        if oih.do.changeCorrector
+            oih.opt = aux.seton(oih.opt,'corrector',corrInfo);
+            resCorr = continuation.corrector(fun,oih);
+            oih.do.changeCorrector = false;
         end
-        Opt = aux.updateOpt(Opt,OptIsSet,Info);
+        oih.updateOpt();
         %
         %% live plot
         %
-        if aux.ison(Opt.plot) && Is.valid
+        if aux.ison(oih.opt.plot) && oih.is.valid
             try
-                [Plot, Opt] = plot.livePlot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, funPredictor, sPredictor, Plot, Bifurcation, dpaPoints);
+                plot.livePlot(oih, ds, dsim1, oih.solver.output.iterations(end), funPredictor, sPredictor, dpaPoints);
             catch exceptionPlot
-                aux.printLine(Opt,'--> The plot update has failed.\n');
-                if Opt.pauseOnError
-                    aux.printLine(Opt,['----> ',exceptionPlot.message]);
+                aux.printLine(oih,'--> The plot update has failed.\n');
+                if oih.opt.pauseOnError
+                    aux.printLine(oih,['----> ',exceptionPlot.message]);
                     input('Press [ENTER] to continue...');
                 end
             end
@@ -420,33 +418,33 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         %
         %% catch counter
         %
-        if Counter.catchOld == Counter.catch
-            Counter.catch = 0;
+        if oih.counter.catchOld == oih.counter.catch
+            oih.counter.catch = 0;
         end
         %
     end
     %
     %% bifurcation tracing
     %
-    if Opt.bifurcation.trace
+    if oih.opt.bifurcation.trace
         try
-            delete(Plot.plCurr);
-            [Bifurcation] = bifurcation.trace(Opt,OptIsSet,Path,Bifurcation,Solver,Info,func,resCorr);
+            delete(oih.plot.plCurr);
+            bifurcation.trace(oih,func,resCorr);
         catch exceptionBifurcationTrace
-            aux.printLine(Opt,'--> Failed to trace bifurcations.\n');
-            if Opt.pauseOnError
-                aux.printLine(Opt,['---> ',exceptionBifurcationTrace.message]);
+            aux.printLine(oih,'--> Failed to trace bifurcations.\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['---> ',exceptionBifurcationTrace.message]);
                 input('Press [ENTER] to continue...');
             end
         end
-    elseif Opt.bifurcation.parameterTrace
+    elseif oih.opt.bifurcation.parameterTrace
         try
-            delete(Plot.plCurr);
-            bifurcation.parameterTrace(Opt,Path,Bifurcation,Info,fun);
+            delete(oih.plot.plCurr);
+            bifurcation.parameterTrace(oih,fun);
         catch exceptionBifurcationParameterTrace
-            aux.printLine(Opt,'--> Failed to trace bifurcation parameter.\n');
-            if Opt.pauseOnError
-                aux.printLine(Opt,['---> ',exceptionBifurcationParameterTrace.message]);
+            aux.printLine(oih,'--> Failed to trace bifurcation parameter.\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['---> ',exceptionBifurcationParameterTrace.message]);
                 input('Press [ENTER] to continue...');
             end
         end
@@ -454,23 +452,23 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     %% DPA
     %
-    if Opt.dpa && OptIsSet.dpa && ~Opt.dpaGammaVar && Opt.bifurcation.parameterTrace
-        Path = dpa.trace(fun,dpaPoints,Info,Opt,Path);
+    if oih.opt.dpa && oih.optIsSet.dpa && ~oih.opt.dpaGammaVar && oih.opt.bifurcation.parameterTrace
+        Path = dpa.trace(fun,dpaPoints,oih);
     end
     %
     %% live plot finalization
     %
-    if aux.ison(Opt.plot) && initialExitflag>0
+    if aux.ison(oih.opt.plot) && initialExitflag>0
         try
-            Info.finalSolutionPoint = true;
-            plot.livePlot(Opt, Info, Path, ds, dsim1, Solver.output.iterations(end), Counter, funPredictor, sPredictor, Plot, Bifurcation,dpaPoints);
-            if isfield(Plot,'plCurr')
-                delete(Plot.plCurr);
+            oih.info.finalSolutionPoint = true;
+            plot.livePlot(oih, ds, dsim1, oih.solver.output.iterations(end), funPredictor, sPredictor, dpaPoints);
+            if isfield(oih.plot,'plCurr')
+                delete(oih.plot.plCurr);
             end
         catch exceptionPlotFinal
-            aux.printLine(Opt,'--> The plot update has failed.\n');
-            if Opt.pauseOnError
-                aux.printLine(Opt,['---> ',exceptionPlotFinal.message]);
+            aux.printLine(oih,'--> The plot update has failed.\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['---> ',exceptionPlotFinal.message]);
                 input('Press [ENTER] to continue...');
             end
         end
@@ -479,24 +477,26 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
     %
     %% final disp
     %
-    aux.printLine(Opt,[Info.exitMsg,'\n']);
-    aux.printLine(Opt,'--> time elapsed: %.3f s\n',toc(Info.t0));
+    aux.printLine(oih,[oih.info.exitMsg,'\n']);
+    aux.printLine(oih,'--> time elapsed: %.3f s\n',toc(oih.info.t0));
     %
     %% output
     %
-    InfoOut.numberOfSteps = Counter.step;
-    InfoOut.numberOfInvalidPoints = Counter.loop - Counter.step;
-    if OptIsSet.pathInfoFunction
-        InfoOut.pathInfoValue = Path.pathInfoValue;
+    oih.infoOut.numberOfSteps = oih.counter.step;
+    oih.infoOut.numberOfInvalidPoints = oih.counter.loop - oih.counter.step;
+    if oih.optIsSet.pathInfoFunction
+        oih.infoOut.pathInfoValue = oih.path.pathInfoValue;
     end
-    if Opt.jacobianOut.basic
-        jacobianOut = Path.getJacobianByName('last');
-    elseif Opt.jacobianOut.full
-        jacobianOut = Path.JAll;
+    if oih.opt.jacobianOut.basic
+        jacobianOut = oih.path.getJacobianByName('last');
+    elseif oih.opt.jacobianOut.full
+        jacobianOut = oih.path.JAll;
     end
-    exitflag = Info.exitflag;
-    varAll = Path.varAll;
-    lAll = Path.lAll;
-    sAll = Path.sAll;
+    exitflag = oih.info.exitflag;
+    varAll = oih.path.varAll;
+    lAll = oih.path.lAll;
+    sAll = oih.path.sAll;
+    bifStruct = oih.bifurcation;
+    infoOutStruct = oih.infoOut;
 	%
 end

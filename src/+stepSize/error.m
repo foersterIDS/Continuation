@@ -19,14 +19,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations and rate of contraction.
-%       Path          -- contains the solution points of the path and the
-%                        predictors.
-%       Opt           -- contains user inputs, such as optimal values, the
-%                        weights, accessible by 'weightsMultiplicative',
-%                        the sum weight ('stepSizeErrorMax') and the 
-%                        PD constants ('stepSizeErrorPd').
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -39,15 +32,15 @@
 %   Leibniz University Hannover
 %   20.01.2022 - Tido Kubatschek
 %
-function [xi] = error(Solver,Path,Opt)
+function [xi] = error(oih)
     %
-    EI = calcError(Solver,Path,Opt,0);
+    EI = calcError(oih,0);
     %
     %
-    K = Opt.stepSizeErrorPd;
+    K = oih.opt.stepSizeErrorPd;
     %
-    if Path.nAll > 1 && ~isempty(Path.speedOfContinuation) && K(2) > 0
-        EIM1 = calcError(Solver,Path,Opt,1);
+    if oih.path.nAll > 1 && ~isempty(oih.path.speedOfContinuation) && K(2) > 0
+        EIM1 = calcError(oih,1);
     else
         EIM1 = 0;
     end
@@ -56,24 +49,24 @@ function [xi] = error(Solver,Path,Opt)
     %
     %% adjustment factor
     %
-    xi = 2^(E/Opt.stepSizeErrorMax);
+    xi = 2^(E/oih.opt.stepSizeErrorMax);
 end
 
-function EI = calcError(Solver,Path,Opt,previous)
+function EI = calcError(oih,previous)
     %
     %% Weights
-    weights = Opt.weightsError.';
+    weights = oih.opt.weightsError.';
     %
     %
     % determine length
-    lengthPath = Path.nAll;
-    lengthIterations = length(Solver.output.iterations);
+    lengthPath = oih.path.nAll;
+    lengthIterations = length(oih.solver.output.iterations);
     if weights(3) ~= 0
-        lengthArrays = length(Path.speedOfContinuation);
+        lengthArrays = length(oih.path.speedOfContinuation);
     elseif weights(4) ~= 0
-        lengthArrays = length(Solver.output.rateOfConvergence);
+        lengthArrays = length(oih.solver.output.rateOfConvergence);
     elseif weights(5) ~= 0
-        lengthArrays = length(Path.xPredictorAll(1,:));
+        lengthArrays = length(oih.path.xPredictorAll(1,:));
     else
         lengthArrays = 1;
     end
@@ -94,9 +87,9 @@ function EI = calcError(Solver,Path,Opt,previous)
         end
     end
     
-    % create vector with Path.varAll and Path.lAll
+    % create vector with oih.path.varAll and oih.path.lAll
     %
-    xAll = [Path.varAll(:,1:lengthPath);Path.lAll(1:lengthPath)];
+    xAll = [oih.path.varAll(:,1:lengthPath);oih.path.lAll(1:lengthPath)];
     %
     %% define target values
     %
@@ -104,32 +97,32 @@ function EI = calcError(Solver,Path,Opt,previous)
     %           optimal speed of continuation, optimal change of curvature,
     %           optimal distance of predictor
     %
-    wTarget = [Opt.nIterOpt, Opt.optimalContractionRate,...
-        Opt.speedOfContinuation, 1, Opt.predictorDistance];
+    wTarget = [oih.opt.nIterOpt, oih.opt.optimalContractionRate,...
+        oih.opt.speedOfContinuation, 1, oih.opt.predictorDistance];
     %
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(Solver.output.iterations)
-        if Opt.dsMax==inf
-            wIter = max(Solver.output.iterations(endOfIterations),1);
+    if weights(1) ~= 0 && ~isempty(oih.solver.output.iterations)
+        if oih.opt.dsMax==inf
+            wIter = max(oih.solver.output.iterations(endOfIterations),1);
         else
-            wIter = Solver.output.iterations(endOfIterations);
+            wIter = oih.solver.output.iterations(endOfIterations);
         end
     else
         wIter = wTarget(1);
     end
     %
     %% Factor by contraction rate
-    if weights(2) ~= 0 && ~isempty(Solver.output.rateOfContraction)
-        wContr = Solver.output.rateOfContraction(endOfArray);
+    if weights(2) ~= 0 && ~isempty(oih.solver.output.rateOfContraction)
+        wContr = oih.solver.output.rateOfContraction(endOfArray);
     else
         wContr = wTarget(2);
     end
     %
     %% Factor by speed of continuation
-    if weights(3) ~= 0 && ~isempty(Path.speedOfContinuation)
-        wSpeed = Path.speedOfContinuation(endOfArray);
+    if weights(3) ~= 0 && ~isempty(oih.path.speedOfContinuation)
+        wSpeed = oih.path.speedOfContinuation(endOfArray);
     else
         wSpeed = wTarget(3);
     end
@@ -142,7 +135,7 @@ function EI = calcError(Solver,Path,Opt,previous)
         % calc second order derivatives of current and last step with 
         % respect to arclength
         %
-        deltaS = Path.sAll(lengthPath:-1:lengthPath-2) - Path.sAll(lengthPath-1:-1:lengthPath-3);
+        deltaS = oih.path.sAll(lengthPath:-1:lengthPath-2) - oih.path.sAll(lengthPath-1:-1:lengthPath-3);
         %
         rPp1 = 1/(deltaS(1))^2 * (xAll(:,end) - (1 + deltaS(1)/deltaS(2))*xAll(:,end-1) + deltaS(1)/deltaS(2) * xAll(:,end-2));
         rPp2 = 1/(deltaS(2))^2 * (xAll(:,end-1) - (1 + deltaS(2)/deltaS(3))*xAll(:,end-2) + deltaS(2)/deltaS(3) * xAll(:,end-3));
@@ -154,7 +147,7 @@ function EI = calcError(Solver,Path,Opt,previous)
         %
         % calculate change of curvature
         %
-        if kappaPrevious <= Opt.solverTol || kappaCurrent <= Opt.solverTol
+        if kappaPrevious <= oih.opt.solverTol || kappaCurrent <= oih.opt.solverTol
             wCurv = 1;
         else
             wCurv = kappaCurrent/kappaPrevious;
@@ -165,12 +158,12 @@ function EI = calcError(Solver,Path,Opt,previous)
     %
     %% Factor by distance of predictor
     %
-    if weights(5) ~= 0 && ~isempty(Path.xPredictorAll)
+    if weights(5) ~= 0 && ~isempty(oih.path.xPredictorAll)
         if norm(xAll(:,lengthPath)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(xAll(:,lengthPath));
+            relDistanceOfPredictor = norm(oih.path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(xAll(:,lengthPath));
             wDist = relDistanceOfPredictor;
-        elseif norm(Path.xPredictorAll(:,endOfArray)) > 1e-6
-            relDistanceOfPredictor = norm(Path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(Path.xPredictorAll(:,endOfArray));
+        elseif norm(oih.path.xPredictorAll(:,endOfArray)) > 1e-6
+            relDistanceOfPredictor = norm(oih.path.xPredictorAll(:,endOfArray) - xAll(:,lengthPath)) / norm(oih.path.xPredictorAll(:,endOfArray));
             wDist = relDistanceOfPredictor;
         else
             wDist = wTarget(5);

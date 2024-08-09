@@ -8,12 +8,7 @@
 %
 %
 %   Inputs:
-%       Solver.output -- contains information of solver, such as the 
-%                        needed number of iterations.
-%       Path          -- contains the solution points of the path
-%       Opt           -- contains user inputs, such as optimal number of
-%                        iterations, accessible by 'nIterOpt' and the
-%                        weights, accessible by 'weightsAngleCustom'.
+%       oih           -- OptInfoHandle object
 %                        
 %   Outputs:
 %       xi            -- stepsize adaption factor
@@ -26,12 +21,12 @@
 %   Leibniz University Hannover
 %   17.01.2022 - Tido Kubatschek
 %
-function [xi] = angleCustom(Solver,Path,Opt)
+function [xi] = angleCustom(oih)
     %
     % collect needed data of Path
     %
-    varNeeded = Path.varAll(:,end-2:end);
-    lNeeded = Path.lAll(end-2:end);
+    varNeeded = oih.path.varAll(:,end-2:end);
+    lNeeded = oih.path.lAll(end-2:end);
     zNeeded = [varNeeded;lNeeded];
     %
     % calculate connecting vectors
@@ -45,19 +40,19 @@ function [xi] = angleCustom(Solver,Path,Opt)
     %
     % correct number of iterations
     %
-    if Opt.dsMax==inf
-        iter = max(Solver.output.iterations(end),1);
+    if oih.opt.dsMax==inf
+        iter = max(oih.solver.output.iterations(end),1);
     else
-        iter = Solver.output.iterations(end);
+        iter = oih.solver.output.iterations(end);
     end
     %
     % calculate deviation of iterations
     %
-    deviationOfIterations = Opt.nIterOpt/iter;
+    deviationOfIterations = oih.opt.nIterOpt/iter;
     %
     % calculate ratio
     %
-    ratio = angle / Opt.stepSizeAngle;
+    ratio = angle / oih.opt.stepSizeAngle;
     %
     if ratio < 0.9 % if ratio < 0.9, set ratio to 0.9
         ratio = 0.9;
@@ -66,7 +61,7 @@ function [xi] = angleCustom(Solver,Path,Opt)
     end
     %
     % get weigths
-    weights = Opt.weightsAngleCustom;
+    weights = oih.opt.weightsAngleCustom;
     %
     xi = deviationOfIterations^weights(1) * (1/ratio)^weights(2);
     %

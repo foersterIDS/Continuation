@@ -26,20 +26,20 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,event,Initial)
-    if ~Do.stepback
-        if ~Do.deflate
-            if Counter.error == 0
-                if Opt.stepSizeEvent                 
+function [dsn,event] = control(ds,oih,event)
+    if ~oih.do.stepback
+        if ~oih.do.deflate
+            if oih.counter.error == 0
+                if oih.opt.stepSizeEvent                 
                     % fill variables struct
                     % in the first run, fill with all possible variables
                     if isempty(event.eventObj)
                         event.variables.dsCurrent = ds;
-                        event.variables.dsMinCurrent = Opt.dsMin;
-                        event.variables.dsMaxCurrent = Opt.dsMax;
-                        event.variables.Counter = Counter;
-                        event.variables.Solver = Solver;
-                        event.variables.Path = Path;
+                        event.variables.dsMinCurrent = oih.opt.dsMin;
+                        event.variables.dsMaxCurrent = oih.opt.dsMax;
+                        event.variables.Counter = oih.counter;
+                        event.variables.Solver = oih.solver;
+                        event.variables.Path = oih.path;
                     else
                         % after creating eventObj, read out names of
                         % needed variables with method and save them in
@@ -58,9 +58,9 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,ev
                                 case 'dsCurrent'
                                     event.variables.dsCurrent = ds;
                                 case 'dsMinCurrent'
-                                    event.variables.dsMinCurrent = Opt.dsMin;
+                                    event.variables.dsMinCurrent = oih.opt.dsMin;
                                 case 'dsMaxCurrent'
-                                    event.variables.dsMaxCurrent = Opt.dsMax;
+                                    event.variables.dsMaxCurrent = oih.opt.dsMax;
                                 otherwise
                             event.variables.(event.namesOfNeededVariables{k}) = eval(event.namesOfNeededVariables{k});
                             end
@@ -68,7 +68,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,ev
                     end
 
                     % adjust stepsize
-                    [dsn,event.eventObj,changed,Opt] = stepSize.eventAdjustment(ds,event.eventObj,Opt,Initial,event.variables);
+                    [dsn,event.eventObj,changed,Opt] = stepSize.eventAdjustment(ds,event.eventObj,oih,event.variables);
                 else
                     changed = false;
                 end
@@ -79,125 +79,125 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,ev
                     %
                     % angle change based
                     %
-                    if Opt.stepSizeControl.angleChange
+                    if oih.opt.stepSizeControl.angleChange
                         %
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if Path.nAll > 3
-                            xi = stepSize.angleChange(Solver,Path,Opt);
+                        if oih.path.nAll > 3
+                            xi = stepSize.angleChange(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % angle custom
                     %
-                    elseif Opt.stepSizeControl.angleCustom
+                    elseif oih.opt.stepSizeControl.angleCustom
                         %
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if Path.nAll > 2
-                            xi = stepSize.angleCustom(Solver,Path,Opt);
+                        if oih.path.nAll > 2
+                            xi = stepSize.angleCustom(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % contraction
                     %
-                    elseif Opt.stepSizeControl.contraction
-                        xi = stepSize.contraction(Solver,Opt);
+                    elseif oih.opt.stepSizeControl.contraction
+                        xi = stepSize.contraction(oih);
                     %
                     % error
                     %
-                    elseif Opt.stepSizeControl.error
-                        xi = stepSize.error(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.error
+                        xi = stepSize.error(oih);
                     %
                     % errorAlt
                     %
-                    elseif Opt.stepSizeControl.errorAlt
-                        xi = stepSize.errorAlt(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.errorAlt
+                        xi = stepSize.errorAlt(oih);
                     %
                     % fayezioghani
                     %
-                    elseif Opt.stepSizeControl.fayezioghani
+                    elseif oih.opt.stepSizeControl.fayezioghani
                         %
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if Path.nAll > 2
-                            xi = stepSize.fayezioghani(ds,Solver,Path,Path.getJacobianByName('last'),Opt);
+                        if oih.path.nAll > 2
+                            xi = stepSize.fayezioghani(ds,oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % fixed step size
                     %
-                    elseif Opt.stepSizeControl.fix
+                    elseif oih.opt.stepSizeControl.fix
                         xi = 1;
                     % 
                     % iterations based - exponential
                     %
-                    elseif Opt.stepSizeControl.iterationsExponential
-                        xi = stepSize.iterationsExponential(Solver,Opt);
+                    elseif oih.opt.stepSizeControl.iterationsExponential
+                        xi = stepSize.iterationsExponential(oih);
                     % 
                     % iterations based - polynomial
                     %
-                    elseif Opt.stepSizeControl.iterationsPolynomial
-                        xi = stepSize.iterationsPolynomial(Solver,Opt);
+                    elseif oih.opt.stepSizeControl.iterationsPolynomial
+                        xi = stepSize.iterationsPolynomial(oih);
                     % 
                     % multiplicative method
                     %
-                    elseif Opt.stepSizeControl.multiplicative
-                        xi = stepSize.multiplicative(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.multiplicative
+                        xi = stepSize.multiplicative(oih);
                     % 
                     % multiplicativeAlt method
                     %
-                    elseif Opt.stepSizeControl.multiplicativeAlt
-                        xi = stepSize.multiplicativeAlt(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.multiplicativeAlt
+                        xi = stepSize.multiplicativeAlt(oih);
                     %
                     % pid control - custom
                     %
-                    elseif Opt.stepSizeControl.pidCustom
+                    elseif oih.opt.stepSizeControl.pidCustom
                         %
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if Path.nAll > 4
-                            xi = stepSize.pidCustom(Path,Opt);
+                        if oih.path.nAll > 4
+                            xi = stepSize.pidCustom(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % pid control - valli
                     %
-                    elseif Opt.stepSizeControl.pidValli
+                    elseif oih.opt.stepSizeControl.pidValli
                         %
                         % Check if there are enough solution points to use
                         % method. Otherwise use iterations.
                         %
-                        if Path.nAll > 4
-                            xi = stepSize.pidValli(Path,Opt);
+                        if oih.path.nAll > 4
+                            xi = stepSize.pidValli(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % szyszkowski
                     %
-                    elseif Opt.stepSizeControl.szyszkowski
-                        if Path.nAll > 3
-                            xi = stepSize.szyszkowski(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.szyszkowski
+                        if oih.path.nAll > 3
+                            xi = stepSize.szyszkowski(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % yoon
                     %
-                    elseif Opt.stepSizeControl.yoon
-                        if Path.nAll > 3
-                            xi = stepSize.yoon(Solver,Path,Opt);
+                    elseif oih.opt.stepSizeControl.yoon
+                        if oih.path.nAll > 3
+                            xi = stepSize.yoon(oih);
                         else
-                            xi = stepSize.iterationsPolynomial(Solver,Opt);
+                            xi = stepSize.iterationsPolynomial(oih);
                         end
                     %
                     % wrong method
@@ -208,29 +208,29 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,ev
                     %
                     %% adapt step size
                     dsn = xi * ds;
-                    %% Limit to max./min. step size, also limit to Opt.maxStepSizeChange*ds / ds/Opt.maxStepSizeChange*ds:
-                    dsn = min([norm(Opt.dsMax),Opt.maxStepSizeChange*ds,dsn]);
-                    dsn = max([Opt.dsMin,ds/Opt.maxStepSizeChange,dsn]);
+                    %% Limit to max./min. step size, also limit to oih.opt.maxStepSizeChange*ds / ds/oih.opt.maxStepSizeChange*ds:
+                    dsn = min([norm(oih.opt.dsMax),oih.opt.maxStepSizeChange*ds,dsn]);
+                    dsn = max([oih.opt.dsMin,ds/oih.opt.maxStepSizeChange,dsn]);
                 end
             else
-                if Opt.stepSizeControl.fix
-                    dsn = Info.ds0;
+                if oih.opt.stepSizeControl.fix
+                    dsn = oih.info.ds0;
                 else
                     dsn = ds/2;
-                    %% Limit to max./min. step size, also limit to Opt.maxStepSizeChange*ds / ds/Opt.maxStepSizeChange*ds:
-                    dsn = min([norm(Opt.dsMax),Opt.maxStepSizeChange*ds,dsn]);
-                    dsn = max([Opt.dsMin,ds/Opt.maxStepSizeChange,dsn]);
+                    %% Limit to max./min. step size, also limit to oih.opt.maxStepSizeChange*ds / ds/oih.opt.maxStepSizeChange*ds:
+                    dsn = min([norm(oih.opt.dsMax),oih.opt.maxStepSizeChange*ds,dsn]);
+                    dsn = max([oih.opt.dsMin,ds/oih.opt.maxStepSizeChange,dsn]);
                 end
             end
         else
             dsn = ds;
         end
     else
-        if Opt.stepSizeControl.fix
-            dsn = Info.ds0;
+        if oih.opt.stepSizeControl.fix
+            dsn = oih.info.ds0;
         else
-            xe = [Path.varAll(:,end);Path.lAll(end)];
-            dsn = norm([Path.plusStruct.var;Path.plusStruct.l]-xe)/2;
+            xe = [oih.path.varAll(:,end);oih.path.lAll(end)];
+            dsn = norm([oih.path.plusStruct.var;oih.path.plusStruct.l]-xe)/2;
         end
     end
 end

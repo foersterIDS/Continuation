@@ -4,39 +4,39 @@
 %   Leibniz University Hannover
 %   31.03.2022 - Alwin Förster
 %
-function parameterTrace(Opt,Path,Bifurcation,Info,fun)
+function parameterTrace(oih,fun)
     %% settings for dpa:
-    bifTrace = Bifurcation.bif(1,:);
+    bifTrace = oih.bifurcation.bif(1,:);
     nbif = numel(bifTrace);
-    OptTrace = Opt;
-    OptTrace = aux.setoff(OptTrace,'bifurcation');
-    OptTrace.direction = [zeros(size(OptTrace.direction));sign(Opt.gTarget-Opt.g0)];
-    OptTrace.l0 = Opt.g0;
-    OptTrace.lTarget = Opt.gTarget;
-    OptTrace.dpaGammaVar = true;
-    PathBifs = struct('varAll',[],'lAll',[],'sAll',[]);
+    optTrace = oih.opt;
+    optTrace = aux.setoff(optTrace,'bifurcation');
+    optTrace.direction = [zeros(size(optTrace.direction));sign(oih.opt.gTarget-oih.opt.g0)];
+    optTrace.l0 = oih.opt.g0;
+    optTrace.lTarget = oih.opt.gTarget;
+    optTrace.dpaGammaVar = true;
+    varAllBifs = [];
+    lAllBifs = [];
     %% start dpa:
     for ii=1:nbif
         i = bifTrace(ii);
-        sc = Bifurcation.scaling(ii);
-        resDpa = @(v,l,g) dpa.resBif(fun,[v;l],g,Opt,sc);
-        func = @(x,g) dpa.mergeResiduals(Opt,fun,resDpa,x,g);
-        x0 = [Path.varAll(:,i);Path.lAll(i)];
-        dsBif = mean(diff(Path.sAll(i+(-1:1))));
-        OptTrace.dscale0 = max(abs([x0;Opt.g0]),10^-8*ones(numel(x0)+1,1));
-        [vari,li,~,~,si] = continuation(func,x0,Opt.g0,Opt.gTarget,dsBif,'Opt',OptTrace);
-        PathBifs.varAll = [PathBifs.varAll,NaN(Info.nv+1,1),vari];
-        PathBifs.lAll = [PathBifs.lAll,NaN,li];
-        PathBifs.sAll = [PathBifs.sAll,NaN,si];
+        sc = oih.bifurcation.scaling(ii);
+        resDpa = @(v,l,g) dpa.resBif(fun,[v;l],g,oih,sc);
+        func = @(x,g) dpa.mergeResiduals(oih,fun,resDpa,x,g);
+        x0 = [oih.path.varAll(:,i);oih.path.lAll(i)];
+        dsBif = mean(diff(oih.path.sAll(i+(-1:1))));
+        optTrace.dscale0 = max(abs([x0;oih.opt.g0]),10^-8*ones(numel(x0)+1,1));
+        [vari,li,~,~,si] = continuation(func,x0,oih.opt.g0,oih.opt.gTarget,dsBif,'Opt',optTrace);
+        varAllBifs = [varAllBifs,NaN(oih.info.nv+1,1),vari];
+        lAllBifs = [lAllBifs,NaN,li];
     end
     %% output:
-    PathTemp = Path;
-    if ~isempty(PathBifs.varAll)
-        Path.varAll = [PathTemp.varAll,PathBifs.varAll(1:Info.nv,:)];
-        Path.lAll = [PathTemp.lAll,PathBifs.varAll(Info.nv+1,:);
-                      Opt.g0*ones(size(PathTemp.lAll)),PathBifs.lAll];
-        Path.sAll = [PathTemp.sAll,PathBifs.sAll];
+    if ~isempty(varAllBifs)
+        varAllTemp = [oih.path.varAll,varAllBifs(1:oih.info.nv,:)];
+        lAllTemp = [oih.path.lAll,varAllBifs(oih.info.nv+1,:);
+                    oih.opt.g0*ones(size(oih.path.lAll)),lAllBifs];
+        oih.path.overwrite(varAllTemp,lAllTemp,[],true);
     else
-        Path.lAll = [PathTemp.lAll;Opt.g0*ones(size(PathTemp.lAll))];
+        lAllTemp = [oih.path.lAll;oih.opt.g0*ones(size(oih.path.lAll))];
+        oih.path.overwrite([],lAllTemp,[],false);
     end
 end

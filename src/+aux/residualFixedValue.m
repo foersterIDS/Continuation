@@ -4,12 +4,12 @@
 %   Leibniz University Hannover
 %   20.05.2020 - Alwin Förster
 %
-function [varargout] = residualFixedValue(func,v,lFix,Opt)
-    if Opt.jacobian
+function [varargout] = residualFixedValue(func,v,lFix,oih)
+    if oih.opt.jacobian
         [R,J] = func(v,lFix);
         [n1,n2] = size(J);
         if n2<=n1 && n2<numel(v)
-            Jl = aux.numericJacobian(@(v) func(v,lFix), v, 'derivativeDimensions', (n2+1):numel(v), 'diffquot', Opt.diffquot, 'centralValue', R);
+            Jl = aux.numericJacobian(@(v) func(v,lFix), v, 'derivativeDimensions', (n2+1):numel(v), 'diffquot', oih.opt.diffquot, 'centralValue', R);
         else
             Jl = [];
         end

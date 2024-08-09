@@ -4,13 +4,13 @@
 %   Leibniz University Hannover
 %   20.12.2021 - Alwin Förster
 %
-function [varargout] = residualSuspendContinuation(func,v,lFix,Opt)
+function [varargout] = residualSuspendContinuation(func,v,lFix,oih)
     nv = numel(v);
-    if Opt.jacobian
+    if oih.opt.jacobian
         [R,J] = func(v,lFix);
         [n1,n2] = size(J);
         if n2<=n1 && n2<nv
-            Jl = numericJacobian(@(v) func(v,lFix), v, 'derivativeDimensions', (n2+1):numel(v), 'diffquot', Opt.diffquot, 'centralValue', R);
+            Jl = numericJacobian(@(v) func(v,lFix), v, 'derivativeDimensions', (n2+1):numel(v), 'diffquot', oih.opt.diffquot, 'centralValue', R);
         else
             J = J(:,1:nv);
             Jl = [];

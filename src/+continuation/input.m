@@ -5,7 +5,7 @@
 %   08.05.2020 - Alwin Förster
 %   05.01.2021 - Tido Kubatschek
 %
-function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
+function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %% determine purpose
     %
     Purpose = struct('continuation',false,...
@@ -55,15 +55,15 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %   Sub-structs may only contain true or false values.
     %   Wheter a true value exists can be checked via 'aux.ison(OptSubStruct)'.
     %   If a sub-struct contains multiple true values the first one is valid.
-    [Opt,OptInfo,evalCell] = aux.csf2struct('Opt');
+    [opt,OptInfo,evalCell] = aux.csf2struct('Opt');
     for ii=1:numel(evalCell)
-        Opt.(evalCell{ii}) = eval(Opt.(evalCell{ii}));
+        opt.(evalCell{ii}) = eval(opt.(evalCell{ii}));
     end
-    OptFieldnames = fieldnames(Opt);
-    OptIsSet = struct();
+    OptFieldnames = fieldnames(opt);
+    optIsSet = struct();
     for ii=1:numel(OptFieldnames)
-        OptIsSet.(OptFieldnames{ii}) = false;
-        if isstruct(Opt.(OptFieldnames{ii}))
+        optIsSet.(OptFieldnames{ii}) = false;
+        if isstruct(opt.(OptFieldnames{ii}))
             [~,OptSubStructInfo] = aux.csf2struct(['Opt',OptFieldnames{ii}]);
             OptStructInfo.(OptFieldnames{ii}) = OptSubStructInfo;
             OptStructFieldnames.(OptFieldnames{ii}) = fieldnames(OptSubStructInfo);
@@ -84,24 +84,24 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                 vararginCell{i} = OptFieldnames{iLower};
             end
             %% set
-            if isfield(Opt,vararginCell{i})
+            if isfield(opt,vararginCell{i})
                 %% set option:
                 if i+1<=numel(vararginCell)
-                    if islogical(Opt.(vararginCell{i}))
+                    if islogical(opt.(vararginCell{i}))
                         switch vararginCell{i+1}
                             case 'on'
-                                Opt.(vararginCell{i}) = true;
+                                opt.(vararginCell{i}) = true;
                             case 'off'
-                                Opt.(vararginCell{i}) = false;
+                                opt.(vararginCell{i}) = false;
                             case true
-                                Opt.(vararginCell{i}) = true;
+                                opt.(vararginCell{i}) = true;
                             case false
-                                Opt.(vararginCell{i}) = false;
+                                opt.(vararginCell{i}) = false;
                             otherwise
-                                Opt.(vararginCell{i}) = vararginCell{i+1};
+                                opt.(vararginCell{i}) = vararginCell{i+1};
                         end
-                    elseif isstruct(Opt.(vararginCell{i}))
-                        subOpts = fieldnames(Opt.(vararginCell{i}));
+                    elseif isstruct(opt.(vararginCell{i}))
+                        subOpts = fieldnames(opt.(vararginCell{i}));
                         %% adapt to name convention
                         OptLowerSubFieldnames = cellfun(@lower,subOpts,'UniformOutput',false);
                         iLower = find(strcmpi(OptLowerSubFieldnames,vararginCell{i}));
@@ -109,27 +109,27 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                             vararginCell{i+1} = subOpts{iLower};
                         end
                         %% check
-                        if isfield(Opt.(vararginCell{i}),vararginCell{i+1})
-                            for j=1:numel(fieldnames(Opt.(vararginCell{i})))
+                        if isfield(opt.(vararginCell{i}),vararginCell{i+1})
+                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
                                 switch vararginCell{i+1}
                                     case subOpts{j}
-                                        Opt.(vararginCell{i}).(subOpts{j}) = true;
+                                        opt.(vararginCell{i}).(subOpts{j}) = true;
                                     otherwise
-                                        Opt.(vararginCell{i}).(subOpts{j}) = false;
+                                        opt.(vararginCell{i}).(subOpts{j}) = false;
                                 end
                             end
                         elseif strcmpi(vararginCell{i+1},'on')
-                            for j=1:numel(fieldnames(Opt.(vararginCell{i})))
+                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
                                 switch j
                                     case 1
-                                        Opt.(vararginCell{i}).(subOpts{j}) = true;
+                                        opt.(vararginCell{i}).(subOpts{j}) = true;
                                     otherwise
-                                        Opt.(vararginCell{i}).(subOpts{j}) = false;
+                                        opt.(vararginCell{i}).(subOpts{j}) = false;
                                 end
                             end
                         elseif strcmpi(vararginCell{i+1},'off')
-                            for j=1:numel(fieldnames(Opt.(vararginCell{i})))
-                                Opt.(vararginCell{i}).(subOpts{j}) = false;
+                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
+                                opt.(vararginCell{i}).(subOpts{j}) = false;
                             end
                         else
                             %% check nameLegacy for Opt-sub-struct:
@@ -149,17 +149,17 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                                 error(errMsg);
                             end
                         end
-                    elseif isnumeric(Opt.(vararginCell{i})) && isnumeric(vararginCell{i+1})
-                        Opt.(vararginCell{i}) = vararginCell{i+1};
-                    elseif isa(Opt.(vararginCell{i}),'function_handle') && isa(vararginCell{i+1},'function_handle')
-                        Opt.(vararginCell{i}) = vararginCell{i+1};
-                    elseif iscell(Opt.(vararginCell{i})) && iscell(vararginCell{i+1})
-                        Opt.(vararginCell{i}) = vararginCell{i+1};
+                    elseif isnumeric(opt.(vararginCell{i})) && isnumeric(vararginCell{i+1})
+                        opt.(vararginCell{i}) = vararginCell{i+1};
+                    elseif isa(opt.(vararginCell{i}),'function_handle') && isa(vararginCell{i+1},'function_handle')
+                        opt.(vararginCell{i}) = vararginCell{i+1};
+                    elseif iscell(opt.(vararginCell{i})) && iscell(vararginCell{i+1})
+                        opt.(vararginCell{i}) = vararginCell{i+1};
                     else
                         errMsg = sprintf('invalid input');
                         error(errMsg);
                     end
-                    OptIsSet.(vararginCell{i}) = true;
+                    optIsSet.(vararginCell{i}) = true;
                 else
                     errMsg = sprintf('Option %s has no value.',vararginCell{i});
                     error(errMsg);
@@ -173,7 +173,7 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                 if numel(indOptIsSetTemp)>1
                     error('OptIsSet used to often.');
                 elseif numel(indOptIsSetTemp)==1
-                    OptIsSet = OptTemp.(OptFieldnamesTemp{indOptIsSetTemp});
+                    optIsSet = OptTemp.(OptFieldnamesTemp{indOptIsSetTemp});
                     OptTemp = rmfield(OptTemp,OptFieldnamesTemp{indOptIsSetTemp});
                     OptFieldnamesTemp(indOptIsSetTemp) = [];
                     doOptIsSet = false;
@@ -183,9 +183,9 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                     containsField = contains(OptFieldnamesTemp,OptFieldnames{ii});
                     if sum(containsField)
                         usedFields(containsField) = 1;
-                        Opt.(OptFieldnames{ii}) = OptTemp.(OptFieldnames{ii});
+                        opt.(OptFieldnames{ii}) = OptTemp.(OptFieldnames{ii});
                         if doOptIsSet
-                            OptIsSet.(OptFieldnames{ii}) = true;
+                            optIsSet.(OptFieldnames{ii}) = true;
                         end
                     end
                 end
@@ -240,12 +240,12 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %
     if Purpose.continuation
         % out:
-        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+        if ~(optIsSet.jacobian && ~opt.jacobian)
             try
                 [R,J] = fun(var0,lStart);
-                Opt.jacobian = true;
+                opt.jacobian = true;
             catch
-                Opt.jacobian = false;
+                opt.jacobian = false;
             end
         end
         % in:
@@ -256,32 +256,32 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         end
     elseif Purpose.parameterTracing
         % out:
-        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+        if ~(optIsSet.jacobian && ~opt.jacobian)
             try
-                [R,J] = fun(var0,lStart,Opt.g0);
-                Opt.jacobian = true;
+                [R,J] = fun(var0,lStart,opt.g0);
+                opt.jacobian = true;
             catch
-                Opt.jacobian = false;
+                opt.jacobian = false;
             end
         end
         % in:
         if abs(nargin(fun))~=3
             error('%d is an invalid number of input arguments for fun(...) using parameter tracing.\nfun = fun(v,l,g)',abs(nargin(fun)))
         else
-            func = @(v,l) fun(v,l,Opt.g0);
+            func = @(v,l) fun(v,l,opt.g0);
         end
         % check settings:
-        if ~(Opt.bifurcation.parameterTrace || Opt.dpa)
+        if ~(opt.bifurcation.parameterTrace || opt.dpa)
             error('fun = @(v,l,g) ... can only be used for DPA.');
         end
     elseif Purpose.homotopy
         % out:
-        if ~(OptIsSet.jacobian && ~Opt.jacobian)
+        if ~(optIsSet.jacobian && ~opt.jacobian)
             try
                 [R,J] = fun(var0);
-                Opt.jacobian = true;
+                opt.jacobian = true;
             catch
-                Opt.jacobian = false;
+                opt.jacobian = false;
             end
         end
         % in:
@@ -295,7 +295,7 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %% check Opt:
     %
 	errmsg = '';
-    [errmsg,Opt,OptIsSet] = continuation.checkOpt(errmsg,var0,vararginCell,Opt,OptInfo,OptFieldnames,OptIsSet,OptStructInfo,OptStructFieldnames);
+    [errmsg,opt,optIsSet] = continuation.checkOpt(errmsg,var0,vararginCell,opt,OptInfo,OptFieldnames,optIsSet,OptStructInfo,OptStructFieldnames);
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);
@@ -304,6 +304,10 @@ function [Opt,ds0,OptIsSet,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %% set dependent options
     %
     InfoTemp = struct('ds0',ds0,'lEnd',lEnd,'lStart',lStart,'var0',var0);
-    Opt = aux.updateOpt(Opt,OptIsSet,InfoTemp);
+    opt = aux.updateOpt(opt,optIsSet,InfoTemp);
+    %
+    %% OptInfoHandle instantiation
+    %
+    oih = aux.OptInfoHandle(opt,optIsSet);
     %
 end

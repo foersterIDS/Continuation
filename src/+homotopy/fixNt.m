@@ -4,8 +4,8 @@
 %   Leibniz University Hannover
 %   19.01.2022 - Alwin Förster
 %
-function [varargout] = fixNt(R,x,Rx0,x0,Opt)
-    if Opt.jacobian
+function [varargout] = fixNt(R,x,Rx0,x0,oih)
+    if oih.opt.jacobian
         [Rx,Jx] = R(x);
         nx = numel(x);
         Jx = Jx(1:nx,1:nx);

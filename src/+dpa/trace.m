@@ -4,36 +4,38 @@
 %   Leibniz University Hannover
 %   04.04.2022 - Alwin Förster
 %
-function trace(fun,dpaPoints,Info,Opt,Path)
+function trace(fun,dpaPoints,oih)
     %% settings for dpa:
     dpaTrace = dpaPoints;
     npoints = numel(dpaTrace);
-    OptTrace = Opt;
-    OptTrace.direction = [zeros(size(OptTrace.direction));sign(Opt.gTarget-Opt.g0)];
-    OptTrace.l0 = Opt.g0;
-    OptTrace.lTarget = Opt.gTarget;
-    OptTrace.dpaGammaVar = true;
-    PathDpa = struct('varAll',[],'lAll',[],'sAll',[]);
+    optTrace = oih.opt;
+    optTrace.direction = [zeros(size(optTrace.direction));sign(oih.opt.gTarget-oih.opt.g0)];
+    optTrace.l0 = oih.opt.g0;
+    optTrace.lTarget = oih.opt.gTarget;
+    optTrace.dpaGammaVar = true;
+    varAllDpa = [];
+    lAllDpa = [];
+    sAllDpa = [];
     %% start dpa:
     for ii=1:npoints
         i = dpaTrace(ii);
-        func = @(x,g) dpa.mergeResiduals(Opt,fun,Opt.dpaResidual,x,g);
-        x0 = [Path.varAll(:,i);Path.lAll(i)];
-        dsDpa = max([mean(diff(Path.sAll(i+(-1:1))))/100,Opt.dsMin]);
-        OptTrace.dscale0 = max(abs([x0;Opt.g0]),10^-8*ones(numel(x0)+1,1));
-        [varI,lI,~,~,sI] = continuation(func,x0,Opt.g0,Opt.gTarget,dsDpa,'Opt',OptTrace);
-        PathDpa.varAll = [PathDpa.varAll,NaN(Info.nv+1,1),varI];
-        PathDpa.lAll = [PathDpa.lAll,NaN,lI];
-        PathDpa.sAll = [PathDpa.sAll,NaN,sI];
+        func = @(x,g) dpa.mergeResiduals(oih,fun,oih.opt.dpaResidual,x,g);
+        x0 = [oih.path.varAll(:,i);oih.path.lAll(i)];
+        dsDpa = max([mean(diff(oih.path.sAll(i+(-1:1))))/100,oih.opt.dsMin]);
+        optTrace.dscale0 = max(abs([x0;oih.opt.g0]),10^-8*ones(numel(x0)+1,1));
+        [varI,lI,~,~,sI] = continuation(func,x0,oih.opt.g0,oih.opt.gTarget,dsDpa,'Opt',optTrace);
+        varAllDpa = [varAllDpa,NaN(oih.info.nv+1,1),varI];
+        lAllDpa = [lAllDpa,NaN,lI];
+        sAllDpa = [sAllDpa,NaN,sI];
     end
     %% output:
-    PathTemp = Path;
-    if ~isempty(PathDpa.varAll)
-        Path.varAll = [PathTemp.varAll,PathDpa.varAll(1:Info.nv,:)];
-        Path.lAll = [PathTemp.lAll,PathDpa.varAll(Info.nv+1,:);
-                      Opt.g0*ones(size(PathTemp.lAll)),PathDpa.lAll];
-        Path.sAll = [PathTemp.sAll,PathDpa.sAll];
+    if ~isempty(varAllDpa)
+        varAllTemp = [oih.path.varAll,varAllDpa(1:oih.info.nv,:)];
+        lAllTemp = [oih.path.lAll,varAllDpa(oih.info.nv+1,:);
+                    oih.opt.g0*ones(size(oih.path.lAll)),lAllDpa];
+        oih.path.overwrite(varAll,lAll,[],true);
     else
-        Path.lAll = [PathTemp.lAll;Opt.g0*ones(size(PathTemp.lAll))];
+        lAllTemp = [oih.path.lAll;oih.opt.g0*ones(size(oih.path.lAll))];
+        oih.path.overwrite([],lAll,[],false);
     end
 end
