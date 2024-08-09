@@ -80,6 +80,7 @@ function [varAll,lAll,exitflag,Bifurcation,sAll,jacobianOut,breakFunOut,InfoOut]
         NameValueArgs.jacobian {validation.scalarLogical}
         NameValueArgs.jacobianOut {mustBeMember(NameValueArgs.jacobianOut,{'basic','full'})}
         NameValueArgs.l0 (1,1) double
+        NameValueArgs.lDirFunction (1,1) function_handle
         NameValueArgs.lTarget (1,1) double
         NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
         NameValueArgs.maxClosedCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxClosedCounter,0)}

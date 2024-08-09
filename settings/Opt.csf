@@ -39,6 +39,7 @@ initialDeflationPoints<>eval<>[]<>#double
 jacobian<>eval<>false<>#scalar#logical
 jacobianOut<>struct<>OptJacobianOut<>#struct
 l0<>eval<>lStart<>#scalar#double
+lDirFunction<>eval<>@(var,l,J)1<>#function_handle
 lTarget<>eval<>lEnd<>#scalar#double
 livePlotFig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
 maxClosedCounter<>double<>5<>#scalar#integer#positive#nonzero

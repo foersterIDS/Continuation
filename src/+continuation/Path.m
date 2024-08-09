@@ -7,23 +7,25 @@
 classdef Path < handle
     %% properties
     properties (GetAccess = public, SetAccess = private)
-        bifTestValue
-        iterations
-        JAll
-        lAll
-        nL
-        nVar
-        pathInfoValue
-        plus = false
-        rateOfContraction
-        signDetJRedAll
-        speedOfContinuation
-        varAll
-        xPredictorAll
+        bifTestValue            % bifurcation test value
+        iterations              % number of solver iterations
+        JAll                    % cell array of jacobians
+        lAll                    % parameter values (scalar)
+        lDir                    % parameter directions (vector)
+        lRoot                   % initial parameter
+        nL                      % number of parameters
+        nVar                    % number of variables
+        pathInfoValue           % path info value
+        stepBackStatus = false  % status of step back mode
+        rateOfContraction       % rate of contraction (solver)
+        signDetJRedAll          % sign of determinant of the jacobian (nVar x nVar)
+        speedOfContinuation     % speed of continuation
+        varAll                  % variable values
+        xPredictorAll           % predictor values
     end
 
     properties (Access = public)
-        outputFormat
+        outputFormat            % output format 'full'/'singleValueForL'
     end
 
     properties (Access = private)
@@ -37,9 +39,9 @@ classdef Path < handle
     end
 
     properties (Dependent)
-        nAll
-        sAll
-        xAll
+        nAll                    % number of points on path
+        sAll                    % arc length
+        xAll                    % variables and parameters
     end
 
     %% public methods
@@ -94,6 +96,21 @@ classdef Path < handle
         end
 
         %% getter
+        function lAll = get.lAll(obj)
+            switch obj.outputFormat
+                case 'singleValueForL'
+                    if obj.nL==1
+                        lAll = obj.lAll;
+                    else
+                        lAll = cumsum([0,sqrt(sum(diff(obj.lAll,1,2).^2,1))]);
+                    end
+                case 'full'
+                    lAll = obj.lAll;
+                otherwise
+                    error('Unknown output format.');
+            end
+        end
+
         function nAll = get.nAll(obj)
             nAll = numel(obj.lAll(1,:));
         end
@@ -121,7 +138,7 @@ classdef Path < handle
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
-                l (1,1) double
+                l (:,1) double
                 J (:,:) double
                 Solver (1,1) struct
                 pos (1,1) double {mustBeInteger,mustBeGreaterThan(pos,0)} = obj.nAll+1
@@ -133,9 +150,53 @@ classdef Path < handle
             validateattributes(var,{'numeric'},{'size',[obj.nVar,1]});
             validateattributes(l,{'numeric'},{'size',[obj.nL,1]});
             obj.checkInputOptions(NameValueArgs);
+            %% transform parameters
+            if obj.nL>1
+                if pos~=obj.nAll+1
+                    error('With nL>1, entries may only be added at the end of the path.');
+                end
+                if obj.nAll==0
+                    %% initial
+                    if numel(l)==obj.nL
+                        obj.lRoot = l;
+                        if ~obj.OptIsSet.lDirFunction
+                            error("'lDirFunction' must be set if more than one parameter is used.");
+                        end
+                    else
+                        error('All parameters must be set at initial point.');
+                    end
+                else
+                    %% additional
+                    obj.outputFormat = 'full';
+                    lLast = obj.lAll(:,pos-1);
+                    obj.resetOutput();
+                    if numel(l)==obj.nL
+                        %% correct lDir:
+                        obj.lDir(:,pos-1) = (l-lLast)/norm(l-lLast);
+                    elseif numel(l)==1
+                        %% calc. full l
+                        lSVAdd = l;
+                        lSVEnd = obj.lAll(:,end);
+                        dlSV = lSVAdd-lSVEnd;
+                        l = lLast+dlSV*obj.lDir(:,end);
+                    else
+                        error('Number of parameters must be 1 or nL.');
+                    end
+                end
+            end
+% #########################################################################
+% #########################################################################
+% todo: transformation of J??? ############################################
+% #########################################################################
+% #########################################################################
             %% add/insert
             obj.varAll = [obj.varAll(:,1:(pos-1)),var,obj.varAll(:,pos:end)];
             obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
+            if obj.nL>1
+                lDirTemp = obj.Opt.lDirFunction(var,l,J); % todo #########################################################################################
+                lDirTemp = lDirTemp/norm(lDirTemp);
+                obj.lDir = [obj.lDir(:,1:(pos-1)),lDirTemp,obj.lDir(:,pos:end)];
+            end
             if obj.Opt.jacobianOut.basic
                 obj.JAll{3} = obj.JAll{2};
                 obj.JAll{2} = J;
@@ -170,7 +231,7 @@ classdef Path < handle
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
-                l (1,1) double
+                l (:,1) double
                 J (:,:) double
                 Solver (1,1) struct
                 NameValueArgs.bifTestValue (1,1) double
@@ -252,6 +313,12 @@ classdef Path < handle
                 obj (1,1) continuation.Path
                 idxRmv (1,:) double {mustBeInteger,mustBeGreaterThan(idxRmv,0)}
             end
+            %% sort idxRmv
+            idxRmv = sort(idxRmv);
+            %% check nL
+            if obj.nL>1 && ~(isempty(idxRmv) || (idxRmv(end)==obj.nAll && all(diff(idxRmv)==1)))
+                error('If nL>1, only the last entries in the path may be removed.');
+            end
             %% remove
             if obj.Opt.jacobianOut.basic
                 if sum(idxRmv==obj.nAll)
@@ -274,6 +341,9 @@ classdef Path < handle
                 error('jacobianOut must be full or basic!');
             end
             obj.lAll(:,idxRmv) = [];
+            if obj.nL>1
+                obj.lDir(:,idxRmv) = [];
+            end
             obj.signDetJRedAll(:,idxRmv) = [];
             obj.varAll(:,idxRmv) = [];
             if obj.OptIsSet.bifAdditionalTestfunction
@@ -344,8 +414,12 @@ classdef Path < handle
             arguments
                 obj (1,1) continuation.Path
             end
+            %% check nL
+            if obj.nL>1
+                error('Stepback must not be called if nL>1.');
+            end
             %% toggle plus
-            if obj.plus
+            if obj.stepBackStatus
                 %% add plus
                 obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
                 if obj.Opt.jacobianOut.basic
@@ -381,7 +455,7 @@ classdef Path < handle
                 %% clear plus struct
                 obj.clearPlusStruct();
                 %% toggle plus
-                obj.plus = false;
+                obj.stepBackStatus = false;
             else
                 if obj.nAll<2
                     error("Path must have at least two entries to use 'plus'.");
@@ -446,7 +520,7 @@ classdef Path < handle
                     obj.speedOfContinuation = obj.speedOfContinuation(:,1:(end-1));
                 end
                 %% toggle plus
-                obj.plus = true;
+                obj.stepBackStatus = true;
             end
         end
 
@@ -456,7 +530,7 @@ classdef Path < handle
                 obj (1,1) continuation.Path
             end
             %% deactivate stepback
-            obj.plus = false;
+            obj.stepBackStatus = false;
             obj.clearPlusStruct();
             %% turn path
             idxTurn = obj.nAll:-1:1;

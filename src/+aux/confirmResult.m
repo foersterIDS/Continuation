@@ -30,7 +30,7 @@ function [xDeflation,Bifurcation,Counter,Do,Info,Initial,Is,Remove,Solver,Stepsi
         end
         Path.addPointAtEnd(xSolution(1:(end-1)),xSolution(end),Solver.jacobian,Solver,optAddPointArgs{:});
         % set structs
-        if ~Path.plus
+        if ~Path.stepBackStatus
             Counter.validStepback = 0;
         else
             Counter.validStepback = Counter.validStepback+1;

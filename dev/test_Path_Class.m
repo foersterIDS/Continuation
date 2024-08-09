@@ -12,35 +12,35 @@ StepsizeOptions = struct('iterations',true,...
                          'rateOfContraction',true,...
                          'speedOfContinuation',true);
 
-p = continuation.Path(3,1,Opt,OptIsSet,StepsizeOptions);
+cPath = continuation.Path(3,1,Opt,OptIsSet,StepsizeOptions);
 
-p.addPointAtEnd(randn(3,1),1,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),2,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),3,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.toggleStepback();
-p.addPointAtEnd(randn(3,1),4,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.toggleStepback();
-p.addPointAtEnd(randn(3,1),5,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.remove(5);
-p.addPointAtEnd(randn(3,1),6,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),7,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.remove(5:6);
-p.addPointAtEnd(randn(3,1),8,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),9,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),10,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPointAtEnd(randn(3,1),11,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.remove(1:2);
-p.addPoint(randn(3,1),1,randn(3,4),Solver,1,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPoint(randn(3,1),2,randn(3,4),Solver,2,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.remove(3);
-p.addPoint(randn(3,1),4,randn(3,4),Solver,4,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPoint(randn(3,1),5,randn(3,4),Solver,5,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPoint(randn(3,1),6,randn(3,4),Solver,6,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.addPoint(randn(3,1),7,randn(3,4),Solver,7,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
-p.remove(11);
+cPath.addPointAtEnd(randn(3,1),1,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),2,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),3,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.toggleStepback();
+cPath.addPointAtEnd(randn(3,1),4,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.toggleStepback();
+cPath.addPointAtEnd(randn(3,1),5,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.remove(5);
+cPath.addPointAtEnd(randn(3,1),6,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),7,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.remove(5:6);
+cPath.addPointAtEnd(randn(3,1),8,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),9,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),10,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPointAtEnd(randn(3,1),11,randn(3,4),Solver,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.remove(1:2);
+cPath.addPoint(randn(3,1),1,randn(3,4),Solver,1,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPoint(randn(3,1),2,randn(3,4),Solver,2,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.remove(3);
+cPath.addPoint(randn(3,1),4,randn(3,4),Solver,4,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPoint(randn(3,1),5,randn(3,4),Solver,5,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPoint(randn(3,1),6,randn(3,4),Solver,6,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.addPoint(randn(3,1),7,randn(3,4),Solver,7,'predictor',randn(3,1),'speedOfContinuation',rand,'pathInfoValue',rand,'bifTestValue',rand);
+cPath.remove(11);
 
 % 1:10
-p.lAll
+cPath.lAll
 
 %% run continuation test
 % add paths
