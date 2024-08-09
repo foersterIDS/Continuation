@@ -26,7 +26,7 @@
 %   03.06.2020 - Niklas Marhenke
 %   21.10.2020 - Tido Kubatschek
 %
-function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Opt,Info,event,Initial)
+function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Path,Opt,Info,event,Initial)
     if ~Do.stepback
         if ~Do.deflate
             if Counter.error == 0
@@ -230,7 +230,7 @@ function [dsn,Counter,event,Opt] = control(ds,Counter,Solver,Do,Plus,Path,Opt,In
             dsn = Info.ds0;
         else
             xe = [Path.varAll(:,end);Path.lAll(end)];
-            dsn = norm(Path-xe)/2;
+            dsn = norm([Path.plusStruct.var;Path.plusStruct.l]-xe)/2;
         end
     end
 end

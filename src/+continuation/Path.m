@@ -24,7 +24,6 @@ classdef Path < handle
 
     properties (Access = public)
         outputFormat
-        xPredictor
     end
 
     properties (Access = private)
@@ -71,7 +70,6 @@ classdef Path < handle
             obj.lAll = zeros(nL,0);
             obj.signDetJRedAll = zeros(1,0);
             obj.varAll = zeros(nVar,0);
-            obj.xPredictor = zeros(nVar+nL,1);
             obj.resetOutput();
             %% additional functions
             if obj.OptIsSet.pathInfoFunction
@@ -115,16 +113,6 @@ classdef Path < handle
                 oF (1,:) char {mustBeMember(oF,{'singleValueForL','full'})}
             end
             obj.outputFormat = oF;
-        end
-
-        function set.xPredictor(obj,xP)
-            arguments
-                obj (1,1) continuation.Path
-                xP (:,1) double {mustBeVector}
-            end
-            xP = xP(:);
-            % validateattributes(xP,{'double'},{'size',[obj.nVar+1,1]});
-            obj.xPredictor = xP;
         end
 
         %% general methods
@@ -288,7 +276,6 @@ classdef Path < handle
             obj.lAll(:,idxRmv) = [];
             obj.signDetJRedAll(:,idxRmv) = [];
             obj.varAll(:,idxRmv) = [];
-            obj.xPredictor = [];
             if obj.OptIsSet.bifAdditionalTestfunction
                 obj.bifTestValue(:,idxRmv) = [];
             end
@@ -373,7 +360,6 @@ classdef Path < handle
                 obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
                 obj.signDetJRedAll = [obj.signDetJRedAll,obj.plusStruct.signDetJRed];
                 obj.varAll = [obj.varAll,obj.plusStruct.var];
-                obj.xPredictor = obj.plusStruct.xPredictor;
                 if obj.OptIsSet.bifAdditionalTestfunction
                     obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
                 end
@@ -441,7 +427,6 @@ classdef Path < handle
                 obj.lAll = obj.lAll(:,1:(end-1));
                 obj.signDetJRedAll = obj.signDetJRedAll(:,1:(end-1));
                 obj.varAll = obj.varAll(:,1:(end-1));
-                obj.xPredictor = [];
                 if obj.OptIsSet.bifAdditionalTestfunction
                     obj.bifTestValue = obj.bifTestValue(:,1:(end-1));
                 end
@@ -488,7 +473,6 @@ classdef Path < handle
             obj.lAll = obj.lAll(:,idxTurn);
             obj.signDetJRedAll = obj.signDetJRedAll(:,idxTurn);
             obj.varAll = obj.varAll(:,idxTurn);
-            obj.xPredictor = [];
             if obj.OptIsSet.bifAdditionalTestfunction
                 obj.bifTestValue = obj.bifTestValue(:,idxTurn);
             end
