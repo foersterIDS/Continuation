@@ -42,8 +42,6 @@ p.remove(11);
 % 1:10
 p.lAll
 
-p.xPredictor = p.xAll(:,end);
-
 %% run continuation test
 % add paths
 addpath('../src');
