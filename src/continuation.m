@@ -35,7 +35,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     arguments
         fun (1,1) function_handle
         var0 (:,1) double
-        lStart (1,1) double
+        lStart (:,1) double
         lEnd (1,1) double
         ds0 (1,1) double {mustBeGreaterThan(ds0,0)}
         NameValueArgs.Opt (1,1) struct
@@ -81,6 +81,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.jacobianOut {mustBeMember(NameValueArgs.jacobianOut,{'basic','full'})}
         NameValueArgs.l0 (1,1) double
         NameValueArgs.lDirFunction (1,1) function_handle
+        NameValueArgs.lMult0 (:,1) double
         NameValueArgs.lTarget (1,1) double
         NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
         NameValueArgs.maxClosedCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxClosedCounter,0)}

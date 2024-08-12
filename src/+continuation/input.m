@@ -34,6 +34,12 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
             error('Illegal use of the function continuation.input(...).');
     end
     %
+    %% multi-parameter:
+    %
+    if numel(lStart)~=1 && ~sum(cellfun(@(x) strcmp(x,'lDirFunction'),vararginCell))
+        error('lDirFunction must be set when using multiple parameters.');
+    end
+    %
     %% check mandatory input:
     %
     if purpose.continuation

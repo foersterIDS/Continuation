@@ -65,6 +65,9 @@ classdef Path < handle
                 error('jacobianOut must be full or basic!');
             end
             obj.lAll = zeros(nL,0);
+            if oih.info.nl>1
+                obj.lRoot = obj.oih.opt.lMult0;
+            end
             obj.signDetJRedAll = zeros(1,0);
             obj.varAll = zeros(nVar,0);
             obj.resetOutput();
@@ -137,7 +140,7 @@ classdef Path < handle
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
-                l (:,1) double
+                l (1,1) double
                 J (:,:) double
                 oih (1,1) aux.OptInfoHandle
                 pos (1,1) double {mustBeInteger,mustBeGreaterThan(pos,0)} = obj.nAll+1
@@ -156,43 +159,38 @@ classdef Path < handle
                 end
                 if obj.nAll==0
                     %% initial
-                    if numel(l)==obj.nL
-                        obj.lRoot = l;
-                        if ~obj.oih.optIsSet.lDirFunction
-                            error("'lDirFunction' must be set if more than one parameter is used.");
-                        end
-                    else
-                        error('All parameters must be set at initial point.');
+                    if ~obj.oih.optIsSet.lDirFunction
+                        error("'lDirFunction' must be set if more than one parameter is used.");
                     end
+                    l = obj.lRoot;
                 else
                     %% additional
                     obj.outputFormat = 'full';
                     lLast = obj.lAll(:,pos-1);
                     obj.resetOutput();
-                    if numel(l)==obj.nL
-                        %% correct lDir:
-                        obj.lDir(:,pos-1) = (l-lLast)/norm(l-lLast);
-                    elseif numel(l)==1
+                    lDirLast = obj.lDir(:,pos-1);
+                    if numel(l)==1
                         %% calc. full l
                         lSVAdd = l;
                         lSVEnd = obj.lAll(:,end);
                         dlSV = lSVAdd-lSVEnd;
                         l = lLast+dlSV*obj.lDir(:,end);
-                    else
-                        error('Number of parameters must be 1 or nL.');
-                    end
-                end
-            end
+                        %% calc. full J
 % #########################################################################
 % #########################################################################
 % todo: transformation of J??? ############################################
 % #########################################################################
 % #########################################################################
+                    else
+                        error('Number of parameter input(!) must be 1.');
+                    end
+                end
+            end
             %% add/insert
             obj.varAll = [obj.varAll(:,1:(pos-1)),var,obj.varAll(:,pos:end)];
             obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
             if obj.nL>1
-                lDirTemp = obj.oih.opt.lDirFunction(var,l,J); % todo #########################################################################################
+                lDirTemp = obj.oih.opt.lDirFunction(var,l,J);
                 lDirTemp = lDirTemp/norm(lDirTemp);
                 obj.lDir = [obj.lDir(:,1:(pos-1)),lDirTemp,obj.lDir(:,pos:end)];
             end
