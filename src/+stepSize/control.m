@@ -216,7 +216,7 @@ function [dsn,event] = control(ds,oih,event)
                 if oih.opt.stepSizeControl.fix
                     dsn = oih.info.ds0;
                 else
-                    dsn = ds/2;
+                    dsn = ds/(2^oih.counter.error);
                     %% Limit to max./min. step size, also limit to oih.opt.maxStepSizeChange*ds / ds/oih.opt.maxStepSizeChange*ds:
                     dsn = min([norm(oih.opt.dsMax),oih.opt.maxStepSizeChange*ds,dsn]);
                     dsn = max([oih.opt.dsMin,ds/oih.opt.maxStepSizeChange,dsn]);
@@ -229,7 +229,7 @@ function [dsn,event] = control(ds,oih,event)
         if oih.opt.stepSizeControl.fix
             dsn = oih.info.ds0;
         else
-            xe = [oih.path.varAll(:,end);oih.path.lAll(end)];
+            xe = oih.path.xAll(:,end);
             dsn = norm(oih.path.xPlus-xe)/2;
         end
     end
