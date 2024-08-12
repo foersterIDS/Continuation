@@ -7,7 +7,7 @@
 function [funPredictor,JacPredictor] = taylor(oih,no,nf)
     no = min([oih.path.nAll-1,no]);
     ns = min([oih.path.nAll,no+1+nf]);
-    xAll = [oih.path.varAll;oih.path.lAll];
+    xAll = oih.path.xAll;
     nd = length(xAll(:,end));
     %% calc scaling:
     dscMin = 10^-15;

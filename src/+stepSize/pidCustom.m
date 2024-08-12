@@ -28,7 +28,7 @@
 function [xi] = pidCustom(oih)
     % solution points
     %
-    zAll = [oih.path.varAll; oih.path.lAll];
+    zAll = oih.path.xAll;
     %
     % define function handle for finite difference calculation
     %

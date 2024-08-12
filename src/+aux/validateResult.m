@@ -18,7 +18,7 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                 normXsXi = norm(xSolution-xi);
                 if nPath>1 && oih.opt.alphaReverseAutoMode
                     %% alphaReverseAutoMode
-                    dsHist = sqrt(sum(([oih.path.varAll;oih.path.lAll]-[oih.path.varAll(:,end);oih.path.lAll(end)]).^2));
+                    dsHist = sqrt(sum((oih.path.xAll-oih.path.xAll(:,end)).^2));
                     oobHist = find(dsHist>2*ds);
                     if ~isempty(oobHist) && oobHist(end)<(nPath-1)
                         idxHist = oobHist(end):(nPath-1);

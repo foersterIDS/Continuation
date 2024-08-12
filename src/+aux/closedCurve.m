@@ -14,7 +14,7 @@ function [isClosed] = closedCurve(oih,ds)
     nu = 1+np/2;
     ns = oih.path.nAll;
     if ns > n+nu
-        xAll = [oih.path.varAll; oih.path.lAll];
+        xAll = oih.path.xAll;
         epsDistX = min([dsTol*norm(xAll(1:(end-1),end)-xAll(1:(end-1),end-1)),dsTol*ds,oih.opt.dsMax]);
         epsDistL = min([dsTol*norm(xAll(end,end)-xAll(end,end-1)),dsTol*ds,oih.opt.dsMax]);
         epsAng = 0.5*(2*pi / 360);

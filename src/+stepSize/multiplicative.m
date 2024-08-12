@@ -32,7 +32,7 @@
 function [xi] = multiplicative(oih)
     % create vector with oih.path.varAll and oih.path.lAll
     %
-    xAll = [oih.path.varAll;oih.path.lAll];
+    xAll = oih.path.xAll;
     %
     %% define target values
     %
