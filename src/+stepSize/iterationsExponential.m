@@ -24,9 +24,9 @@
 function [xi] = iterationsExponential(oih)
     % correct number of iterations
     if oih.opt.dsMax==inf
-        iter = max(oih.solver.output.iterations(end),1);
+        iter = max(oih.path.iterations(end),1);
     else
-        iter = oih.solver.output.iterations(end);
+        iter = oih.path.iterations(end);
     end
     % calculate step size adaption factor
     xi = 2^((oih.opt.nIterOpt - iter)/oih.opt.stepSizeExponentialWeight);

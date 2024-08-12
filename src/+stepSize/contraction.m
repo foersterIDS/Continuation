@@ -18,18 +18,18 @@
 %   20.01.2022 - Tido Kubatschek
 %
 function [xi] = contraction(oih)
-    if ~isempty(oih.solver.output.rateOfContraction)
+    if ~isempty(oih.path.rateOfContraction)
         % get rates of contraction
         %
         % current rate
         %
-        currentRate = oih.solver.output.rateOfContraction(end);
+        currentRate = oih.path.rateOfContraction(end);
         %
         % if there is more than one rate accessible also get previous rate
         % and calculate relative difference
         %
-        if length(oih.solver.output.rateOfContraction) > 1
-            previousRate = oih.solver.output.rateOfContraction(end-1);
+        if length(oih.path.rateOfContraction) > 1
+            previousRate = oih.path.rateOfContraction(end-1);
             relDifference = abs(currentRate - previousRate) / abs(previousRate);
         else
             relDifference = inf;

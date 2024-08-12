@@ -60,11 +60,11 @@ function EI = calcError(oih,previous)
     %
     % determine length
     lengthPath = oih.path.nAll;
-    lengthIterations = length(oih.solver.output.iterations);
+    lengthIterations = length(oih.path.iterations);
     if weights(3) ~= 0
         lengthArrays = length(oih.path.speedOfContinuation);
     elseif weights(4) ~= 0
-        lengthArrays = length(oih.solver.output.rateOfConvergence);
+        lengthArrays = length(oih.path.rateOfConvergence);
     elseif weights(5) ~= 0
         lengthArrays = length(oih.path.xPredictorAll(1,:));
     else
@@ -78,13 +78,8 @@ function EI = calcError(oih,previous)
         endOfArray = lengthArrays - 1;
         lengthPath = lengthPath - 1;
     else
-        if lengthPath < 3
-            endOfIterations = lengthIterations - 1;
-            endOfArray = lengthArrays - 1;
-        else
-            endOfIterations = lengthIterations;
-            endOfArray = lengthArrays;
-        end
+        endOfIterations = lengthIterations;
+        endOfArray = lengthArrays;
     end
     
     % create vector with oih.path.varAll and oih.path.lAll
@@ -103,19 +98,19 @@ function EI = calcError(oih,previous)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(oih.solver.output.iterations)
+    if weights(1) ~= 0 && ~isempty(oih.path.iterations)
         if oih.opt.dsMax==inf
-            wIter = max(oih.solver.output.iterations(endOfIterations),1);
+            wIter = max(oih.path.iterations(endOfIterations),1);
         else
-            wIter = oih.solver.output.iterations(endOfIterations);
+            wIter = oih.path.iterations(endOfIterations);
         end
     else
         wIter = wTarget(1);
     end
     %
     %% Factor by contraction rate
-    if weights(2) ~= 0 && ~isempty(oih.solver.output.rateOfContraction)
-        wContr = oih.solver.output.rateOfContraction(endOfArray);
+    if weights(2) ~= 0 && ~isempty(oih.path.rateOfContraction)
+        wContr = oih.path.rateOfContraction(endOfArray);
     else
         wContr = wTarget(2);
     end

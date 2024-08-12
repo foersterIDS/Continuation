@@ -49,11 +49,11 @@ function [xi] = multiplicative(oih)
     %
     %% Factor by number of iterations
     % correct number of iterations
-    if weights(1) ~= 0 && ~isempty(oih.solver.output.iterations)
+    if weights(1) ~= 0 && ~isempty(oih.path.iterations)
         if oih.opt.dsMax==inf
-            wIter = max(oih.solver.output.iterations(end),1);
+            wIter = max(oih.path.iterations(end),1);
         else
-            wIter = oih.solver.output.iterations(end);
+            wIter = oih.path.iterations(end);
         end
     else
         wIter = wTarget(1);
@@ -61,8 +61,8 @@ function [xi] = multiplicative(oih)
     %
     %% Factor by contraction rate
     %
-    if weights(2) ~= 0 && ~isempty(oih.solver.output.rateOfContraction)
-        wContr = oih.solver.output.rateOfContraction(end);
+    if weights(2) ~= 0 && ~isempty(oih.path.rateOfContraction)
+        wContr = oih.path.rateOfContraction(end);
     else
         wContr = wTarget(2);
     end

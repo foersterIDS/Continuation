@@ -7,7 +7,7 @@
 %
 %
 %   Inputs:
-%       oih.solver.output -- contains information of solver, such as the 
+%       oih.path    -- contains information of path, such as the 
 %                        needed number of iterations.
 %       Path          -- contains the solution points of the path
 %       Opt           -- contains user inputs, such as optimal number of
@@ -56,9 +56,9 @@ function [xi] = yoon(oih)
     % correct number of iterations
     %
     if oih.opt.dsMax==inf
-        iter = max(oih.solver.output.iterations(end),1);
+        iter = max(oih.path.iterations(end),1);
     else
-        iter = oih.solver.output.iterations(end);
+        iter = oih.path.iterations(end);
     end
     %
     % calculate deviation of iterations
