@@ -27,9 +27,23 @@ classdef OptInfoHandle < handle
     end
 
     methods
+        %% constructor
         function obj = OptInfoHandle(opt,optIsSet)
             obj.opt = opt;
             obj.optIsSet = optIsSet;
+        end
+
+        %% general functions
+        function oihOut = copy(obj)
+            oihOut = aux.OptInfoHandle(obj.opt,obj.optIsSet);
+            props = properties(obj);
+            for ii=1:numel(props)
+                if isstruct(obj.(props{ii}))
+                    oihOut.(props{ii}) = obj.(props{ii});
+                else
+                    oihOut.(props{ii}) = obj.(props{ii}).copy();
+                end
+            end
         end
 
         function initializeStructsAndClasses(obj,var0,lStart,lEnd,ds0)

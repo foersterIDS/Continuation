@@ -104,8 +104,16 @@ function [xDeflation] = confirmResult(func,funSolution,xSolution,xPredictor,oih,
                 optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
                 optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.pathInfoFunction(func,rmvJacobian,xRmv(1:(end-1)),xRmv(end));
             end
-            rmvJacobian = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+1)),[oih.path.varAll(:,end);oih.path.lAll(end)],'centralValue',funRmv,'derivativeDimensions',oih.info.nv+1,'diffquot',oih.opt.diffquot)];
-            oih.path.addPointAtEnd(varRmv,lRmv,rmvJacobian,optAddPointArgs{:});
+            if oih.stepsizeOptions.predictor
+                optAddPointArgs{numel(optAddPointArgs)+1} = 'predictor';
+                optAddPointArgs{numel(optAddPointArgs)+1} = xRmv;
+            end
+            if oih.stepsizeOptions.speedOfContinuation
+                optAddPointArgs{numel(optAddPointArgs)+1} = 'speedOfContinuation';
+                optAddPointArgs{numel(optAddPointArgs)+1} = speedOfContinuation;
+            end
+            rmvJacobian = [rmvJacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+1)),xRmv,'centralValue',funRmv,'derivativeDimensions',oih.info.nv+1,'diffquot',oih.opt.diffquot)];
+            oih.path.addPointAtEnd(varRmv,lRmv,rmvJacobian,oih,optAddPointArgs{:});
             oih.do.stepback = false;
             oih.do.suspend = false;
             oih.do.remove = true;

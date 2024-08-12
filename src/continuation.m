@@ -227,7 +227,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                 aux.printLine(oih,'---> deflation: catch!\n');
                 if oih.opt.pauseOnError
                     aux.printLine(oih,['----> ',exceptionDeflation.message]);
-                    input('Press [ENTER] to continue...');
+                    input('Pause on error. Press [ENTER] to continue...');
                 end
                 oih.counter.catch = oih.counter.catch + 1;
             end
@@ -265,7 +265,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             aux.printLine(oih,'---> predictor: catch!\n');
             if oih.opt.pauseOnError
                 aux.printLine(oih,['----> ',exceptionPredictor.message]);
-                input('Press [ENTER] to continue...');
+                input('Pause on error. Press [ENTER] to continue...');
             end
             oih.counter.catch = oih.counter.catch + 1;
         end
@@ -321,7 +321,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             aux.printLine(oih,'---> solve: catch!\n');
             if oih.opt.pauseOnError
                 aux.printLine(oih,['----> ',exceptionSolve.message]);
-                input('Press [ENTER] to continue...');
+                input('Pause on error. Press [ENTER] to continue...');
             end
             oih.counter.catch = oih.counter.catch + 1;
         end
@@ -411,7 +411,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                 aux.printLine(oih,'--> The plot update has failed.\n');
                 if oih.opt.pauseOnError
                     aux.printLine(oih,['----> ',exceptionPlot.message]);
-                    input('Press [ENTER] to continue...');
+                    input('Pause on error. Press [ENTER] to continue...');
                 end
             end
         end
@@ -434,7 +434,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             aux.printLine(oih,'--> Failed to trace bifurcations.\n');
             if oih.opt.pauseOnError
                 aux.printLine(oih,['---> ',exceptionBifurcationTrace.message]);
-                input('Press [ENTER] to continue...');
+                input('Pause on error. Press [ENTER] to continue...');
             end
         end
     elseif oih.opt.bifurcation.parameterTrace
@@ -445,7 +445,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             aux.printLine(oih,'--> Failed to trace bifurcation parameter.\n');
             if oih.opt.pauseOnError
                 aux.printLine(oih,['---> ',exceptionBifurcationParameterTrace.message]);
-                input('Press [ENTER] to continue...');
+                input('Pause on error. Press [ENTER] to continue...');
             end
         end
     end
@@ -469,7 +469,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             aux.printLine(oih,'--> The plot update has failed.\n');
             if oih.opt.pauseOnError
                 aux.printLine(oih,['---> ',exceptionPlotFinal.message]);
-                input('Press [ENTER] to continue...');
+                input('Pause on error. Press [ENTER] to continue...');
             end
         end
         drawnow;

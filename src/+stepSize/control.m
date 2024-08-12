@@ -230,7 +230,7 @@ function [dsn,event] = control(ds,oih,event)
             dsn = oih.info.ds0;
         else
             xe = [oih.path.varAll(:,end);oih.path.lAll(end)];
-            dsn = norm([oih.path.plusStruct.var;oih.path.plusStruct.l]-xe)/2;
+            dsn = norm(oih.path.xPlus-xe)/2;
         end
     end
 end

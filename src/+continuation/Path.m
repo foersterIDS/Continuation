@@ -40,6 +40,7 @@ classdef Path < handle
         nAll                    % number of points on path
         sAll                    % arc length
         xAll                    % variables and parameters
+        xPlus                   % variables and parameters of next point in stepback
     end
 
     %% public methods
@@ -57,7 +58,7 @@ classdef Path < handle
             obj.nL = nL;
             obj.oih = oih;
             if obj.oih.opt.jacobianOut.basic
-                obj.JAll = cell(1,3); % initial, last, previous
+                obj.JAll = {[],[],[]}; % initial, last, previous
             elseif obj.oih.opt.jacobianOut.full
                 obj.JAll = {};
             else
@@ -115,6 +116,10 @@ classdef Path < handle
 
         function xAll = get.xAll(obj)
             xAll = [obj.varAll;obj.lAll];
+        end
+
+        function xPlus = get.xPlus(obj)
+            xPlus = [obj.plusStruct.var;obj.plusStruct.l];
         end
 
         %% setter
@@ -240,13 +245,42 @@ classdef Path < handle
             obj.addPoint(var,l,J,oih,pos,nva{:});
         end
 
-        function objCopy = copy(obj)
-            objCopy = eval(class(obj));
-            for prop=properties(obj).'
+        function detJv = detJv(obj,NameValueArgs)
+            arguments
+                obj (1,1) continuation.Path
+                NameValueArgs.index (1,1) double {mustBeInteger}
+                NameValueArgs.name (1,:) char {mustBeMember(NameValueArgs.name,{'last','previous','initial','plus'})} = 'last'
+            end
+            if isfield(NameValueArgs,'index')
+                Jv = obj.JAll{index}(1:obj.nVar,1:obj.nVar);
+            else
+                switch NameValueArgs.name
+                    case 'last'
+                        Jv = obj.JAll{end}(1:obj.nVar,1:obj.nVar);
+                    case 'previous'
+                        if obj.nAll>1
+                            Jv = obj.JAll{end-1}(1:obj.nVar,1:obj.nVar);
+                        else
+                            Jv = obj.JAll{end}(1:obj.nVar,1:obj.nVar);
+                        end
+                    case 'initial'
+                        Jv = obj.JAll{1}(1:obj.nVar,1:obj.nVar);
+                    case 'plus'
+                        Jv = obj.plusStruct.J(1:obj.nVar,1:obj.nVar);
+                end
+            end
+            detJv = det(Jv);
+        end
+
+        function pathOut = copy(obj)
+            pathOut = continuation.Path(obj.nVar,obj.nL,obj.oih);
+            props = properties(obj);
+            for ii=1:numel(props)
+                prop = props{ii};
                 try
-                    objCopy.(prop) = obj.(prop);
+                    pathOut.(prop) = obj.(prop);
                 catch
-                    warning('failed to copy property: %s', prop);
+                    % dependend or private set
                 end
             end
         end
@@ -261,34 +295,42 @@ classdef Path < handle
             end
             %% get jacobian
             if obj.oih.opt.jacobianOut.basic
-                switch jacName
-                    case 'initial'
-                        J = obj.JAll{1};
-                    case 'last'
-                        J = obj.JAll{2};
-                    case 'plus'
-                        J = obj.plusStruct.J;
-                    case 'previous'
-                        if obj.nAll==1
+                if numel(obj.JAll)==3
+                    switch jacName
+                        case 'initial'
+                            J = obj.JAll{1};
+                        case 'last'
                             J = obj.JAll{2};
-                        else
-                            J = obj.JAll{3};
-                        end
+                        case 'plus'
+                            J = obj.plusStruct.J;
+                        case 'previous'
+                            if obj.nAll==1
+                                J = obj.JAll{2};
+                            else
+                                J = obj.JAll{3};
+                            end
+                    end
+                else
+                    J = [];
                 end
             elseif obj.oih.opt.jacobianOut.full
-                switch jacName
-                    case 'initial'
-                        J = obj.JAll{1};
-                    case 'last'
-                        J = obj.JAll{end};
-                    case 'plus'
-                        J = obj.plusStruct.J;
-                    case 'previous'
-                        if obj.nAll==1
+                if obj.nAll>0
+                    switch jacName
+                        case 'initial'
+                            J = obj.JAll{1};
+                        case 'last'
                             J = obj.JAll{end};
-                        else
-                            J = obj.JAll{end-1};
-                        end
+                        case 'plus'
+                            J = obj.plusStruct.J;
+                        case 'previous'
+                            if obj.nAll==1
+                                J = obj.JAll{end};
+                            else
+                                J = obj.JAll{end-1};
+                            end
+                    end
+                else
+                    J = [];
                 end
             else
                 error('jacobianOut must be full or basic!');
@@ -314,7 +356,7 @@ classdef Path < handle
 
         function overwrite(obj,varAll,lAll,bifAll,doClearPath)
             arguments
-                obj (1,1) xontinuation.Path
+                obj (1,1) continuation.Path
                 varAll (:,:) double
                 lAll (:,:) double
                 bifAll (:,:) double

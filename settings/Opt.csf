@@ -24,7 +24,7 @@ dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#
 dpaGammaVar<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
 dpaResidual<>function_handle<>@(v,l,g)1<>#scalar#nargin:3
 dsMax<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
-dsMin<>double<>10^-9<>#scalar#double#positive#smaller:norm(Opt.dsMax)
+dsMin<>double<>10^-9<>#scalar#double#positive#smaller:norm(opt.dsMax)
 dsTol<>eval<>[0.5,1.5]<>#array#positive#double#increasing#size:[1,2]
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscaleMin<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
@@ -33,7 +33,7 @@ eventUserInput<>cell<>{}<>#cell
 g0<>eval<>lStart<>#scalar#double
 gTarget<>eval<>lEnd<>#scalar#double
 homotopy<>struct<>OptHomotopy<>#struct
-homotopyErrorCounter<>double<>2<>#scalar#integer#positive#nonzero#neq:Opt.deflationErrorCounter
+homotopyErrorCounter<>double<>2<>#scalar#integer#positive#nonzero#neq:opt.deflationErrorCounter
 includeReverse<>eval<>false<>#scalar#logical
 initialDeflationPoints<>eval<>[]<>#double
 jacobian<>eval<>false<>#scalar#logical
@@ -62,7 +62,7 @@ predictorPolynomialAdaptive<>eval<>false<>#scalar#logical
 predictorPolynomialFit<>double<>0<>#scalar#integer#positive
 predictorPolynomialDegree<>double<>1<>#scalar#integer#positive#nonzero
 predictorSolver<>eval<>false<>#scalar#logical
-removeErrorCounter<>double<>6<>#scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter#neq:Opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
+removeErrorCounter<>double<>6<>#scalar#integer#positive#nonzero#larger:opt.stepbackErrorCounter+1#neq:opt.homotopyErrorCounter#neq:opt.deflationErrorCounter#neq:opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
 reverse<>struct<>OptReverse<>#struct
 scaling<>struct<>OptScaling<>#struct
 solver<>struct<>OptSolver<>#struct#ison:solver
@@ -70,7 +70,7 @@ solverForce1it<>eval<>false<>#scalar#logical
 solverMaxIterations<>double<>50<>#scalar#integer#positive#nonzero
 solverTol<>double<>10^-10<>#scalar#double#positive#nonzero
 speedOfContinuation<>double<>10<>#scalar#double#positive#nonzero
-stepbackErrorCounter<>double<>3<>#scalar#integer#positive#nonzero#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+stepbackErrorCounter<>double<>3<>#scalar#integer#positive#nonzero#neq:opt.homotopyErrorCounter#neq:opt.deflationErrorCounter
 stepSizeAngle<>eval<>(2/360)*(2*pi)<>#scalar#double#positive
 stepSizeControl<>struct<>OptStepSizeControl<>#struct#ison:stepSizeControl
 stepSizeErrorMax<>double<>0.6<>#scalar#double#positive#nonzero
@@ -82,7 +82,7 @@ stepSizePidParams<>eval<>[0.075,0.175,0.01]<>#array#positive#nonzero#double#size
 stepSizePidTol<>double<>0.05<>#scalar#double#positive
 stopOnBifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
 stopOnCrossing<>eval<>false<>#scalar#logical#ison:bifurcation
-suspendContinuationErrorCounter<>double<>10<>#scalar#integer#positive#nonzero#larger:Opt.stepbackErrorCounter+1#neq:Opt.homotopyErrorCounter#neq:Opt.deflationErrorCounter
+suspendContinuationErrorCounter<>double<>10<>#scalar#integer#positive#nonzero#larger:opt.stepbackErrorCounter+1#neq:opt.homotopyErrorCounter#neq:opt.deflationErrorCounter
 targetTol<>double<>0<>#scalar#double#positive
 timeLimit<>double<>inf<>#scalar#positive#nonzero
 weightsAngleCustom<>eval<>[0.5,0.7]<>#array#positive#double#size:[1,2]

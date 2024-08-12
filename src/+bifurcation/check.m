@@ -33,7 +33,7 @@ function check(func,oih,resCorr)
         %% determine bifurcation-points:
         jacStateTemp = oih.opt.jacobian;
         oih.opt.jacobian = false;
-        [bifSolver,defaultBifSolverOutput] = continuation.solver(OptBif,0);
+        [bifSolver,defaultBifSolverOutput] = continuation.solver(oih,0);
         oih.opt.jacobian = jacStateTemp;
         detSolverJacobianRed = det(lastJacobianRed);
         oih.bifurcation.scaling = [oih.bifurcation.scaling,1/detSolverJacobianRed];
@@ -85,20 +85,32 @@ function check(func,oih,resCorr)
                 dscale = aux.getDscale(oih);
                 [xBif,funBif,bifSolverExitflag,bifSolverOutput,bifSolverJacobian] = bifSolver(residualBif,[varBifPredictor;lBifPredictor],dscale);
                 if bifSolverExitflag>0
-                    oih.path.sAll = [oih.path.sAll(1:end-1),oih.path.sAll(end-1)+[norm(xBif-[oih.path.varAll(:,end-1);oih.path.lAll(end-1)]),norm(xBif-[oih.path.varAll(:,end-1);oih.path.lAll(end-1)])+norm([oih.path.varAll(:,end);oih.path.lAll(end)]-xBif)]];
-                    oih.path.varAll = [oih.path.varAll(:,1:end-1),xBif(1:end-1),oih.path.varAll(:,end)];
-                    oih.path.lAll = [oih.path.lAll(1:end-1),xBif(end),oih.path.lAll(end)];
+                    optAddPointArgs = {};
                     if oih.optIsSet.bifAdditionalTestfunction
-                        oih.path.bifTestValue = [oih.path.bifTestValue oih.opt.bifAdditionalTestfunction(func,xBif,oih.jacobian,oih.path,oih.info)];
+                        optAddPointArgs{numel(optAddPointArgs)+1} = 'bifTestValue';
+                        optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.bifAdditionalTestfunction(func,xBif,bifSolverJacobian,oih.path,oih.info);
                     end
+                    if oih.optIsSet.pathInfoFunction
+                        optAddPointArgs{numel(optAddPointArgs)+1} = 'pathInfoValue';
+                        optAddPointArgs{numel(optAddPointArgs)+1} = oih.opt.pathInfoFunction(func,bifSolverJacobian,xBif(1:(end-1)),xBif(end));
+                    end
+                    if oih.stepsizeOptions.predictor
+                        optAddPointArgs{numel(optAddPointArgs)+1} = 'predictor';
+                        optAddPointArgs{numel(optAddPointArgs)+1} = [varBifPredictor;lBifPredictor];
+                    end
+                    if oih.stepsizeOptions.speedOfContinuation
+                        optAddPointArgs{numel(optAddPointArgs)+1} = 'speedOfContinuation';
+                        optAddPointArgs{numel(optAddPointArgs)+1} = 1;
+                    end
+                    oih.path.addPoint(xBif(1:end-1),xBif(end),bifSolverJacobian,oih,oih.path.nAll,optAddPointArgs{:});
                     % 
                     % get type of bifurcation
-                    bifType = (sign(det(oih.path.getJacobianByName('previous')))==sign(det(oih.path.getJacobianByName('last')))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+                    bifType = (sign(oih.path.detJv('name','previous'))==sign(oih.path.detJv('name','last'))); % 1: fold bif.; 0: branch point bif; NaN: unknown
                     %
                     % if bifType = 0 (branch point) calculate directions
                     % of paths by null() and save to oih.bifurcation.dirs cell array
                     if bifType == 0
-                        nv = numel(oih.path.varAll(:,1));
+                        nv = oih.path.nVar;
                         solverJacobianRed = bifSolverJacobian(1:nv,1:nv);
                         solverJacobianLam = bifSolverJacobian(1:nv,nv+1);
                         jacRedJacLam = [solverJacobianRed, solverJacobianLam];

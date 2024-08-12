@@ -136,7 +136,7 @@ for i=1:2
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: lTarget: (lEnd-lStart)/3+lStart ###\n',i),probinfo,probcounter);
     %% lTarget:
     fprintf('\n### %d: alphaReverse: pi/4 ###\n',i);
-    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','alphaReverse',pi/4);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','alphaReverse',pi/4,'alphaReverseAutoMode','off');
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: alphaReverse: pi/4 ###\n',i),probinfo,probcounter);
     %% plot:
     fprintf('\n### %d: plot: on ###\n',i);

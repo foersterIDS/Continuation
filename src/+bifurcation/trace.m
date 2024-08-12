@@ -6,7 +6,7 @@
 %   02.07.2021 - Tido Kubatschek
 %
 function trace(oih,func,resCorr)
-    bifTrace = oih.bifrucation.bif(:,oih.bifrucation.bif(2,:) == 0);
+    bifTrace = oih.bifurcation.bif(:,oih.bifurcation.bif(2,:) == 0);
     nbif = numel(bifTrace(1,:));
     oihSphere = oih.copy();
     oihSphere.opt = aux.seton(oihSphere.opt,'corrector','sphere');
@@ -33,7 +33,7 @@ function trace(oih,func,resCorr)
             end
             [varBifPredictor,lBifPredictor] = continuation.predictor(oihSphere,dsBif,[],func,resCorr);
             xBifPredictor = [varBifPredictor;lBifPredictor];
-            dscale = aux.getDscale(oih,struct('varAll',varBifPredictor,'lAll',lBifPredictor));
+            dscale = aux.getDscale(oih,xBifPredictor);
             [xBifIj,~,solverBifExitflag] = oih.solver.main(residualBifSphere,xBifPredictor,dscale);
             if solverBifExitflag>0
                 xdirsOld = [xdirsOld,xBifIj-x0];
@@ -48,7 +48,7 @@ function trace(oih,func,resCorr)
                     dxBifPredictor = randn(numel(x0),1);
                     for ki = 1:2
                         xBifPredictor = x0+(-1)^ki*dsBif*dxBifPredictor/norm(dxBifPredictor);
-                        dscale = aux.getDscale(oih,struct('varAll',xBifPredictor(1:end-1,:),'lAll',xBifPredictor(end,:)));
+                        dscale = aux.getDscale(oih,xBifPredictor);
                         [xBifIj,~,solverBifExitflag] = oih.solver.main(residualBifSphere,xBifPredictor,dscale);
                         if solverBifExitflag>0 && norm(xBifIj-x0)>=dsBif*0.99 && norm(xBifIj-x0)<=dsBif*1.01
                             xdirsTrace = [xdirsTrace,xBifIj-x0];
@@ -58,13 +58,13 @@ function trace(oih,func,resCorr)
                 end
             end
             %% use tangent vectors - experimental!
-            for j=1:(numel(oih.bifrucation.dirs)/2)
-                [bifNum, bifDir] = oih.bifrucation.dirs{j,:};
+            for j=1:(numel(oih.bifurcation.dirs)/2)
+                [bifNum, bifDir] = oih.bifurcation.dirs{j,:};
                 if bifNum == indBif
                     if ~isempty(bifDir)
                         for ki = 1:2
                             xBifPredictor = x0+(-1)^ki*dsBif*bifDir/norm(bifDir);
-                            dscale = aux.getDscale(oih,struct('varAll',xBifPredictor(1:end-1,:),'lAll',xBifPredictor(end,:)));
+                            dscale = aux.getDscale(oih,xBifPredictor);
                             [xBifIj,~,solverBifExitflag] = oih.solver.main(residualBifSphere,xBifPredictor,dscale);
                             if solverBifExitflag>0 && norm(xBifIj-x0)>=dsBif*0.99 && norm(xBifIj-x0)<=dsBif*1.01
                                 xdirsTrace = [xdirsTrace,xBifIj-x0];
@@ -87,7 +87,7 @@ function trace(oih,func,resCorr)
                 if exitflagJ>=0
                     varAllTemp = [oih.path.varAll,NaN(numel(x0)-1,1),varJ];
                     lAllTemp = [oih.path.lAll,NaN,lJ];
-                    bifTemp = [oih.bifrucation.bif,bifStructJ.bif];
+                    bifTemp = [oih.bifurcation.bif,bifStructJ.bif];
                     oih.path.overwrite(varAllTemp,lAllTemp,bifTemp,true);
                 end
             end

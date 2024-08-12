@@ -8,7 +8,7 @@
 function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %% determine purpose
     %
-    Purpose = struct('continuation',false,...
+    purpose = struct('continuation',false,...
                      'homotopy',false,...
                      'parameterTracing',false);
     switch nargin
@@ -16,17 +16,17 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
             if abs(nargin(fun))==2
                 %% continuation
                 % input: vararginCell,fun,var0,lStart,lEnd,ds0
-                Purpose.continuation = true;
+                purpose.continuation = true;
             elseif abs(nargin(fun))==3
                 %% parameter tracing
                 % input: vararginCell,fun,var0,lStart,lEnd,ds0
                 % fun = @(v,l,g) ...
-                Purpose.parameterTracing = true;
+                purpose.parameterTracing = true;
             end
         case 3
             %% homotopy
             % input: vararginCell,fun,var0
-            Purpose.homotopy = true;
+            purpose.homotopy = true;
             lStart = 0;
             lEnd = 1;
             ds0 = 0.1;
@@ -36,7 +36,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %
     %% check mandatory input:
     %
-    if Purpose.continuation
+    if purpose.continuation
         if isempty(var0)
             error('var0 must not be empty!');
         end
@@ -55,7 +55,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %   Sub-structs may only contain true or false values.
     %   Wheter a true value exists can be checked via 'aux.ison(OptSubStruct)'.
     %   If a sub-struct contains multiple true values the first one is valid.
-    [opt,OptInfo,evalCell] = aux.csf2struct('Opt');
+    [opt,optInfo,evalCell] = aux.csf2struct('Opt');
     for ii=1:numel(evalCell)
         opt.(evalCell{ii}) = eval(opt.(evalCell{ii}));
     end
@@ -238,7 +238,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %
     %% read fun:
     %
-    if Purpose.continuation
+    if purpose.continuation
         % out:
         if ~(optIsSet.jacobian && ~opt.jacobian)
             try
@@ -254,7 +254,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         else
             func = @(v,l) fun(v,l);
         end
-    elseif Purpose.parameterTracing
+    elseif purpose.parameterTracing
         % out:
         if ~(optIsSet.jacobian && ~opt.jacobian)
             try
@@ -274,7 +274,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         if ~(opt.bifurcation.parameterTrace || opt.dpa)
             error('fun = @(v,l,g) ... can only be used for DPA.');
         end
-    elseif Purpose.homotopy
+    elseif purpose.homotopy
         % out:
         if ~(optIsSet.jacobian && ~opt.jacobian)
             try
@@ -295,7 +295,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %% check Opt:
     %
 	errmsg = '';
-    [errmsg,opt,optIsSet] = continuation.checkOpt(errmsg,var0,vararginCell,opt,OptInfo,OptFieldnames,optIsSet,OptStructInfo,OptStructFieldnames);
+    [errmsg,opt,optIsSet] = continuation.checkOpt(errmsg,var0,vararginCell,opt,optInfo,OptFieldnames,optIsSet,OptStructInfo,OptStructFieldnames);
     if ~isempty(errmsg)
         errmsg = errmsg(2:end);
         error(errmsg);
