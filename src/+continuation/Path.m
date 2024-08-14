@@ -29,6 +29,7 @@ classdef Path < handle
     end
 
     properties (Access = private)
+        JFullTemp               % full jacobian of last evaluation
         oih                     % OptInfoHandle object
         plusStruct = struct('bifTestValue',[],'iterations',[],'J',[],...
                             'pathInfoValue',[],'rateOfContraction',[],...
@@ -100,7 +101,11 @@ classdef Path < handle
                     if obj.nL==1
                         lAll = obj.lAll;
                     else
-                        lAll = cumsum([0,sqrt(sum(diff(obj.lAll,1,2).^2,1))]);
+                        if isempty(obj.lAll)
+                            lAll = zeros(obj.nL,0);
+                        else
+                            lAll = cumsum([0,sqrt(sum(diff(obj.lAll,1,2).^2,1))]);
+                        end
                     end
                 case 'full'
                     lAll = obj.lAll;
@@ -140,7 +145,7 @@ classdef Path < handle
             arguments
                 obj (1,1) continuation.Path
                 var (:,1) double
-                l (1,1) double
+                l (:,1) double
                 J (:,:) double
                 oih (1,1) aux.OptInfoHandle
                 pos (1,1) double {mustBeInteger,mustBeGreaterThan(pos,0)} = obj.nAll+1
@@ -150,7 +155,7 @@ classdef Path < handle
                 NameValueArgs.speedOfContinuation (1,1) double
             end
             validateattributes(var,{'numeric'},{'size',[obj.nVar,1]});
-            validateattributes(l,{'numeric'},{'size',[obj.nL,1]});
+%             validateattributes(l,{'numeric'},{'size',[obj.nL,1]});
             obj.checkInputOptions(NameValueArgs);
             %% transform parameters
             if obj.nL>1
@@ -176,11 +181,13 @@ classdef Path < handle
                         dlSV = lSVAdd-lSVEnd;
                         l = lLast+dlSV*obj.lDir(:,end);
                         %% calc. full J
-% #########################################################################
-% #########################################################################
-% todo: transformation of J??? ############################################
-% #########################################################################
-% #########################################################################
+                        if size(J,2)<obj.nVar+obj.nL
+                            Jred = J;
+                            J = obj.JFullTemp;
+                            if isempty(J) || ~all(all(Jred(1:obj.nVar,1:obj.nVar)==J(1:obj.nVar,1:obj.nVar)))
+                                error('No current jacobian found.')
+                            end
+                        end
                     else
                         error('Number of parameter input(!) must be 1.');
                     end
@@ -188,7 +195,9 @@ classdef Path < handle
             end
             %% add/insert
             obj.varAll = [obj.varAll(:,1:(pos-1)),var,obj.varAll(:,pos:end)];
+            obj.outputFormat = 'full';
             obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
+            obj.resetOutput();
             if obj.nL>1
                 lDirTemp = obj.oih.opt.lDirFunction(var,l,J);
                 lDirTemp = lDirTemp/norm(lDirTemp);
@@ -268,6 +277,36 @@ classdef Path < handle
                 end
             end
             detJv = det(Jv);
+        end
+
+        function [varargout] = fOfvarAndlSingleIO(obj,fun,v,l)
+            if obj.nL==1
+                %% nL = 1
+                if obj.oih.opt.jacobian
+                    [varargout{1},varargout{2}] = fun(v,l);
+                else
+                    varargout{1} = fun(v,l);
+                end
+            else
+                %% nL > 1
+                % l to lFull
+                obj.outputFormat = 'full';
+                lLast = obj.lAll(:,end);
+                obj.resetOutput();
+                lSVAdd = l;
+                lSVEnd = obj.lAll(:,end);
+                dlSV = lSVAdd-lSVEnd;
+                l = lLast+dlSV*obj.lDir(:,end);
+                % eval fun
+                if obj.oih.opt.jacobian
+                    [varargout{1},JFull] = fun(v,l);
+                    obj.JFullTemp = JFull;
+                    % JFull to J
+                    varargout{2} = [JFull(:,1:obj.nVar),JFull(:,obj.nVar+(1:obj.nL))*obj.lDir(:,end)];
+                else
+                    varargout{1} = fun(v,l);
+                end
+            end
         end
 
         function pathOut = copy(obj)

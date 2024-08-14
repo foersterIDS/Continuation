@@ -9,8 +9,10 @@ function [breakFunOut,ds] = exitLoop(oih, ds, funSolution, breakFunOut)
     %% eval. break function:
     %
     try
-        if oih.is.valid
+        if oih.is.valid && oih.optIsSet.breakFunction
+            oih.path.outputFormat = 'full';
             [bfun,breakFunOut] = oih.opt.breakFunction(funSolution,oih.solver.jacobian,oih.path.varAll,oih.path.lAll,breakFunOut);
+            oih.path.resetOutput();
         else
             bfun = false;
         end

@@ -35,7 +35,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     arguments
         fun (1,1) function_handle
         var0 (:,1) double
-        lStart (:,1) double
+        lStart (1,1) double
         lEnd (1,1) double
         ds0 (1,1) double {mustBeGreaterThan(ds0,0)}
         NameValueArgs.Opt (1,1) struct
@@ -163,7 +163,11 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     %
     %% find initial solution
     %
-    residualInitial = @(v) aux.residualFixedValue(func,v,oih.opt.l0,oih);
+    if oih.optIsSet.lMult0
+        residualInitial = @(v) aux.residualFixedValue(func,v,oih.opt.lMult0,oih);
+    else
+        residualInitial = @(v) aux.residualFixedValue(func,v,oih.opt.l0,oih);
+    end
     [varInitial,funInitial,initialExitflag,oih.solver.output,jacobianInitial] = oih.solver.main(residualInitial,oih.info.var0,oih.opt.dscale0(1:end-1));
     oih.solver.jacobian = jacobianInitial;
     aux.checkJacobian(residualInitial,funInitial,varInitial,oih);
@@ -173,8 +177,17 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         oih.do.continuation = true;
         oih.do.loop = true;
         dpaPoints = [];
-        oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+1)),[varInitial;oih.info.lStart],'centralValue',funInitial,'derivativeDimensions',oih.info.nv+1,'diffquot',oih.opt.diffquot)];
-        [~,breakFunOut] = oih.opt.breakFunction(funInitial,oih.solver.jacobian,varInitial,oih.info.lStart,breakFunOut);
+        if oih.optIsSet.lMult0
+            lInitial = oih.opt.lMult0;
+        else
+            lInitial = oih.info.lStart;
+        end
+        xInitial = [varInitial;lInitial];
+        oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xInitial,'centralValue',funInitial,'derivativeDimensions',oih.info.nv+(1:oih.info.nl),'diffquot',oih.opt.diffquot)];
+        if oih.optIsSet.lMult0
+            func = @(v,l) oih.path.fOfvarAndlSingleIO(func,v,l);
+        end
+        [~,breakFunOut] = oih.opt.breakFunction(funInitial,oih.solver.jacobian,varInitial,lInitial,breakFunOut);
         aux.printLine(oih,'Initial solution at %s = %.2e\n',paraName,oih.opt.l0);
         if oih.stepsizeOptions.rateOfContraction
             if size(solverStepsizes, 1) < 3
@@ -197,7 +210,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         if oih.stepsizeOptions.speedOfContinuation
             optArgsAddPoint = [optArgsAddPoint,'speedOfContinuation',oih.opt.speedOfContinuation];
         end
-        oih.path.addPointAtEnd(varInitial,oih.opt.l0,oih.solver.jacobian,oih,optArgsAddPoint{:});
+        oih.path.addPointAtEnd(varInitial,lInitial,oih.solver.jacobian,oih,optArgsAddPoint{:});
         %% init. plot
         if aux.ison(oih.opt.plot)
             plot.livePlot(oih, oih.info.ds0, oih.info.ds0, oih.solver.output.iterations(end));
@@ -485,6 +498,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     %
     oih.infoOut.numberOfSteps = oih.counter.step;
     oih.infoOut.numberOfInvalidPoints = oih.counter.loop - oih.counter.step;
+    oih.path.outputFormat = 'full';
     if oih.optIsSet.pathInfoFunction
         oih.infoOut.pathInfoValue = oih.path.pathInfoValue;
     end

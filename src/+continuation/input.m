@@ -248,9 +248,16 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
         % out:
         if ~(optIsSet.jacobian && ~opt.jacobian)
             try
-                [R,J] = fun(var0,lStart);
+                if optIsSet.lMult0
+                    [R,J] = fun(var0,opt.lMult0);
+                else
+                    [R,J] = fun(var0,lStart);
+                end
                 opt.jacobian = true;
             catch
+                if optIsSet.lMult0
+                    error('A Jacobian must be provided if multiple parameters are tracked.');
+                end
                 opt.jacobian = false;
             end
         end
