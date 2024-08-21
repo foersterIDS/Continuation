@@ -179,7 +179,7 @@ classdef Path < handle
                         lSVAdd = l;
                         lSVEnd = obj.lAll(:,end);
                         dlSV = lSVAdd-lSVEnd;
-                        l = lLast+dlSV*obj.lDir(:,end);
+                        l = lLast+dlSV*lDirLast;
                         %% calc. full J
                         if size(J,2)<obj.nVar+obj.nL
                             Jred = J;
@@ -199,7 +199,12 @@ classdef Path < handle
             obj.lAll = [obj.lAll(:,1:(pos-1)),l,obj.lAll(:,pos:end)];
             obj.resetOutput();
             if obj.nL>1
-                lDirTemp = obj.oih.opt.lDirFunction(var,l,J);
+                if obj.nAll>1
+                    ds = norm(diff(obj.xAll(:,end+[-1,0]),1,2));
+                else
+                    ds = obj.oih.info.ds0;
+                end
+                lDirTemp = obj.oih.opt.lDirFunction(var,l,J,ds);
                 lDirTemp = lDirTemp/norm(lDirTemp);
                 obj.lDir = [obj.lDir(:,1:(pos-1)),lDirTemp,obj.lDir(:,pos:end)];
             end
@@ -533,111 +538,114 @@ classdef Path < handle
             end
             %% check nL
             if obj.nL>1
-                error('Stepback must not be called if nL>1.');
-            end
-            %% toggle plus
-            if obj.stepBackStatus
-                %% add plus
-                obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
-                if obj.oih.opt.jacobianOut.basic
-                    obj.JAll{3} = obj.JAll{2};
-                    obj.JAll{2} = obj.plusStruct.J;
-                elseif obj.oih.opt.jacobianOut.full
-                    obj.JAll{end+1} = obj.plusStruct.J;
-                else
-                    error('jacobianOut must be full or basic!');
-                end
-                obj.lAll = [obj.lAll,obj.plusStruct.l];
-                obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
-                obj.signDetJRedAll = [obj.signDetJRedAll,obj.plusStruct.signDetJRed];
-                obj.varAll = [obj.varAll,obj.plusStruct.var];
-                if obj.oih.optIsSet.bifAdditionalTestfunction
-                    obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
-                end
-                if obj.oih.stepsizeOptions.iterations
-                    obj.iterations = [obj.iterations,obj.plusStruct.iterations];
-                end
-                if obj.oih.optIsSet.pathInfoFunction
-                    obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
-                end
-                if obj.oih.stepsizeOptions.predictor
-                    obj.xPredictorAll = [obj.xPredictorAll,obj.plusStruct.xPredictor];
-                end
-                if obj.oih.stepsizeOptions.rateOfContraction
-                    obj.rateOfContraction = [obj.rateOfContraction,obj.plusStruct.rateOfContraction];
-                end
-                if obj.oih.stepsizeOptions.speedOfContinuation
-                    obj.speedOfContinuation = [obj.speedOfContinuation,obj.plusStruct.speedOfContinuation];
-                end
-                %% clear plus struct
-                obj.clearPlusStruct();
-                %% toggle plus
                 obj.stepBackStatus = false;
+                obj.oih.do.stepback = false;
+                aux.printLine(obj.oih,'------> Stepback must not be called if nL>1.');
             else
-                if obj.nAll<2
-                    error("Path must have at least two entries to use 'plus'.");
-                end
-                %% fill plus
-                if obj.oih.opt.jacobianOut.basic
-                    obj.plusStruct.J = obj.JAll{2};
-                elseif obj.oih.opt.jacobianOut.full
-                    obj.plusStruct.J = obj.JAll{end};
-                else
-                    error('jacobianOut must be full or basic!');
-                end
-                obj.plusStruct.l = obj.lAll(:,end);
-                obj.plusStruct.signDetJRed = obj.signDetJRedAll(:,end);
-                obj.plusStruct.var = obj.varAll(:,end);
-                if obj.oih.optIsSet.bifAdditionalTestfunction
-                    obj.plusStruct.bifTestValue = obj.bifTestValue(:,end);
-                end
-                if obj.oih.stepsizeOptions.iterations
-                    obj.plusStruct.iterations = obj.iterations(:,end);
-                end
-                if obj.oih.optIsSet.pathInfoFunction
-                    obj.plusStruct.pathInfoValue = obj.pathInfoValue(:,end);
-                end
-                if obj.oih.stepsizeOptions.predictor
-                    obj.plusStruct.xPredictor = obj.xPredictorAll(:,end);
-                end
-                if obj.oih.stepsizeOptions.rateOfContraction
-                    obj.plusStruct.rateOfContraction = obj.rateOfContraction(:,end);
-                end
-                if obj.oih.stepsizeOptions.speedOfContinuation
-                    obj.plusStruct.speedOfContinuation = obj.speedOfContinuation(:,end);
-                end
-                %% cut all
-                if obj.oih.opt.jacobianOut.basic
-                    obj.JAll{2} = obj.JAll{3};
-                    obj.JAll{3} = [];
-                elseif obj.oih.opt.jacobianOut.full
-                    obj.JAll = obj.JAll(1:(end-1));
-                else
-                    error('jacobianOut must be full or basic!');
-                end
-                obj.lAll = obj.lAll(:,1:(end-1));
-                obj.signDetJRedAll = obj.signDetJRedAll(:,1:(end-1));
-                obj.varAll = obj.varAll(:,1:(end-1));
-                if obj.oih.optIsSet.bifAdditionalTestfunction
-                    obj.bifTestValue = obj.bifTestValue(:,1:(end-1));
-                end
-                if obj.oih.stepsizeOptions.iterations
-                    obj.iterations = obj.iterations(:,1:(end-1));
-                end
-                if obj.oih.optIsSet.pathInfoFunction
-                    obj.pathInfoValue = obj.pathInfoValue(:,1:(end-1));
-                end
-                if obj.oih.stepsizeOptions.predictor
-                    obj.xPredictorAll = obj.xPredictorAll(:,1:(end-1));
-                end
-                if obj.oih.stepsizeOptions.rateOfContraction
-                    obj.rateOfContraction = obj.rateOfContraction(:,1:(end-1));
-                end
-                if obj.oih.stepsizeOptions.speedOfContinuation
-                    obj.speedOfContinuation = obj.speedOfContinuation(:,1:(end-1));
-                end
                 %% toggle plus
-                obj.stepBackStatus = true;
+                if obj.stepBackStatus
+                    %% add plus
+                    obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
+                    if obj.oih.opt.jacobianOut.basic
+                        obj.JAll{3} = obj.JAll{2};
+                        obj.JAll{2} = obj.plusStruct.J;
+                    elseif obj.oih.opt.jacobianOut.full
+                        obj.JAll{end+1} = obj.plusStruct.J;
+                    else
+                        error('jacobianOut must be full or basic!');
+                    end
+                    obj.lAll = [obj.lAll,obj.plusStruct.l];
+                    obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
+                    obj.signDetJRedAll = [obj.signDetJRedAll,obj.plusStruct.signDetJRed];
+                    obj.varAll = [obj.varAll,obj.plusStruct.var];
+                    if obj.oih.optIsSet.bifAdditionalTestfunction
+                        obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
+                    end
+                    if obj.oih.stepsizeOptions.iterations
+                        obj.iterations = [obj.iterations,obj.plusStruct.iterations];
+                    end
+                    if obj.oih.optIsSet.pathInfoFunction
+                        obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
+                    end
+                    if obj.oih.stepsizeOptions.predictor
+                        obj.xPredictorAll = [obj.xPredictorAll,obj.plusStruct.xPredictor];
+                    end
+                    if obj.oih.stepsizeOptions.rateOfContraction
+                        obj.rateOfContraction = [obj.rateOfContraction,obj.plusStruct.rateOfContraction];
+                    end
+                    if obj.oih.stepsizeOptions.speedOfContinuation
+                        obj.speedOfContinuation = [obj.speedOfContinuation,obj.plusStruct.speedOfContinuation];
+                    end
+                    %% clear plus struct
+                    obj.clearPlusStruct();
+                    %% toggle plus
+                    obj.stepBackStatus = false;
+                else
+                    if obj.nAll<2
+                        error("Path must have at least two entries to use 'plus'.");
+                    end
+                    %% fill plus
+                    if obj.oih.opt.jacobianOut.basic
+                        obj.plusStruct.J = obj.JAll{2};
+                    elseif obj.oih.opt.jacobianOut.full
+                        obj.plusStruct.J = obj.JAll{end};
+                    else
+                        error('jacobianOut must be full or basic!');
+                    end
+                    obj.plusStruct.l = obj.lAll(:,end);
+                    obj.plusStruct.signDetJRed = obj.signDetJRedAll(:,end);
+                    obj.plusStruct.var = obj.varAll(:,end);
+                    if obj.oih.optIsSet.bifAdditionalTestfunction
+                        obj.plusStruct.bifTestValue = obj.bifTestValue(:,end);
+                    end
+                    if obj.oih.stepsizeOptions.iterations
+                        obj.plusStruct.iterations = obj.iterations(:,end);
+                    end
+                    if obj.oih.optIsSet.pathInfoFunction
+                        obj.plusStruct.pathInfoValue = obj.pathInfoValue(:,end);
+                    end
+                    if obj.oih.stepsizeOptions.predictor
+                        obj.plusStruct.xPredictor = obj.xPredictorAll(:,end);
+                    end
+                    if obj.oih.stepsizeOptions.rateOfContraction
+                        obj.plusStruct.rateOfContraction = obj.rateOfContraction(:,end);
+                    end
+                    if obj.oih.stepsizeOptions.speedOfContinuation
+                        obj.plusStruct.speedOfContinuation = obj.speedOfContinuation(:,end);
+                    end
+                    %% cut all
+                    if obj.oih.opt.jacobianOut.basic
+                        obj.JAll{2} = obj.JAll{3};
+                        obj.JAll{3} = [];
+                    elseif obj.oih.opt.jacobianOut.full
+                        obj.JAll = obj.JAll(1:(end-1));
+                    else
+                        error('jacobianOut must be full or basic!');
+                    end
+                    obj.lAll = obj.lAll(:,1:(end-1));
+                    obj.signDetJRedAll = obj.signDetJRedAll(:,1:(end-1));
+                    obj.varAll = obj.varAll(:,1:(end-1));
+                    if obj.oih.optIsSet.bifAdditionalTestfunction
+                        obj.bifTestValue = obj.bifTestValue(:,1:(end-1));
+                    end
+                    if obj.oih.stepsizeOptions.iterations
+                        obj.iterations = obj.iterations(:,1:(end-1));
+                    end
+                    if obj.oih.optIsSet.pathInfoFunction
+                        obj.pathInfoValue = obj.pathInfoValue(:,1:(end-1));
+                    end
+                    if obj.oih.stepsizeOptions.predictor
+                        obj.xPredictorAll = obj.xPredictorAll(:,1:(end-1));
+                    end
+                    if obj.oih.stepsizeOptions.rateOfContraction
+                        obj.rateOfContraction = obj.rateOfContraction(:,1:(end-1));
+                    end
+                    if obj.oih.stepsizeOptions.speedOfContinuation
+                        obj.speedOfContinuation = obj.speedOfContinuation(:,1:(end-1));
+                    end
+                    %% toggle plus
+                    obj.stepBackStatus = true;
+                end
             end
         end
 

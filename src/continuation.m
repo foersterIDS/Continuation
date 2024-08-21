@@ -307,7 +307,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                     nDer = numel(oih.solver.jacobian(1,:));
                     oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xSolution,'centralValue',funSolution,'derivativeDimensions',(nDer+1):(oih.info.nv+oih.info.nl),'diffquot',oih.opt.diffquot)];
                 end
-else
+            else
                 %% regular solver
                 %            
                 if oih.opt.solver.fsolve && oih.opt.solverForce1it

@@ -60,7 +60,7 @@ function [xDeflation] = confirmResult(func,funSolution,xSolution,xPredictor,oih,
         if ((oih.counter.error==oih.opt.stepbackErrorCounter) || oih.do.stepbackManually) && (oih.path.nAll>1)
             %% stepback
             oih.path.toggleStepback();
-            if oih.counter.validStepback<oih.opt.stepbackErrorCounter
+            if oih.counter.validStepback<oih.opt.stepbackErrorCounter && ~oih.optIsSet.lMult0
                 oih.do.stepback = true;
             else
                 oih.do.stepback = false;

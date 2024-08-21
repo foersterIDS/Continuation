@@ -46,7 +46,12 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                         xim1 = [oih.path.varAll(:,end-1);oih.path.lAll(end-1)];
                         alpha = acos(((xSolution-xi)'*(xi-xim1))/(sqrt((xSolution-xi)'*(xSolution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
                         if alpha<oih.opt.alphaReverse
-                            if aux.ison(oih.opt.bifurcation) && ~oih.opt.bifurcation.mark
+                            if oih.optIsSet.lMult0 && xSolution(end)-oih.path.lAll(end)<0
+                                oih.is.valid = false;
+                                oih.is.reverse = true;
+                                invPoiStrTemp = '(Scalar l cannot get smaller when tracing multiple parameters.)';
+                                invPoiStr(1:numel(invPoiStrTemp)) = invPoiStrTemp;
+                            elseif aux.ison(oih.opt.bifurcation) && ~oih.opt.bifurcation.mark
                                 if sign(det(oih.solver.jacobian(1:oih.info.nv,1:oih.info.nv)))*oih.path.signDetJRedAll(:,end)<0 && oih.counter.bifStepsizeRed<2
                                     oih.is.valid = false;
                                     oih.do.stepbackManually = true;
