@@ -1,3 +1,4 @@
+acceptBadInitialSolution<>eval<>false<>#scalar#logical
 adaptCorrector<>struct<>OptAdaptCorrector<>#struct
 alphaReverse<>double<>pi/2<>#scalar#double#positive#nonzero#isoff:alphaReverseAutoMode
 alphaReverseAutoMode<>eval<>true<>#scalar#logical

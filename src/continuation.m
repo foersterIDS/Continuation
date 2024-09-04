@@ -39,6 +39,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         lEnd (1,1) double
         ds0 (1,1) double {mustBeGreaterThan(ds0,0)}
         NameValueArgs.Opt (1,1) struct
+        NameValueArgs.acceptBadInitialSolution {validation.scalarLogical}
         NameValueArgs.adaptCorrector (1,:) char {mustBeMember(NameValueArgs.adaptCorrector,{'basic','solve'})}
         NameValueArgs.alphaReverse (1,1) double {mustBeGreaterThan(NameValueArgs.alphaReverse,0)}
         NameValueArgs.alphaReverseAutoMode {validation.scalarLogical}
@@ -173,7 +174,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     aux.checkJacobian(residualInitial,funInitial,varInitial,oih);
     breakFunOut = [];
     event.eventObj = [];
-    if initialExitflag>=0
+    if initialExitflag>=0 || oih.opt.acceptBadInitialSolution
         oih.do.continuation = true;
         oih.do.loop = true;
         dpaPoints = [];
