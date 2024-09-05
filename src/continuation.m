@@ -402,15 +402,15 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         if oih.is.valid
             if ~isempty(oih.solver.output.iterations)
-                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')));
+                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
             else
-                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')));
+                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
             end
         else
             if ~isempty(oih.solver.output.iterations)
-                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')));
+                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
             else
-                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')));
+                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
             end
         end
         [breakFunOut,ds] = aux.exitLoop(oih,ds,funSolution,breakFunOut);
