@@ -38,11 +38,13 @@ function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun)
         JacPredictor = dxds;
     else
         %% secant predictor
+        nOrder = 1;
+        nFit = 0;
         if nargout>1
-            [funTaylor,JacTaylor] = predictor.taylor(oih,1,0);
+            [funTaylor,JacTaylor] = predictor.taylor(oih,nOrder,nFit);
             JacPredictor = JacTaylor(s);
         else
-            funTaylor = predictor.taylor(oih,1,0);
+            funTaylor = predictor.taylor(oih,nOrder,nFit);
         end
         funPredictor = funTaylor(s);
         aux.printLine(oih,'------> Switched to basic secant predictor due to bad cond(J).\n');
