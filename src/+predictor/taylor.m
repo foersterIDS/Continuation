@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   05.10.2020 - Alwin Förster
 %
-function [funPredictor,JacPredictor] = taylor(oih,no,nf)
-    no = min([oih.path.nAll-1,no]);
-    ns = min([oih.path.nAll,no+1+nf]);
+function [funPredictor,JacPredictor] = taylor(oih,nOrder,nFit)
+    nOrder = min([oih.path.nAll-1,nOrder]);
+    ns = min([oih.path.nAll,nOrder+1+nFit]);
     xAll = oih.path.xAll;
     nd = length(xAll(:,end));
     %% calc scaling:
@@ -21,7 +21,7 @@ function [funPredictor,JacPredictor] = taylor(oih,no,nf)
         dscS = max([abs(oih.path.sAll(2)-sBasis),dscMin]);
     end
     %% calc taylor-predictor:
-    pSc = poly.fitn((oih.path.sAll(end+((-ns+1):0))-sBasis)./dscS,(xAll(:,end+((-ns+1):0))-xBasis)./kron(dscX,ones(1,ns)),no);
+    pSc = poly.fitn((oih.path.sAll(end+((-ns+1):0))-sBasis)./dscS,(xAll(:,end+((-ns+1):0))-xBasis)./kron(dscX,ones(1,ns)),nOrder);
     funPredictorSc = @(s) poly.valn(pSc,(oih.path.sAll(end)+s-sBasis)/dscS,nd);
     if nargout>1
         dpSc = poly.dern(pSc,nd);
