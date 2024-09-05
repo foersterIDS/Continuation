@@ -34,7 +34,7 @@ function [residual,jacobian] = residualOrthogonal(x,xAll,ds,Jac,oih)
             % calc tangent via jacobian
             PathHelp.varAll = xAll(1:end-1,:);
             PathHelp.lAll = xAll(end,:);
-            [xiPredictor,tangent] = predictor.ode(PathHelp,ds,Jac,[],oih);
+            [xiPredictor,tangent] = predictor.tangential(PathHelp,ds,Jac,[],oih);
         end       
     end
     %

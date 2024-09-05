@@ -18,7 +18,7 @@ function [vp,lp,funPredictor,sp,ds] = predictor(oih,ds,solverJacobian,func,resCo
         if oih.path.nAll==1
             funPredictor = @(s) predictor.initial(oih,s);
         else
-            funPredictor = @(s) predictor.ode(oih,s,solverJacobian,func);
+            funPredictor = @(s) predictor.tangential(oih,s,solverJacobian,func);
         end
     else
         error('predictor not set or of unknown type');

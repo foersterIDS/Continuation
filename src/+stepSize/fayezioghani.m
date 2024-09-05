@@ -38,7 +38,7 @@ function [xi] = fayezioghani(ds,oih)
     jac = oih.path.getJacobianByName('last');
     v = zNeeded(:,end) - zNeeded(:,end-1);
     if diff(size(jac)) == 0 && size(jac,1) == (size(varNeeded,1) + 1)
-        [~,tangent] = predictor.ode(oih,ds,jac,[]);
+        [~,tangent] = predictor.tangential(oih,ds,jac,[]);
     else
         tangent = v;
     end
