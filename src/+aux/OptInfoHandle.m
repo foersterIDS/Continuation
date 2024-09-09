@@ -47,6 +47,12 @@ classdef OptInfoHandle < handle
         end
 
         function initializeStructsAndClasses(obj,var0,lStart,lEnd,ds0)
+            %% check initial
+            %
+            if ~isempty(obj.bifurcation)
+                error('Structures and classes are already initialized!');
+            end
+            %
             %% Bifurcation
             %
             obj.bifurcation = struct('bif',zeros(2,0),...
@@ -147,7 +153,8 @@ classdef OptInfoHandle < handle
             %% Remove
             %
             obj.remove = struct('ds',NaN,...
-                                's',NaN);
+                                's',NaN,...
+                                'step',inf);
             %
             %% Solver
             %

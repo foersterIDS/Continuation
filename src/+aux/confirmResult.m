@@ -46,6 +46,9 @@ function [xDeflation] = confirmResult(func,funSolution,xSolution,xPredictor,oih,
                 oih.opt.dsMax = oih.initial.dsMax;
                 oih.do.remove = false;
                 oih.counter.remove = 0;
+            elseif oih.counter.step>5+oih.remove.step
+                oih.opt.dsMax = oih.initial.dsMax;
+                oih.do.remove = false;
             end
         end
     else
@@ -117,6 +120,7 @@ function [xDeflation] = confirmResult(func,funSolution,xSolution,xPredictor,oih,
             oih.do.stepback = false;
             oih.do.suspend = false;
             oih.do.remove = true;
+            oih.remove.step = oih.counter.step;
             oih.counter.remove = oih.counter.remove+1;
         else
             %% else
