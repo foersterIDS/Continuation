@@ -39,6 +39,7 @@ classdef Path < handle
 
     properties (Dependent)
         nAll                    % number of points on path
+        nX                      % number of vars and ls
         sAll                    % arc length
         xAll                    % variables and parameters
         xPlus                   % variables and parameters of next point in stepback
@@ -116,6 +117,10 @@ classdef Path < handle
 
         function nAll = get.nAll(obj)
             nAll = numel(obj.lAll(1,:));
+        end
+
+        function nX = get.nX(obj)
+            nX = obj.nVar+obj.nL;
         end
 
         function sAll = get.sAll(obj)
