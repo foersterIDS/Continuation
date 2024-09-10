@@ -83,6 +83,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.l0 (1,1) double
         NameValueArgs.lDirFunction (1,1) function_handle
         NameValueArgs.lMult0 (:,1) double
+        NameValueArgs.lMultSpace (:,2) double
         NameValueArgs.lTarget (1,1) double
         NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
         NameValueArgs.maxClosedCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxClosedCounter,0)}

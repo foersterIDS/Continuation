@@ -81,6 +81,14 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                 oih.is.valid = false;
                 invPoiStr(1:18) = '(fun=0 not solved)';
             end
+            if oih.is.valid && oih.optIsSet.lMultSpace
+                lSolution = oih.path.getFullLfromLSV(xSolution(end));
+                if any((lSolution>oih.opt.lMultSpace(:,2))+(lSolution<oih.opt.lMultSpace(:,1)))
+                    oih.is.valid = false;
+                    invPoiStr(:) = ' ';
+                    invPoiStr(1:25) = '(lMult out of lMultSpace)';
+                end
+            end
         catch
             oih.is.valid = false;
             oih.is.catch = 1;

@@ -41,7 +41,8 @@ jacobian<>eval<>false<>#scalar#logical
 jacobianOut<>struct<>OptJacobianOut<>#struct
 l0<>eval<>lStart<>#scalar#double
 lDirFunction<>eval<>@(var,l,J)1<>#function_handle#isset:lMult0
-lMult0<>double<>1<>#double#isset:lDirFunction
+lMult0<>double<>1<>#double#isset:lDirFunction#isoff:bidirectional
+lMultSpace<>double<>NaN<>#double#isset:lMult0#isoff:bidirectional
 lTarget<>eval<>lEnd<>#scalar#double
 livePlotFig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
 maxClosedCounter<>double<>5<>#scalar#integer#positive#nonzero

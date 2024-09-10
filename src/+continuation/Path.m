@@ -319,6 +319,20 @@ classdef Path < handle
             end
         end
 
+        function lFull = getFullLfromLSV(obj,lSV)
+            obj.outputFormat = 'full';
+            lLast = obj.lAll(:,end);
+            obj.resetOutput();
+            lDirLast = obj.lDir(:,end);
+            %% calc. full l
+            lSVEnd = obj.lAll(:,end);
+            if lSV<lSVEnd
+                error('lSV has to be greater than lSVEnd');
+            end
+            dlSV = lSV-lSVEnd;
+            lFull = lLast+dlSV*lDirLast;
+        end
+
         function pathOut = copy(obj)
             pathOut = continuation.Path(obj.nVar,obj.nL,obj.oih);
             props = properties(obj);
