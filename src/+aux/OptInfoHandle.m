@@ -24,6 +24,7 @@ classdef OptInfoHandle < handle
         remove
         solver
         stepsizeOptions
+        temp
     end
 
     methods
@@ -167,6 +168,10 @@ classdef OptInfoHandle < handle
                                 'output',defaultSolverOutput,...
                                 'predictor',predictorSolver,...
                                 'temp',[]);
+            %
+            %% Temp
+            %
+            obj.temp = struct();
             %
         end
 

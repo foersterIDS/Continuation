@@ -58,6 +58,7 @@ plot<>struct<>OptPlot<>#struct
 plotPause<>eval<>false<>#scalar#positive#nonzero#integer|#scalar#logical
 plotVarOfInterest<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
 plotVarsIndex<>eval<>1:numel(var0)<>#array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
+preconditioning<>struct<>OptPreconditioning<>#struct
 predictor<>struct<>OptPredictor<>#struct#ison:predictor
 predictorDistance<>double<>0.5<>#scalar#double#positive#nonzero
 predictorPolynomialAdaptive<>eval<>false<>#scalar#logical

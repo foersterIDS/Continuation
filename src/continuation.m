@@ -99,6 +99,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.plotPause {validation.scalarLogical} % #scalar#positive#nonzero#integer|#scalar#logical
         NameValueArgs.plotVarOfInterest (1,1) double {mustBeGreaterThan(NameValueArgs.plotVarOfInterest,0)} % #scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
         NameValueArgs.plotVarsIndex (1,:) double % #array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
+        NameValueArgs.preconditioning {mustBeMember(NameValueArgs.preconditioning,{'diagJacobian','incompleteLU','jacobian','jacobiScaled'})}
         NameValueArgs.predictor (1,:) char {mustBeMember(NameValueArgs.predictor,{'polynomial','tangential'})}
         NameValueArgs.predictorDistance (1,1) double {mustBeGreaterThan(NameValueArgs.predictorDistance,0)}
         NameValueArgs.predictorPolynomialAdaptive {validation.scalarLogical}
@@ -237,6 +238,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         if oih.do.deflate
             try
+                oih.do.precon = false;
                 residual = @(x) aux.deflation(residual,xDeflation,x,oih.opt.jacobian);
             catch exceptionDeflation
                 aux.printLine(oih,'---> deflation: catch!\n');
@@ -247,11 +249,14 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                 oih.counter.catch = oih.counter.catch + 1;
             end
         elseif oih.do.suspend
+            oih.do.precon = false;
             residual = @(v,lFix) aux.residualSuspendContinuation(func,v,lFix,oih);
         else
+            oih.do.precon = true*aux.ison(oih.opt.preconditioning);
             residual = @(x) aux.mergeResiduals(func,resCorr,x,oih.path.xAll,ds,oih.path.getJacobianByName('last'),oih);
         end
         if oih.path.nAll==1 && ~isempty(oih.opt.initialDeflationPoints)
+            oih.do.precon = false;
             for ii=1:numel(oih.opt.initialDeflationPoints(1,:))
                 residual = @(x) aux.deflation(residual,oih.opt.initialDeflationPoints(:,ii),x,oih.opt.jacobian);
             end
@@ -331,6 +336,12 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                 aux.checkJacobian(residual,funSolution,xSolution,oih);
             end
             oih.is.currentJacobian = true;
+            %% undo precon
+            if oih.do.precon
+                funSolution = oih.temp.invPrecon*funSolution;
+                oih.solver.jacobian = oih.temp.invPrecon*oih.solver.jacobian;
+                oih.do.precon = false;
+            end
         catch exceptionSolve
             xSolution = NaN(size(xPredictor));
             funSolution = inf(size(xPredictor));
