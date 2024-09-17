@@ -62,17 +62,17 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %   Wheter a true value exists can be checked via 'aux.ison(OptSubStruct)'.
     %   If a sub-struct contains multiple true values the first one is valid.
     [opt,optInfo,evalCell] = aux.csf2struct('Opt');
-    for ii=1:numel(evalCell)
-        opt.(evalCell{ii}) = eval(opt.(evalCell{ii}));
+    for jj=1:numel(evalCell)
+        opt.(evalCell{jj}) = eval(opt.(evalCell{jj}));
     end
     OptFieldnames = fieldnames(opt);
     optIsSet = struct();
-    for ii=1:numel(OptFieldnames)
-        optIsSet.(OptFieldnames{ii}) = false;
-        if isstruct(opt.(OptFieldnames{ii}))
-            [~,OptSubStructInfo] = aux.csf2struct(['Opt',OptFieldnames{ii}]);
-            OptStructInfo.(OptFieldnames{ii}) = OptSubStructInfo;
-            OptStructFieldnames.(OptFieldnames{ii}) = fieldnames(OptSubStructInfo);
+    for jj=1:numel(OptFieldnames)
+        optIsSet.(OptFieldnames{jj}) = false;
+        if isstruct(opt.(OptFieldnames{jj}))
+            [~,OptSubStructInfo] = aux.csf2struct(['Opt',OptFieldnames{jj}]);
+            OptStructInfo.(OptFieldnames{jj}) = OptSubStructInfo;
+            OptStructFieldnames.(OptFieldnames{jj}) = fieldnames(OptSubStructInfo);
         end
     end
 	%
@@ -80,99 +80,99 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     %
     errMsg = [];
     nameLegacy = [];
-    i = 1;
-    while i<=numel(vararginCell)
+    ii = 1;
+    while ii<=numel(vararginCell)
         try
             %% adapt to name convention
             OptLowerFieldnames = cellfun(@lower,OptFieldnames,'UniformOutput',false);
-            iLower = find(strcmpi(OptLowerFieldnames,vararginCell{i}));
+            iLower = find(strcmpi(OptLowerFieldnames,vararginCell{ii}));
             if ~isempty(iLower)
-                vararginCell{i} = OptFieldnames{iLower};
+                vararginCell{ii} = OptFieldnames{iLower};
             end
             %% set
-            if isfield(opt,vararginCell{i})
+            if isfield(opt,vararginCell{ii})
                 %% set option:
-                if i+1<=numel(vararginCell)
-                    if islogical(opt.(vararginCell{i}))
-                        switch vararginCell{i+1}
+                if ii+1<=numel(vararginCell)
+                    if islogical(opt.(vararginCell{ii}))
+                        switch vararginCell{ii+1}
                             case 'on'
-                                opt.(vararginCell{i}) = true;
+                                opt.(vararginCell{ii}) = true;
                             case 'off'
-                                opt.(vararginCell{i}) = false;
+                                opt.(vararginCell{ii}) = false;
                             case true
-                                opt.(vararginCell{i}) = true;
+                                opt.(vararginCell{ii}) = true;
                             case false
-                                opt.(vararginCell{i}) = false;
+                                opt.(vararginCell{ii}) = false;
                             otherwise
-                                opt.(vararginCell{i}) = vararginCell{i+1};
+                                opt.(vararginCell{ii}) = vararginCell{ii+1};
                         end
-                    elseif isstruct(opt.(vararginCell{i}))
-                        subOpts = fieldnames(opt.(vararginCell{i}));
+                    elseif isstruct(opt.(vararginCell{ii}))
+                        subOpts = fieldnames(opt.(vararginCell{ii}));
                         %% adapt to name convention
                         OptLowerSubFieldnames = cellfun(@lower,subOpts,'UniformOutput',false);
-                        iLower = find(strcmpi(OptLowerSubFieldnames,vararginCell{i}));
+                        iLower = find(strcmpi(OptLowerSubFieldnames,vararginCell{ii}));
                         if ~isempty(iLower)
-                            vararginCell{i+1} = subOpts{iLower};
+                            vararginCell{ii+1} = subOpts{iLower};
                         end
                         %% check
-                        if isfield(opt.(vararginCell{i}),vararginCell{i+1})
-                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
-                                switch vararginCell{i+1}
+                        if isfield(opt.(vararginCell{ii}),vararginCell{ii+1})
+                            for j=1:numel(fieldnames(opt.(vararginCell{ii})))
+                                switch vararginCell{ii+1}
                                     case subOpts{j}
-                                        opt.(vararginCell{i}).(subOpts{j}) = true;
+                                        opt.(vararginCell{ii}).(subOpts{j}) = true;
                                     otherwise
-                                        opt.(vararginCell{i}).(subOpts{j}) = false;
+                                        opt.(vararginCell{ii}).(subOpts{j}) = false;
                                 end
                             end
-                        elseif strcmpi(vararginCell{i+1},'on')
-                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
+                        elseif strcmpi(vararginCell{ii+1},'on')
+                            for j=1:numel(fieldnames(opt.(vararginCell{ii})))
                                 switch j
                                     case 1
-                                        opt.(vararginCell{i}).(subOpts{j}) = true;
+                                        opt.(vararginCell{ii}).(subOpts{j}) = true;
                                     otherwise
-                                        opt.(vararginCell{i}).(subOpts{j}) = false;
+                                        opt.(vararginCell{ii}).(subOpts{j}) = false;
                                 end
                             end
-                        elseif strcmpi(vararginCell{i+1},'off')
-                            for j=1:numel(fieldnames(opt.(vararginCell{i})))
-                                opt.(vararginCell{i}).(subOpts{j}) = false;
+                        elseif strcmpi(vararginCell{ii+1},'off')
+                            for j=1:numel(fieldnames(opt.(vararginCell{ii})))
+                                opt.(vararginCell{ii}).(subOpts{j}) = false;
                             end
                         else
                             %% check nameLegacy for Opt-sub-struct:
                             if isempty(nameLegacy)
                                 nameLegacy = aux.clf2struct('nameLegacy');
                             end
-                            if isfield(nameLegacy,vararginCell{i})
-                                if isfield(nameLegacy.(vararginCell{i}),vararginCell{i+1})
-                                    vararginCell{i+1} = nameLegacy.(vararginCell{i}).(vararginCell{i+1});
-                                    i = i-2;
+                            if isfield(nameLegacy,vararginCell{ii})
+                                if isfield(nameLegacy.(vararginCell{ii}),vararginCell{ii+1})
+                                    vararginCell{ii+1} = nameLegacy.(vararginCell{ii}).(vararginCell{ii+1});
+                                    ii = ii-2;
                                 else
-                                    errMsg = sprintf('Unknown parameter %s for option %s.',vararginCell{i+1},vararginCell{i});
+                                    errMsg = sprintf('Unknown parameter %s for option %s.',vararginCell{ii+1},vararginCell{ii});
                                     error(errMsg);
                                 end
                             else
-                                errMsg = sprintf('Unknown parameter %s for option %s.',vararginCell{i+1},vararginCell{i});
+                                errMsg = sprintf('Unknown parameter %s for option %s.',vararginCell{ii+1},vararginCell{ii});
                                 error(errMsg);
                             end
                         end
-                    elseif isnumeric(opt.(vararginCell{i})) && isnumeric(vararginCell{i+1})
-                        opt.(vararginCell{i}) = vararginCell{i+1};
-                    elseif isa(opt.(vararginCell{i}),'function_handle') && isa(vararginCell{i+1},'function_handle')
-                        opt.(vararginCell{i}) = vararginCell{i+1};
-                    elseif iscell(opt.(vararginCell{i})) && iscell(vararginCell{i+1})
-                        opt.(vararginCell{i}) = vararginCell{i+1};
+                    elseif isnumeric(opt.(vararginCell{ii})) && isnumeric(vararginCell{ii+1})
+                        opt.(vararginCell{ii}) = vararginCell{ii+1};
+                    elseif isa(opt.(vararginCell{ii}),'function_handle') && isa(vararginCell{ii+1},'function_handle')
+                        opt.(vararginCell{ii}) = vararginCell{ii+1};
+                    elseif iscell(opt.(vararginCell{ii})) && iscell(vararginCell{ii+1})
+                        opt.(vararginCell{ii}) = vararginCell{ii+1};
                     else
                         errMsg = sprintf('invalid input');
                         error(errMsg);
                     end
-                    optIsSet.(vararginCell{i}) = true;
+                    optIsSet.(vararginCell{ii}) = true;
                 else
-                    errMsg = sprintf('Option %s has no value.',vararginCell{i});
+                    errMsg = sprintf('Option %s has no value.',vararginCell{ii});
                     error(errMsg);
                 end
-            elseif strcmpi(vararginCell{i},'Opt')
+            elseif strcmpi(vararginCell{ii},'Opt')
                 %% set Opt-struct:
-                OptTemp = vararginCell{i+1};
+                OptTemp = vararginCell{ii+1};
                 OptFieldnamesTemp = fieldnames(OptTemp);
                 doOptIsSet = true;
                 indOptIsSetTemp = find(strcmp(OptFieldnamesTemp,'OptIsSet'));
@@ -185,13 +185,13 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                     doOptIsSet = false;
                 end
                 usedFields = zeros(numel(OptFieldnamesTemp),1);
-                for ii=1:numel(OptFieldnames)
-                    containsField = contains(OptFieldnamesTemp,OptFieldnames{ii});
+                for jj=1:numel(OptFieldnames)
+                    containsField = contains(OptFieldnamesTemp,OptFieldnames{jj});
                     if sum(containsField)
                         usedFields(containsField) = 1;
-                        opt.(OptFieldnames{ii}) = OptTemp.(OptFieldnames{ii});
+                        opt.(OptFieldnames{jj}) = OptTemp.(OptFieldnames{jj});
                         if doOptIsSet
-                            optIsSet.(OptFieldnames{ii}) = true;
+                            optIsSet.(OptFieldnames{jj}) = true;
                         end
                     end
                 end
@@ -202,13 +202,13 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                     else
                         errMsg = 'Unknown options ';
                     end
-                    for ii=1:numel(indNotUsed)
-                        if ii==1
-                            errMsg = [errMsg,OptFieldnamesTemp{indNotUsed(ii)}];
-                        elseif ii<numel(indNotUsed)
-                            errMsg = [errMsg,', ',OptFieldnamesTemp{indNotUsed(ii)}];
+                    for jj=1:numel(indNotUsed)
+                        if jj==1
+                            errMsg = [errMsg,OptFieldnamesTemp{indNotUsed(jj)}];
+                        elseif jj<numel(indNotUsed)
+                            errMsg = [errMsg,', ',OptFieldnamesTemp{indNotUsed(jj)}];
                         else
-                            errMsg = [errMsg,' and ',OptFieldnamesTemp{indNotUsed(ii)}];
+                            errMsg = [errMsg,' and ',OptFieldnamesTemp{indNotUsed(jj)}];
                         end
                     end
                     errMsg = [errMsg,' in user defined Opt-struct.'];
@@ -219,15 +219,15 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                 if isempty(nameLegacy)
                     nameLegacy = aux.clf2struct('nameLegacy');
                 end
-                if isfield(nameLegacy,vararginCell{i})
-                    vararginCell{i} = nameLegacy.(vararginCell{i});
-                    i = i-2;
+                if isfield(nameLegacy,vararginCell{ii})
+                    vararginCell{ii} = nameLegacy.(vararginCell{ii});
+                    ii = ii-2;
                 else
-                    errMsg = sprintf('Unknown option %s.',vararginCell{i});
+                    errMsg = sprintf('Unknown option %s.',vararginCell{ii});
                     % list of options:
                     errMsg = [errMsg,' (List of options: ',OptFieldnames{1}];
-                    for ii=2:numel(OptFieldnames)
-                        errMsg = [errMsg,', ',OptFieldnames{ii}];
+                    for jj=2:numel(OptFieldnames)
+                        errMsg = [errMsg,', ',OptFieldnames{jj}];
                     end
                     error(sprintf(errMsg));
                 end
@@ -239,7 +239,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                 error(errMsg);
             end
         end
-        i = i+2;
+        ii = ii+2;
     end
     %
     %% read fun:

@@ -320,17 +320,21 @@ classdef Path < handle
         end
 
         function lFull = getFullLfromLSV(obj,lSV)
-            obj.outputFormat = 'full';
-            lLast = obj.lAll(:,end);
-            obj.resetOutput();
-            lDirLast = obj.lDir(:,end);
-            %% calc. full l
-            lSVEnd = obj.lAll(:,end);
-            if lSV<lSVEnd
-                error('lSV has to be greater than lSVEnd');
+            if obj.nL==1
+                lFull = lSV;
+            else
+                obj.outputFormat = 'full';
+                lLast = obj.lAll(:,end);
+                obj.resetOutput();
+                lDirLast = obj.lDir(:,end);
+                %% calc. full l
+                lSVEnd = obj.lAll(:,end);
+                if lSV<lSVEnd
+                    error('lSV has to be greater than lSVEnd');
+                end
+                dlSV = lSV-lSVEnd;
+                lFull = lLast+dlSV*lDirLast;
             end
-            dlSV = lSV-lSVEnd;
-            lFull = lLast+dlSV*lDirLast;
         end
 
         function pathOut = copy(obj)
@@ -433,17 +437,17 @@ classdef Path < handle
             end
             if ~isempty(varAll)
                 obj.varAll = varAll;
-            else
+            elseif doClearPath
                 obj.varAll = varAllTemp;
             end
             if ~isempty(lAll)
                 obj.lAll = lAll;
-            else
+            elseif doClearPath
                 obj.lAll = lAllTemp;
             end
             if ~isempty(bifAll)
                 obj.bifTestValue = bifAll;
-            else
+            elseif doClearPath
                 obj.bifTestValue = bifTemp;
             end
         end

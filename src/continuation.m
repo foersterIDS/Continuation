@@ -183,7 +183,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         if oih.optIsSet.lMult0
             lInitial = oih.opt.lMult0;
         else
-            lInitial = oih.info.lStart;
+            lInitial = oih.opt.l0;
         end
         xInitial = [varInitial;lInitial];
         oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xInitial,'centralValue',funInitial,'derivativeDimensions',oih.info.nv+(1:oih.info.nl),'diffquot',oih.opt.diffquot)];
@@ -412,17 +412,24 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         %% end loop
         %
+        lastJacobian = oih.path.getJacobianByName('last');
+        [n1,n2] = size(lastJacobian);
+        if issparse(lastJacobian)
+            condLastJacobian = condest(lastJacobian(1:min(n1,n2),1:min(n1,n2)));
+        else
+            condLastJacobian = cond(lastJacobian(1:min(n1,n2),1:min(n1,n2)));
+        end
         if oih.is.valid
             if ~isempty(oih.solver.output.iterations)
-                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
+                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,condLastJacobian,oih.solver.exitflag);
             else
-                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
+                aux.printLine(oih,'-----> continued at %s = %.4e | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',paraName,oih.path.lAll(end),ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,condLastJacobian,oih.solver.exitflag);
             end
         else
             if ~isempty(oih.solver.output.iterations)
-                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
+                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,oih.solver.output.iterations(end),oih.opt.nIterOpt,condLastJacobian,oih.solver.exitflag);
             else
-                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,cond(oih.path.getJacobianByName('last')),oih.solver.exitflag);
+                aux.printLine(oih,'-----> invalid point %s | ds+: %.2e | loop: %d | step: %d | iter.: %d/%d | cond(J): %.2e | extflg: %d\n',invPoiStr,ds,oih.counter.loop,oih.counter.step,[],oih.opt.nIterOpt,condLastJacobian,oih.solver.exitflag);
             end
         end
         [breakFunOut,ds] = aux.exitLoop(oih,ds,funSolution,breakFunOut);
@@ -484,7 +491,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     %% DPA
     %
     if oih.opt.dpa && oih.optIsSet.dpa && ~oih.opt.dpaGammaVar && oih.opt.bifurcation.parameterTrace
-        Path = dpa.trace(fun,dpaPoints,oih);
+        dpa.trace(fun,dpaPoints,oih);
     end
     %
     %% live plot finalization

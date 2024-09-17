@@ -50,7 +50,7 @@ function [dpaPoints] = checkResidual(fun,dpaPoints,oih)
         isSolution = false;
         index = inf;
         Rres = @(x) dpa.mergeResiduals(oih,fun,oih.opt.dpaResidual,x,oih.opt.g0);
-        [xr,~,exitflag] = oih.solver.numJac(Rres,x0);
+        [xr,~,exitflag,~,Jr] = oih.solver.numJac(Rres,x0);
         if exitflag>0
             switch isZero
                 case 1
@@ -84,14 +84,7 @@ function [dpaPoints] = checkResidual(fun,dpaPoints,oih)
             end
         end
         if isSolution
-            varAll = oih.path.varAll;
-            lAll = oih.path.lAll;
-            varAll = [varAll(:,1:(index-1)),xr(1:nv),varAll(:,index:end)];
-            lAll = [lAll(1:(index-1)),xr(nv+1),lAll(index:end)];
-            sAll = cumsum([0,sqrt(sum(([varAll(:,2:end);lAll(2:end)]-[varAll(:,1:(end-1));lAll(1:(end-1))]).^2,1))]);
-            oih.path.varAll = varAll;
-            oih.path.lAll = lAll;
-            oih.path.sAll = sAll;
+            oih.path.addPoint(xr(1:nv),xr(nv+1),Jr,oih,index,'predictor',x0,'speedOfContinuation',1);
             dpaPoints = [dpaPoints,index];
         end
     end

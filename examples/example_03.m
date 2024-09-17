@@ -69,8 +69,8 @@ dsMax = 0.05; % max. step size
 
 % show plot, use dsMax and set bifurcation detection to trace, fix at gTarget
 [varAllTraceGTarget,lAllTraceGTarget,exitflagTraceGTarget] = continuation(@(v,l) funDpa(v,l,gTarget),var0,lStart,lEnd,ds0,'plot','off',...
-                                                                                                                                         'dsMax',dsMax,...
-                                                                                                                                         'bifurcation','trace');
+                                                                                                                          'dsMax',dsMax,...
+                                                                                                                          'bifurcation','trace');
 
 %% plot:
 figure(8);

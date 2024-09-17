@@ -14,6 +14,9 @@ function livePlot(oih, ds, dsim1, iterations, funPredictor, sPredictor, dpaPoint
         dl0 = abs(oih.info.lEnd-oih.info.lStart);
     end
     numPl = numel(oih.opt.plotVarsIndex);
+    if oih.opt.dpaGammaVar
+        numPl = numPl-1;
+    end
     if nargin<12
         dpaPoints = [];
     end

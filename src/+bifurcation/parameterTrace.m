@@ -10,7 +10,9 @@ function parameterTrace(oih,fun)
     nbif = numel(bifTrace);
     optTrace = oih.opt;
     optTrace = aux.setoff(optTrace,'bifurcation');
-    optTrace.direction = [zeros(size(optTrace.direction));sign(oih.opt.gTarget-oih.opt.g0)];
+    fnOiS = fieldnames(oih.optIsSet);
+    optTrace = rmfield(optTrace,fnOiS(~cell2mat(struct2cell(oih.optIsSet)))); 
+    optTrace.direction = [zeros(size(oih.opt.direction));sign(oih.opt.gTarget-oih.opt.g0)];
     optTrace.l0 = oih.opt.g0;
     optTrace.lTarget = oih.opt.gTarget;
     optTrace.dpaGammaVar = true;
@@ -18,12 +20,12 @@ function parameterTrace(oih,fun)
     lAllBifs = [];
     %% start dpa:
     for ii=1:nbif
-        i = bifTrace(ii);
+        idx = bifTrace(ii);
         sc = oih.bifurcation.scaling(ii);
         resDpa = @(v,l,g) dpa.resBif(fun,[v;l],g,oih,sc);
         func = @(x,g) dpa.mergeResiduals(oih,fun,resDpa,x,g);
-        x0 = [oih.path.varAll(:,i);oih.path.lAll(i)];
-        dsBif = mean(diff(oih.path.sAll(i+(-1:1))));
+        x0 = [oih.path.varAll(:,idx);oih.path.lAll(idx)];
+        dsBif = mean(diff(oih.path.sAll(idx+(-1:1))));
         optTrace.dscale0 = max(abs([x0;oih.opt.g0]),10^-8*ones(numel(x0)+1,1));
         [vari,li,~,~,si] = continuation(func,x0,oih.opt.g0,oih.opt.gTarget,dsBif,'Opt',optTrace);
         varAllBifs = [varAllBifs,NaN(oih.info.nv+1,1),vari];

@@ -15,21 +15,21 @@ function trace(oih,func,resCorr)
     oihTrace.optIsSet.stopOnCrossing = true;
     oihTrace.opt = aux.seton(oihTrace.opt,'bifurcation','mark');
     oihTrace.optIsSet.bifurcation = true;
-    for i=1:nbif
-        indBif = bifTrace(1,i);
+    for ii=1:nbif
+        indBif = bifTrace(1,ii);
         xdirsOld = [];
         xdirsTrace = [];
-        dsBif = mean(diff(oih.path.sAll(bifTrace(1,i)+(-1:1))));
-        x0 = [oih.path.varAll(:,bifTrace(1,i));oih.path.lAll(bifTrace(1,i))];
+        dsBif = mean(diff(oih.path.sAll(bifTrace(1,ii)+(-1:1))));
+        x0 = [oih.path.varAll(:,bifTrace(1,ii));oih.path.lAll(bifTrace(1,ii))];
         residualBifSphere = @(x) aux.mergeResiduals(func,continuation.corrector(func,oihSphere),x,x0,dsBif,[],oihSphere);
         %% find directions of known path
-        for j=1:2
-            if j==1
-                varAllTemp = oih.path.varAll(:,1:bifTrace(1,i));
-                lAllTemp = oih.path.lAll(1:bifTrace(1,i));
+        for jj=1:2
+            if jj==1
+                varAllTemp = oih.path.varAll(:,1:bifTrace(1,ii));
+                lAllTemp = oih.path.lAll(1:bifTrace(1,ii));
             else
-                varAllTemp = oih.path.varAll(:,end:-1:bifTrace(1,i));
-                lAllTemp = oih.path.lAll(end:-1:bifTrace(1,i));
+                varAllTemp = oih.path.varAll(:,end:-1:bifTrace(1,ii));
+                lAllTemp = oih.path.lAll(end:-1:bifTrace(1,ii));
             end
             [varBifPredictor,lBifPredictor] = continuation.predictor(oihSphere,dsBif,[],func,resCorr);
             xBifPredictor = [varBifPredictor;lBifPredictor];
@@ -44,7 +44,7 @@ function trace(oih,func,resCorr)
         if ~isempty(xdirsOld)
             %% find directions of unknown paths by using random direction
             if oih.opt.bifRandDir
-                for j=1:oih.opt.nBifSearch
+                for jj=1:oih.opt.nBifSearch
                     dxBifPredictor = randn(numel(x0),1);
                     for ki = 1:2
                         xBifPredictor = x0+(-1)^ki*dsBif*dxBifPredictor/norm(dxBifPredictor);
@@ -58,8 +58,8 @@ function trace(oih,func,resCorr)
                 end
             end
             %% use tangent vectors - experimental!
-            for j=1:(numel(oih.bifurcation.dirs)/2)
-                [bifNum, bifDir] = oih.bifurcation.dirs{j,:};
+            for jj=1:(numel(oih.bifurcation.dirs)/2)
+                [bifNum, bifDir] = oih.bifurcation.dirs{jj,:};
                 if bifNum == indBif
                     if ~isempty(bifDir)
                         for ki = 1:2
@@ -76,14 +76,14 @@ function trace(oih,func,resCorr)
             end
             %% trace unknown paths
             ntrace = numel(xdirsTrace)/numel(x0);
-            for j=1:ntrace
-                oihTrace.opt.direction = xdirsTrace(:,j)/norm(xdirsTrace(:,j));
-                oihTrace.optIsSet.direction = true;
-                oihTrace.opt.l0 = x0(end);
-                oihTrace.optIsSet.l0 = true;
-                oihTrace.opt.initialDeflationPoints = x0+xdirsOld;
-                oihTrace.optIsSet.initialDeflationPoints = true;
-                [varJ,lJ,exitflagJ,bifStructJ,sJ] = continuation(func,x0(1:end-1),oih.info.lStart,oih.info.lEnd,dsBif,'opt',oihTrace.opt);
+            optTrace = oih.opt;
+            fnOiS = fieldnames(oih.optIsSet);
+            optTrace = rmfield(optTrace,fnOiS(~cell2mat(struct2cell(oih.optIsSet)))); 
+            for jj=1:ntrace
+                optTrace.direction = xdirsTrace(:,jj)/norm(xdirsTrace(:,jj));
+                optTrace.l0 = x0(end);
+                optTrace.initialDeflationPoints = x0+xdirsOld;
+                [varJ,lJ,exitflagJ,bifStructJ,sJ] = continuation(func,x0(1:end-1),oih.info.lStart,oih.info.lEnd,dsBif,'opt',optTrace);
                 if exitflagJ>=0
                     varAllTemp = [oih.path.varAll,NaN(numel(x0)-1,1),varJ];
                     lAllTemp = [oih.path.lAll,NaN,lJ];
