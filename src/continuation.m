@@ -67,7 +67,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.dpaResidual (1,1) function_handle % #nargin:3
         NameValueArgs.dsMax (:,1) double {mustBeGreaterThan(NameValueArgs.dsMax,0)} % #scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
         NameValueArgs.dsMin (1,1) double {mustBeGreaterThan(NameValueArgs.dsMin,0)} % #scalar#double#positive#smaller:norm(oih.opt.dsMax)
-        NameValueArgs.dsTol (1,2) double {mustBePositive} % #array#positive#double#increasing#size:[1,2]
+        NameValueArgs.dsTol (1,2) double {mustBeGreaterThanOrEqual(NameValueArgs.dsTol,0)} % #array#positive#double#increasing#size:[1,2]
         NameValueArgs.dscale0 (:,1) double {mustBeGreaterThan(NameValueArgs.dscale0,0)} % #array#positive#nonzero#double#size:[numel(var0)+1,1]
         NameValueArgs.dscaleMin (:,1) double {mustBeGreaterThan(NameValueArgs.dscaleMin,0)} % #scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
         NameValueArgs.enforceDsMax {validation.scalarLogical} % #ison:predictorSolver
@@ -104,7 +104,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.predictor (1,:) char {mustBeMember(NameValueArgs.predictor,{'polynomial','tangential'})}
         NameValueArgs.predictorDistance (1,1) double {mustBeGreaterThan(NameValueArgs.predictorDistance,0)}
         NameValueArgs.predictorPolynomialAdaptive {validation.scalarLogical}
-        NameValueArgs.predictorPolynomialFit (1,1) double {mustBeInteger,mustBePositive}
+        NameValueArgs.predictorPolynomialFit (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(NameValueArgs.predictorPolynomialFit,0)}
         NameValueArgs.predictorPolynomialDegree (1,1) double {mustBeGreaterThan(NameValueArgs.predictorPolynomialDegree,0)}
         NameValueArgs.predictorSolver {validation.scalarLogical}
         NameValueArgs.removeErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:oih.opt.stepbackErrorCounter+1#neq:oih.opt.homotopyErrorCounter#neq:oih.opt.deflationErrorCounter#neq:oih.opt.suspendContinuationErrorCounter|#scalar#integer#equals:0
@@ -119,7 +119,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.stepSizeAngle (1,1) double {mustBePositive}
         NameValueArgs.stepSizeControl (1,:) char {mustBeMember(NameValueArgs.stepSizeControl,{'angleChange','angleCustom','contraction','error','errorAlt','fayezioghani','fix','iterationsExponential','iterationsPolynomial','multiplicative','multiplicativeAlt','pidCustom','pidValli','szyszkowski','yoon'})}
         NameValueArgs.stepSizeErrorMax (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeErrorMax,0)}
-        NameValueArgs.stepSizeErrorPd (1,:) double {mustBePositive}
+        NameValueArgs.stepSizeErrorPd (1,:) double {mustBeGreaterThanOrEqual(NameValueArgs.stepSizeErrorPd,0)}
         NameValueArgs.stepSizeEvent {validation.scalarLogical}
         NameValueArgs.stepSizeIterationsBeta (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeIterationsBeta,0),mustBeSmallerThan(NameValueArgs.stepSizeIterationsBeta,2)}
         NameValueArgs.stepSizeExponentialWeight (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeExponentialWeight,0)}
@@ -128,15 +128,15 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.stopOnBifurcation {validation.scalarLogical} % #ison:bifurcation
         NameValueArgs.stopOnCrossing {validation.scalarLogical} % #ison:bifurcation
         NameValueArgs.suspendContinuationErrorCounter (1,1) double {mustBeInteger} % #scalar#integer#positive#nonzero#larger:oih.opt.stepbackErrorCounter+1#neq:oih.opt.homotopyErrorCounter#neq:oih.opt.deflationErrorCounter
-        NameValueArgs.targetTol (1,1) double {mustBePositive}
+        NameValueArgs.targetTol (1,1) double {mustBeGreaterThanOrEqual(NameValueArgs.targetTol,0)}
 		NameValueArgs.timeLimit (1,1) double {mustBePositive,mustBeGreaterThan(NameValueArgs.timeLimit,0)}
-        NameValueArgs.weightsAngleCustom (1,2) double {mustBePositive}
-        NameValueArgs.weightsAngleChange (1,2) double {mustBePositive}
-        NameValueArgs.weightsError (1,5) double {mustBePositive}
-        NameValueArgs.weightsFayezioghani (1,2) double {mustBePositive}
-        NameValueArgs.weightsMultiplicative (1,5) double {mustBePositive}
-        NameValueArgs.weightsSzyszkowski (1,2) double {mustBePositive}
-        NameValueArgs.weightsYoon (1,1) double {mustBePositive}
+        NameValueArgs.weightsAngleCustom (1,2) double {mustBePmustBeGreaterThanOrEqual(NameValueArgs.weightsAngleCustom,0)}
+        NameValueArgs.weightsAngleChange (1,2) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsAngleChange,0)}
+        NameValueArgs.weightsError (1,5) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsError,0)}
+        NameValueArgs.weightsFayezioghani (1,2) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsFayezioghani,0)}
+        NameValueArgs.weightsMultiplicative (1,5) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsMultiplicative,0)}
+        NameValueArgs.weightsSzyszkowski (1,2) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsSzyszkowski,0)}
+        NameValueArgs.weightsYoon (1,1) double {mustBeGreaterThanOrEqual(NameValueArgs.weightsYoon,0)}
         NameValueArgs.xTarget (:,1) double
     end
     nameValueArgsCell = aux.struct2cellPreserveFieldnames(NameValueArgs);

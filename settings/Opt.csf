@@ -25,7 +25,7 @@ dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#
 dpaGammaVar<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
 dpaResidual<>function_handle<>@(v,l,g)1<>#scalar#nargin:3
 dsMax<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
-dsMin<>double<>10^-9<>#scalar#double#positive#smaller:norm(opt.dsMax)
+dsMin<>double<>10^-9<>#scalar#double#positive#nonzero#smaller:norm(opt.dsMax)
 dsTol<>eval<>[0.5,1.5]<>#array#positive#double#increasing#size:[1,2]
 dscale0<>eval<>ones(numel(var0)+1,1)<>#array#positive#nonzero#double#size:[numel(var0)+1,1]
 dscaleMin<>double<>1e-5<>#scalar#positive#nonzero#double|#array#positive#nonzero#double#size:[numel(var0)+1,1]
@@ -75,7 +75,7 @@ solverMaxIterations<>double<>50<>#scalar#integer#positive#nonzero
 solverTol<>double<>10^-10<>#scalar#double#positive#nonzero
 speedOfContinuation<>double<>10<>#scalar#double#positive#nonzero
 stepbackErrorCounter<>double<>3<>#scalar#integer#positive#nonzero#neq:opt.homotopyErrorCounter#neq:opt.deflationErrorCounter
-stepSizeAngle<>eval<>(2/360)*(2*pi)<>#scalar#double#positive
+stepSizeAngle<>eval<>(2/360)*(2*pi)<>#scalar#double#positive#nonzero
 stepSizeControl<>struct<>OptStepSizeControl<>#struct#ison:stepSizeControl
 stepSizeErrorMax<>double<>0.6<>#scalar#double#positive#nonzero
 stepSizeErrorPd<>eval<>[1,0]<>#array#double#positive
@@ -83,7 +83,7 @@ stepSizeEvent<>eval<>false<>#scalar#logical
 stepSizeIterationsBeta<>double<>0.5<>#scalar#double#positive#nonzero#smaller:2
 stepSizeExponentialWeight<>double<>4<>#scalar#double#positive#nonzero
 stepSizePidParams<>eval<>[0.075,0.175,0.01]<>#array#positive#nonzero#double#size:[1,3]
-stepSizePidTol<>double<>0.05<>#scalar#double#positive
+stepSizePidTol<>double<>0.05<>#scalar#double#positive#nonzero
 stopOnBifurcation<>eval<>false<>#scalar#logical#ison:bifurcation
 stopOnCrossing<>eval<>false<>#scalar#logical#ison:bifurcation
 suspendContinuationErrorCounter<>double<>10<>#scalar#integer#positive#nonzero#larger:opt.stepbackErrorCounter+1#neq:opt.homotopyErrorCounter#neq:opt.deflationErrorCounter
