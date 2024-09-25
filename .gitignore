@@ -1,3 +1,4 @@
 *.asv
 local/
-dev/local/
+dev/
+insights/
