@@ -152,7 +152,7 @@ for i=1:2
     [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','bifurcation','trace');
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: trace ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plotVarsIndex: 1 ###\n',i);
-    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','plotVarsIndex',1);
+    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','plotOptions',plot.PlotOptions('plotVarsIndex',1));
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plotVarsIndex: 1 ###\n',i),probinfo,probcounter);
     %% includeReverse:
     fprintf('\n### %d: includeReverse: on ###\n',i);
