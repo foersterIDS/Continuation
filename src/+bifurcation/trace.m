@@ -76,9 +76,9 @@ function trace(oih,func,resCorr)
             end
             %% trace unknown paths
             ntrace = numel(xdirsTrace)/numel(x0);
-            optTrace = oih.opt;
-            fnOiS = fieldnames(oih.optIsSet);
-            optTrace = rmfield(optTrace,fnOiS(~cell2mat(struct2cell(oih.optIsSet)))); 
+            optTrace = oihTrace.opt;
+            fnOiS = fieldnames(oihTrace.optIsSet);
+            optTrace = rmfield(optTrace,fnOiS(~cell2mat(struct2cell(oihTrace.optIsSet)))); 
             for jj=1:ntrace
                 optTrace.direction = xdirsTrace(:,jj)/norm(xdirsTrace(:,jj));
                 optTrace.l0 = x0(end);
