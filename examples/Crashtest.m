@@ -151,9 +151,6 @@ for i=1:2
     fprintf('\n### %d: plot: on & bifurcation: trace ###\n',i);
     [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','bifurcation','trace');
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: on & bifurcation: trace ###\n',i),probinfo,probcounter);
-    fprintf('\n### %d: plot: detail & bifurcation: trace ###\n',i);
-    [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','detail','bifurcation','trace');
-    [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plot: detail & bifurcation: trace ###\n',i),probinfo,probcounter);
     fprintf('\n### %d: plotVarsIndex: 1 ###\n',i);
     [vs,ls,exitflag] = continuation(funJacoTest{i},v0,lams,lame,ds0,'dsMax',dsMax,'display','off','plot','on','plotVarsIndex',1);
     [probinfo,probcounter] = crashtestCheckOutput(vs,ls,exitflag,lams,lame,sprintf('\n### %d: plotVarsIndex: 1 ###\n',i),probinfo,probcounter);

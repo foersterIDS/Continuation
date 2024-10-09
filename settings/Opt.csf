@@ -21,8 +21,8 @@ deflationErrorCounter<>double<>5<>#scalar#integer#positive#nonzero
 diffquot<>struct<>OptDiffQuot<>#struct
 direction<>eval<>sign(lEnd-lStart)*[zeros(size(var0));1]<>#scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
 display<>eval<>true<>#scalar#logical
-dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true#ison:plot.dpa
-dpaGammaVar<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa#ison:plot.dpa
+dpa<>eval<>false<>#scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true
+dpaGammaVar<>eval<>false<>#scalar#logical#false|#scalar#logical#true#ison:dpa#isoff:plot|#scalar#logical#true#ison:dpa
 dpaResidual<>function_handle<>@(v,l,g)1<>#scalar#nargin:3
 dsMax<>eval<>inf<>#scalar#double#positive#nonzero|#array#positive#nonzero#double#size:[numel(var0)+1,1]#ison:enforceDsMax
 dsMin<>double<>10^-9<>#scalar#double#positive#nonzero#smaller:norm(opt.dsMax)
@@ -44,7 +44,6 @@ lDirFunction<>eval<>@(var,l,J)1<>#function_handle#isset:lMult0
 lMult0<>double<>1<>#double#isset:lDirFunction#isoff:bidirectional
 lMultSpace<>double<>NaN<>#double#isset:lMult0#isoff:bidirectional
 lTarget<>eval<>lEnd<>#scalar#double
-livePlotFig<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero
 maxClosedCounter<>double<>5<>#scalar#integer#positive#nonzero
 maxErrorCounter<>double<>20<>#scalar#integer#positive#nonzero
 maxRemoveCounter<>double<>20<>#scalar#integer#positive#nonzero
@@ -55,10 +54,9 @@ nStepMax<>eval<>inf<>#scalar#integer#positive#nonzero
 optimalContractionRate<>double<>0.1<>#scalar#double#positive#nonzero#max:1
 pathInfoFunction<>eval<>@(f,J,v,l)0<>#function_handle
 pauseOnError<>eval<>true<>#scalar#logical
-plot<>struct<>OptPlot<>#struct
+plot<>eval<>true<>#scalar#logical
+plotOptions<>eval<>[]<>
 plotPause<>eval<>false<>#scalar#positive#nonzero#integer|#scalar#logical
-plotVarOfInterest<>eval<>NaN<>#scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
-plotVarsIndex<>eval<>1:numel(var0)<>#array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
 preconditioning<>struct<>OptPreconditioning<>#struct
 predictor<>struct<>OptPredictor<>#struct#ison:predictor
 predictorDistance<>double<>0.5<>#scalar#double#positive#nonzero

@@ -85,7 +85,6 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.lMult0 (:,1) double
         NameValueArgs.lMultSpace (:,2) double
         NameValueArgs.lTarget (1,1) double
-        NameValueArgs.livePlotFig (1,1) double % #scalar#isnan|#scalar#integer#positive#nonzero
         NameValueArgs.maxClosedCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxClosedCounter,0)}
         NameValueArgs.maxErrorCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxErrorCounter,0)}
         NameValueArgs.maxRemoveCounter (1,1) double {mustBeGreaterThan(NameValueArgs.maxRemoveCounter,0)}
@@ -96,10 +95,9 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeSmallerThan(NameValueArgs.optimalContractionRate,1)}
         NameValueArgs.pathInfoFunction (1,1) function_handle
         NameValueArgs.pauseOnError {validation.scalarLogical}
-        NameValueArgs.plot (1,:) char {mustBeMember(NameValueArgs.plot,{'on','off','basic','detail','dpa','semilogx','semilogy','loglog','threeDim'})}
+        NameValueArgs.plot {validation.scalarLogical}
+        NameValueArgs.plotOptions (1,1) plot.PlotOptions
         NameValueArgs.plotPause {validation.scalarLogical} % #scalar#positive#nonzero#integer|#scalar#logical
-        NameValueArgs.plotVarOfInterest (1,1) double {mustBeGreaterThan(NameValueArgs.plotVarOfInterest,0)} % #scalar#isnan|#scalar#integer#positive#nonzero#max:numel(var0)
-        NameValueArgs.plotVarsIndex (1,:) double % #array#integer#positive#nonzero#unique#max:numel(var0)#ison:plot
         NameValueArgs.preconditioning {mustBeMember(NameValueArgs.preconditioning,{'diagJacobian','incompleteLU','jacobian','jacobiScaled'})}
         NameValueArgs.predictor (1,:) char {mustBeMember(NameValueArgs.predictor,{'polynomial','tangential'})}
         NameValueArgs.predictorDistance (1,1) double {mustBeGreaterThan(NameValueArgs.predictorDistance,0)}
@@ -216,7 +214,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         oih.path.addPointAtEnd(varInitial,lInitial,oih.solver.jacobian,oih,optArgsAddPoint{:});
         %% init. plot
         if aux.ison(oih.opt.plot)
-            plot.livePlot(oih, oih.info.ds0, oih.info.ds0, oih.solver.output.iterations(end));
+            plot.livePlot(oih,dpaPoints);
         end
     elseif oih.info.validJacobian
         oih.info.exitflag = -2;
@@ -405,8 +403,6 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         %% step size control
         %
-        % save latest stepsize:
-        dsim1 = ds;
         % adjust stepsize:
         [ds,event] = stepSize.control(ds,oih,event);
         %
@@ -444,7 +440,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         if aux.ison(oih.opt.plot) && oih.is.valid
             try
-                plot.livePlot(oih, ds, dsim1, oih.solver.output.iterations(end), funPredictor, sPredictor, dpaPoints);
+                plot.livePlot(oih,dpaPoints);
             catch exceptionPlot
                 aux.printLine(oih,'--> The plot update has failed.\n');
                 if oih.opt.pauseOnError
@@ -462,11 +458,29 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
     end
     %
+    %% live plot finalization
+    %
+    if aux.ison(oih.opt.plot) && initialExitflag>0
+        try
+            oih.info.finalSolutionPoint = true;
+            plot.livePlot(oih,dpaPoints);
+            if isfield(oih.plot,'plCurr')
+                delete(oih.plot.plCurr);
+            end
+        catch exceptionPlotFinal
+            aux.printLine(oih,'--> The plot update has failed.\n');
+            if oih.opt.pauseOnError
+                aux.printLine(oih,['---> ',exceptionPlotFinal.message]);
+                input('Pause on error. Press [ENTER] to continue...');
+            end
+        end
+        drawnow;
+    end
+    %
     %% bifurcation tracing
     %
     if oih.opt.bifurcation.trace
         try
-            delete(oih.plot.plCurr);
             bifurcation.trace(oih,func,resCorr);
         catch exceptionBifurcationTrace
             aux.printLine(oih,'--> Failed to trace bifurcations.\n');
@@ -477,7 +491,6 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         end
     elseif oih.opt.bifurcation.parameterTrace
         try
-            delete(oih.plot.plCurr);
             bifurcation.parameterTrace(oih,fun);
         catch exceptionBifurcationParameterTrace
             aux.printLine(oih,'--> Failed to trace bifurcation parameter.\n');
@@ -492,25 +505,6 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
     %
     if oih.opt.dpa && oih.optIsSet.dpa && ~oih.opt.dpaGammaVar && oih.opt.bifurcation.parameterTrace
         dpa.trace(fun,dpaPoints,oih);
-    end
-    %
-    %% live plot finalization
-    %
-    if aux.ison(oih.opt.plot) && initialExitflag>0
-        try
-            oih.info.finalSolutionPoint = true;
-            plot.livePlot(oih, ds, dsim1, oih.solver.output.iterations(end), funPredictor, sPredictor, dpaPoints);
-            if isfield(oih.plot,'plCurr')
-                delete(oih.plot.plCurr);
-            end
-        catch exceptionPlotFinal
-            aux.printLine(oih,'--> The plot update has failed.\n');
-            if oih.opt.pauseOnError
-                aux.printLine(oih,['---> ',exceptionPlotFinal.message]);
-                input('Pause on error. Press [ENTER] to continue...');
-            end
-        end
-        drawnow;
     end
     %
     %% final disp

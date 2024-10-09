@@ -161,6 +161,8 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                         opt.(vararginCell{ii}) = vararginCell{ii+1};
                     elseif iscell(opt.(vararginCell{ii})) && iscell(vararginCell{ii+1})
                         opt.(vararginCell{ii}) = vararginCell{ii+1};
+                    elseif isa(vararginCell{ii+1},'plot.PlotOptions')
+                        opt.(vararginCell{ii}) = vararginCell{ii+1};
                     else
                         errMsg = sprintf('invalid input');
                         error(errMsg);
@@ -186,7 +188,7 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
                 end
                 usedFields = zeros(numel(OptFieldnamesTemp),1);
                 for jj=1:numel(OptFieldnames)
-                    containsField = contains(OptFieldnamesTemp,OptFieldnames{jj});
+                    containsField = strcmp(OptFieldnamesTemp,OptFieldnames{jj});
                     if sum(containsField)
                         usedFields(containsField) = 1;
                         opt.(OptFieldnames{jj}) = OptTemp.(OptFieldnames{jj});
@@ -319,6 +321,20 @@ function [oih,ds0,func] = input(vararginCell,fun,var0,lStart,lEnd,ds0)
     InfoTemp = struct('ds0',ds0,'lEnd',lEnd,'lStart',lStart,'var0',var0);
     opt = aux.updateOpt(opt,optIsSet,InfoTemp);
     %
+    %% set plotOptions
+    %
+    if isempty(opt.plotOptions)
+        if optIsSet.dpa
+            opt.plotOptions = plot.PlotOptions('mode','dpa');
+        else
+            opt.plotOptions = plot.PlotOptions();
+        end
+        optIsSet.plotOptions = true;
+    end
+    % handle dpa
+    if optIsSet.dpa && ~strcmp(opt.plotOptions.mode,'dpa')
+        opt.plotOptions.changeModeToDPA();
+    end
     %% OptInfoHandle instantiation
     %
     oih = aux.OptInfoHandle(opt,optIsSet);

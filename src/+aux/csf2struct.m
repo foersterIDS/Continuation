@@ -55,6 +55,8 @@ function [structOut,structInfoOut,evalCell] = csf2struct(structName)
                 structOut.(lineCell{1}) = eval(lineCell{3});
             case 'cell'
                 structOut.(lineCell{1}) = eval(lineCell{3});
+            case 'plot.PlotOptions'
+                structOut.(lineCell{1}) = plot.PlotOptions();
             otherwise
                 error('Unknown field type. Struct-file corrupted?');
         end

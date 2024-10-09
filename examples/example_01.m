@@ -31,7 +31,7 @@ close all;
 % use deteiled plot and max. step size
 t2 = tic;
 [varAll2,lAll2,exitflag2] = continuation(fun,var0,lStart,lEnd,ds0,...
-                                           'plot','detail',... % show detailed live plot
+                                           'plot','on',... % show detailed live plot
                                            'dsMax',0.25); % max. step size
 t2 = toc(t2);
 input('Press any key to continue...');
