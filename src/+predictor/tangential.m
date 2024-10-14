@@ -4,9 +4,9 @@
 %   Leibniz University Hannover
 %   12.11.2020 - Alwin Förster
 %
-function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun)
+function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun,idx)
     xAll = oih.path.xAll;
-    xi = xAll(:,end);
+    xi = xAll(:,idx);
     nd = length(xi);
     %% check jacobian:
     [nj1,nj2] = size(solverJacobian);
@@ -20,10 +20,10 @@ function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun)
         jac = aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',oih.opt.diffquot);
     end
     %% build system of equations:
-    [~,m] = max(abs(diff(xAll(:,end+(-1:0)),1,2)));
+    [~,m] = max(abs(diff(xAll(:,idx+(-1:0)),1,2)));
     u = 1:nd;
     u(m) = [];
-    dxmds = sign(diff(xAll(m,end+(-1:0)),1,2));
+    dxmds = sign(diff(xAll(m,idx+(-1:0)),1,2));
     jacM = jac(:,m);
     jacU = jac(:,u);
     % check cond.:
@@ -41,10 +41,10 @@ function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun)
         nOrder = 1;
         nFit = 0;
         if nargout>1
-            [funTaylor,JacTaylor] = predictor.taylor(oih,nOrder,nFit);
+            [funTaylor,JacTaylor] = predictor.taylor(oih,nOrder,nFit,idx);
             JacPredictor = JacTaylor(s);
         else
-            funTaylor = predictor.taylor(oih,nOrder,nFit);
+            funTaylor = predictor.taylor(oih,nOrder,nFit,idx);
         end
         funPredictor = funTaylor(s);
         aux.printLine(oih,'------> Switched to basic secant predictor due to bad cond(J).\n');

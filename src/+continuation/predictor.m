@@ -4,18 +4,29 @@
 %   Leibniz University Hannover
 %   08.05.2020 - Alwin Förster
 %
-function [vp,lp,funPredictor,sp,ds] = predictor(oih,ds,solverJacobian,func,resCorr)
+function [vp,lp,funPredictor,sp,ds] = predictor(oih,ds,solverJacobian,func,resCorr,idx)
+    arguments
+        oih 
+        ds 
+        solverJacobian 
+        func 
+        resCorr 
+        idx = []
+    end
+    if isempty(idx)
+        idx = oih.path.nAll;
+    end
     %% get funPredictor:
     if oih.opt.predictor.polynomial
-        if oih.path.nAll==1
+        if idx==1
             funPredictor = @(s) predictor.initial(oih,s);
         else
-            [nt,nf] = predictor.adaptive(oih);
-            [fpt,Jpt] = predictor.taylor(oih,nt,nf);
+            [nt,nf] = predictor.adaptive(oih,idx);
+            [fpt,Jpt] = predictor.taylor(oih,nt,nf,idx);
             funPredictor = @(s) aux.fncHndToVal(s,fpt,Jpt);
         end
     elseif oih.opt.predictor.tangential
-        if oih.path.nAll==1
+        if idx==1
             funPredictor = @(s) predictor.initial(oih,s);
         else
             funPredictor = @(s) predictor.tangential(oih,s,solverJacobian,func);
@@ -25,7 +36,7 @@ function [vp,lp,funPredictor,sp,ds] = predictor(oih,ds,solverJacobian,func,resCo
     end
     %% predictorSolver:
     if oih.opt.predictorSolver
-        xi = oih.path.xAll(:,end);
+        xi = oih.path.xAll(:,idx);
         if oih.opt.enforceDsMax
             %% enforceDsMax:
             p = 0.95;
@@ -53,12 +64,12 @@ function [vp,lp,funPredictor,sp,ds] = predictor(oih,ds,solverJacobian,func,resCo
     %% get predictor:
     xip1 = funPredictor(sp);
     %% correctPredictor:
-    if oih.opt.correctPredictor && oih.path.nAll>1
-        dxi = oih.path.xAll(:,end)-oih.path.xAll(:,end-1);
-        dxip1 = xip1-oih.path.xAll(:,end);
+    if oih.opt.correctPredictor && idx>1
+        dxi = oih.path.xAll(:,idx)-oih.path.xAll(:,idx-1);
+        dxip1 = xip1-oih.path.xAll(:,idx);
         if dot(dxip1,dxi)<0 && ~sum(ds<0)
             dxip1 = -dxip1;
-            xip1 = oih.path.xAll(:,end)+dxip1;
+            xip1 = oih.path.xAll(:,idx)+dxip1;
         end
     end
     %% make output:

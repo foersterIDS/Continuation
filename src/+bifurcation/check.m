@@ -113,6 +113,7 @@ function check(func,oih,resCorr)
                         nv = oih.path.nVar;
                         solverJacobianRed = bifSolverJacobian(1:nv,1:nv);
                         solverJacobianLam = bifSolverJacobian(1:nv,nv+1);
+                        oih.bifurcation.jacobian = [oih.bifurcation.jacobian, {bifSolverJacobian}];
                         jacRedJacLam = [solverJacobianRed, solverJacobianLam];
                         %
                         nullMatrix = null(jacRedJacLam);
@@ -124,6 +125,8 @@ function check(func,oih,resCorr)
                                 oih.bifurcation.dirs(end+1,:) = [{indBif}, {bifDir}];
                             end
                         end
+                    else
+                        oih.bifurcation.jacobian = [oih.bifurcation.jacobian, {[]}];
                     end
                     break;
                 end

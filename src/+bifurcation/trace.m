@@ -23,15 +23,10 @@ function trace(oih,func,resCorr)
         x0 = [oih.path.varAll(:,bifTrace(1,ii));oih.path.lAll(bifTrace(1,ii))];
         residualBifSphere = @(x) aux.mergeResiduals(func,continuation.corrector(func,oihSphere),x,x0,dsBif,[],oihSphere);
         %% find directions of known path
+        % get jacobian of bifurcation point
+        bifJacobian = oih.bifurcation.jacobian{ii};
         for jj=1:2
-            if jj==1
-                varAllTemp = oih.path.varAll(:,1:bifTrace(1,ii));
-                lAllTemp = oih.path.lAll(1:bifTrace(1,ii));
-            else
-                varAllTemp = oih.path.varAll(:,end:-1:bifTrace(1,ii));
-                lAllTemp = oih.path.lAll(end:-1:bifTrace(1,ii));
-            end
-            [varBifPredictor,lBifPredictor] = continuation.predictor(oihSphere,dsBif,[],func,resCorr);
+            [varBifPredictor,lBifPredictor] = continuation.predictor(oihSphere,(-1)^jj*dsBif,bifJacobian,func,resCorr,indBif);
             xBifPredictor = [varBifPredictor;lBifPredictor];
             dscale = aux.getDscale(oih,xBifPredictor);
             [xBifIj,~,solverBifExitflag] = oih.solver.main(residualBifSphere,xBifPredictor,dscale);
