@@ -53,7 +53,7 @@ for kk = 1:size(foundBifs,2)
         case 1
             marker = 'o';
         otherwise
-            marker = 's'
+            marker = 's';
     end
     xBif = lAll(foundBifs(1,kk));
     yBif = varAll(1,foundBifs(1,kk));
