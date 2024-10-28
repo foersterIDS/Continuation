@@ -14,10 +14,12 @@ function [varInterp,paraInterp,sInterp] = smoothenPath(varData, paraData, sData,
         paraData (:,:) double {mustBeReal}
         sData (1,:) double {mustBeIncreasing(sData)} = []
         NameValueArgs.number double {mustBeInteger,mustBeGreaterThan(NameValueArgs.number,0),mustBeScalarOrEmpty} = []
-        NameValueArgs.increment double {mustBeInteger,mustBeGreaterThan(NameValueArgs.increment,0),mustBeScalarOrEmpty} = []
-        NameValueArgs.interpolationMethod (1,:) char {mustBeMember(NameValueArgs.interpolationMethod, {'linear','pchip','makima','spline'})} = 'spline'
-        NameValueArgs.sTolerance (1,1) double {mustBeGreaterThan(NameValueArgs.sTolerance,0)} = 1e-2
+        NameValueArgs.increment double {mustBeGreaterThan(NameValueArgs.increment,0),mustBeScalarOrEmpty} = []
+        NameValueArgs.interpolationMethod (1,:) char {mustBeMember(NameValueArgs.interpolationMethod, {'linear','pchip','makima','spline'})} = 'makima'
+        NameValueArgs.sTolerance (1,1) double {mustBeGreaterThan(NameValueArgs.sTolerance,0)} = 1e-4
         NameValueArgs.maxIterations (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.maxIterations,0)} = 3
+        NameValueArgs.deletePoints (1,1) logical = false
+        NameValueArgs.delTol (1,1) double {mustBePositive} = 0.001
     end
     %% get optional inputs
     if ~isempty(NameValueArgs.number) && ~isempty(NameValueArgs.increment)
@@ -27,6 +29,9 @@ function [varInterp,paraInterp,sInterp] = smoothenPath(varData, paraData, sData,
     elseif ~isempty(NameValueArgs.number)
         numberOfInterpolationPoints = NameValueArgs.number;
         interpolationIncrement = [];
+    elseif ~isempty(NameValueArgs.increment)
+        numberOfInterpolationPoints = [];
+        interpolationIncrement = NameValueArgs.increment;
     elseif isempty(NameValueArgs.number) && isempty(NameValueArgs.increment)
         interpolationIncrement = 1e-3;
         numberOfInterpolationPoints = [];
@@ -81,7 +86,34 @@ function [varInterp,paraInterp,sInterp] = smoothenPath(varData, paraData, sData,
     end
     % add Last point
     xInterp = [xInterp,XLast];
-    sInterp = [sInterp,norm(diff(xInterp(:,end+(-1:0)),1,2))];
+    sInterp = [sInterp,sInterp(end)+norm(diff(xInterp(:,end+(-1:0)),1,2))];
+    %% Delete uneccessary points
+    if NameValueArgs.deletePoints
+        zInterp = [xInterp;sInterp];
+        maxDistance = NameValueArgs.delTol;
+        firstPoint = zInterp(:,1);
+        fPi = 1;
+        nI = length(sInterp);
+        toDelete = zeros(1,nI);
+        for kk = 2:(nI-1)
+            lastPoint = zInterp(:,kk);
+            n = lastPoint-firstPoint;
+            n = n/norm(n);
+            inBetweenPoins = zInterp(:,(fPi+1):(kk-1));
+            if ~isempty(inBetweenPoins)
+                t = n.'*(inBetweenPoins-firstPoint);
+                distance = vecnorm(firstPoint + t .* n - inBetweenPoins,2,1);
+                idx = fPi + find(distance > maxDistance,1,"first");
+                if ~isempty(idx)
+                    toDelete((fPi+1) : (idx-1)) = true;
+                    firstPoint = zInterp(:,idx);
+                    fPi = idx;
+                end
+            end
+        end
+        xInterp(:,toDelete==true) = [];
+        sInterp(toDelete==true) = [];
+    end
     %% create output
     varInterp = xInterp(1:nVar,:);
     paraInterp = xInterp((nVar+1):end,:);
