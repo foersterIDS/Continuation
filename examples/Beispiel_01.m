@@ -26,8 +26,8 @@ testfun02; % Duffing: mu \ddot q + zeta \dot q + kappa q + \gamma q^3 = P cos( O
 [varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
     continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere');
 
-% %% Smoothen path
-% XInterp = aux.smoothenPath([varAll; lAll], sAll);
+%% Smoothen path
+% XInterp = aux.smoothenPath([varAll; lAll], sAll,'deletePoints',true);
 % 
 % % plot smooth curves into figure
 % plotMethod = 'on'; % 'on' or 'threeDim'
