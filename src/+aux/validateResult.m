@@ -33,7 +33,7 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                             oih.is.valid = true;
                         else
                             alpha = acos(((xSolution-xi)'*oih.opt.direction)/(sqrt((xSolution-xi)'*(xSolution-xi))*sqrt(oih.opt.direction'*oih.opt.direction)));
-                            if alpha<oih.opt.alphaReverse
+                            if alpha<oih.opt.alphaReverse || (nPath==1 && alpha<=pi/2)
                                 oih.is.valid = true;
                             else
                                 oih.is.valid = false;
@@ -45,7 +45,7 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                     else
                         xim1 = [oih.path.varAll(:,end-1);oih.path.lAll(end-1)];
                         alpha = acos(((xSolution-xi)'*(xi-xim1))/(sqrt((xSolution-xi)'*(xSolution-xi))*sqrt((xi-xim1)'*(xi-xim1))));
-                        if alpha<oih.opt.alphaReverse
+                        if alpha<oih.opt.alphaReverse || (nPath==1 && alpha<=pi/2)
                             if oih.optIsSet.lMult0 && xSolution(end)-oih.path.lAll(end)<0
                                 oih.is.valid = false;
                                 oih.is.reverse = true;
@@ -64,7 +64,7 @@ function [invPoiStr] = validateResult(xSolution,funSolution,oih,ds,funPredictor,
                             end
                         else
                             if ~isempty(oih.bifurcation.bif) && oih.bifurcation.bif(1,end)==nPath
-                                oih.is.valid = true;
+                                oih.is.valid = true; % Problematisch!
                             else
                                 oih.is.valid = false;
                                 oih.is.reverse = true;
