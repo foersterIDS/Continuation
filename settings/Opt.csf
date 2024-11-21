@@ -18,6 +18,7 @@ correctorOrthogonalMethod<>struct<>OptCorrectorOrthogonalMethod<>#struct#ison:co
 correctPredictor<>eval<>true<>#scalar#logical
 deflation<>eval<>true<>#scalar#logical
 deflationErrorCounter<>double<>5<>#scalar#integer#positive#nonzero
+diffStep<>double<>10^-6<>#scalar#double#positive#nonzero
 diffquot<>struct<>OptDiffQuot<>#struct
 direction<>eval<>sign(lEnd-lStart)*[zeros(size(var0));1]<>#scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
 display<>eval<>true<>#scalar#logical

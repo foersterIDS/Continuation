@@ -18,9 +18,10 @@ function [jac,f0] = numericJacobian(f, x, NameValueArgs)
         NameValueArgs.centralValue (:,1) double
         NameValueArgs.derivativeDimensions (1,:) double {mustBeInteger,mustBeGreaterThanOrEqual(NameValueArgs.derivativeDimensions,1)}
         NameValueArgs.diffQuot (1,1) struct
+        NameValueArgs.diffStep (1,1) double = 1e-6
     end
     
-    epsilon = 1e-6;
+    epsilon = NameValueArgs.diffStep;
     epsilonInv = 1/epsilon;
     nx = length(x); % Dimension of the input x;
     

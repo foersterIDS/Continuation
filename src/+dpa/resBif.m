@@ -13,7 +13,7 @@ function [R] = resBif(fun,x,g,oih,scale)
     else
         R1 = fun(x(1:end-1),x(end),g);
         funJ = @(v) fun(v,x(end),g);
-        J1 = aux.numericJacobian(funJ,x(1:end-1),'centralValue',R1,'diffquot',oih.opt.diffquot);
+        J1 = aux.numericJacobian(funJ,x(1:end-1),'centralValue',R1,'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep);
     end
     R = det(J1)*scale;
 end

@@ -40,7 +40,7 @@ function [residual,jacobian] = residualOrthogonal2(x,xAll,ds,fun,Jac,oih)
     if oih.opt.jacobian
         [fx,Jx] = fun(x(1:(end-1)),x(end));
     else
-        [Jx,fx] = aux.numericJacobian(@(x) fun(x(1:(end-1)),x(end)),x);
+        [Jx,fx] = aux.numericJacobian(@(x) fun(x(1:(end-1)),x(end)),x,'diffStep',oih.opt.diffStep);
     end
     % normal vector to orthogonal hyper plane
     nx = numel(x);

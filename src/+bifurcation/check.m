@@ -177,7 +177,7 @@ function check(func,oih,resCorr)
                         oih.path.varAll = [oih.path.varAll(:,1:end-1),xBif(1:end-1),oih.path.varAll(:,end)];
                         oih.path.lAll = [oih.path.lAll(1:end-1),xBif(end),oih.path.lAll(end)];
                         % jacobian for xBif
-                        Jacobianbif.solver=aux.numericJacobian(@(x)func(x(1:end-1),x(end)), xBif,'diffquot', oih.opt.diffquot); 
+                        Jacobianbif.solver=aux.numericJacobian(@(x)func(x(1:end-1),x(end)), xBif,'diffquot', oih.opt.diffquot,'diffStep',oih.opt.diffStep); 
                         oih.path.bifTestValue=[oih.path.bifTestValue(1:end-1) oih.opt.bifAdditionalTestfunction(func,xBif,Jacobianbif,oih.path,oih.info),oih.path.bifTestValue(end)];
                         % 
                         % get type of bifurcation

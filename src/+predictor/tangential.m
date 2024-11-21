@@ -14,10 +14,10 @@ function [funPredictor,JacPredictor] = tangential(oih,s,solverJacobian,fun,idx)
         if nj2==nd
             jac = solverJacobian(1:nd-1,1:nd);
         else
-            jac = [solverJacobian(1:nd-1,1:nj2),aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivativeDimensions',(nj2+1):nd,'diffquot',oih.opt.diffquot)];
+            jac = [solverJacobian(1:nd-1,1:nj2),aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'derivativeDimensions',(nj2+1):nd,'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep)];
         end
     else
-        jac = aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',oih.opt.diffquot);
+        jac = aux.numericJacobian(@(x) fun(x(1:end-1),x(end)),xi,'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep);
     end
     %% build system of equations:
     [~,m] = max(abs(diff(xAll(:,idx+(-1:0)),1,2)));

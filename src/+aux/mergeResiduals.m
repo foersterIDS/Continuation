@@ -14,7 +14,7 @@ function [varargout] = mergeResiduals(func,resCorr,x,xAll,ds,lastJacobian,oih)
         [n11,n12] = size(J1);
         [n21,n22] = size(J2);
         if n12<=n11
-            J1l = aux.numericJacobian(@(x) func(x(1:end-1),x(end)), x, 'derivativeDimensions', (n12+1):numel(x), 'diffquot', oih.opt.diffquot, 'centralValue', R1);
+            J1l = aux.numericJacobian(@(x) func(x(1:end-1),x(end)), x, 'derivativeDimensions', (n12+1):numel(x), 'diffquot', oih.opt.diffquot, 'centralValue', R1,'diffStep',oih.opt.diffStep);
         elseif n12>n22
             J1 = J1(:,1:n22);
             J1l = [];

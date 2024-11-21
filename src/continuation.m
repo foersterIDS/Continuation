@@ -60,6 +60,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.deflation {validation.scalarLogical}
         NameValueArgs.deflationErrorCounter (1,1) double {mustBeGreaterThan(NameValueArgs.deflationErrorCounter,0)}
         NameValueArgs.diffquot (1,:) char {mustBeMember(NameValueArgs.diffquot,{'forward','central'})}
+        NameValueArgs.diffStep (1,1) double {mustBeGreaterThan(NameValueArgs.diffStep,0)} % #scalar#double#positive
         NameValueArgs.direction (:,1) double % #scalar#pmone|#array#double#norm:1#size:[numel(var0)+1,1]
         NameValueArgs.display {validation.scalarLogical}
         NameValueArgs.dpa {validation.scalarLogical} % #scalar#logical#false|#scalar#logical#true#isoff:plot|#scalar#logical#true#ison:plot.dpa
@@ -184,7 +185,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             lInitial = oih.opt.l0;
         end
         xInitial = [varInitial;lInitial];
-        oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xInitial,'centralValue',funInitial,'derivativeDimensions',oih.info.nv+(1:oih.info.nl),'diffquot',oih.opt.diffquot)];
+        oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xInitial,'centralValue',funInitial,'derivativeDimensions',oih.info.nv+(1:oih.info.nl),'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep)];
         if oih.optIsSet.lMult0
             func = @(v,l) oih.path.fOfvarAndlSingleIO(func,v,l);
         end
@@ -310,7 +311,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
                 aux.checkJacobian(residualTarget,funSolution,varSolution,oih);
                 if oih.solver.exitflag>0
                     nDer = numel(oih.solver.jacobian(1,:));
-                    oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xSolution,'centralValue',funSolution,'derivativeDimensions',(nDer+1):(oih.info.nv+oih.info.nl),'diffquot',oih.opt.diffquot)];
+                    oih.solver.jacobian = [oih.solver.jacobian,aux.numericJacobian(@(x) func(x(1:oih.info.nv),x(oih.info.nv+(1:oih.info.nl))),xSolution,'centralValue',funSolution,'derivativeDimensions',(nDer+1):(oih.info.nv+oih.info.nl),'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep)];
                 end
             else
                 %% regular solver

@@ -13,7 +13,7 @@ function [R] = residualAdditionalTestfunction(func,x,oih)
     end
      % evaluate Jacobian for every new x
      % cannot use input "Jacobian", as this is evaluated at the last path step
-    Jacobianbif.solver = aux.numericJacobian(@(x)func(x(1:end-1),x(end)), x,'diffquot', oih.opt.diffquot);                  
+    Jacobianbif.solver = aux.numericJacobian(@(x)func(x(1:end-1),x(end)), x,'diffquot', oih.opt.diffquot,'diffStep',oih.opt.diffStep);                  
     R2 = oih.opt.bifAdditionalTestfunction(func,x,Jacobianbif,oih.path,oih.info);
     R = [R1;R2];
 end

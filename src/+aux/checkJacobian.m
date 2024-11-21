@@ -18,7 +18,7 @@ function checkJacobian(fun,f0,x0,oih)
         if isMATLABReleaseOlderThan('R2023b')
             %% R2023a and older
             % numeric Jacobian
-            jacobianNum = aux.numericJacobian(@(xt) fun(xt),x0,'centralValue',f0,'diffquot',oih.opt.diffquot);
+            jacobianNum = aux.numericJacobian(@(xt) fun(xt),x0,'centralValue',f0,'diffquot',oih.opt.diffquot,'diffStep',oih.opt.diffStep);
             % compare with user provided Jacobian
             [na1,na2] = size(oih.solver.jacobian);
             [nn1,nn2] = size(jacobianNum);
