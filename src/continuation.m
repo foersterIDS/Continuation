@@ -301,12 +301,30 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         %
         try
             dscale = aux.getDscale(oih);
-            if sign(oih.path.lAll(end)-oih.opt.lTarget)*sign(lPredictor*(1+oih.opt.targetTol)-oih.opt.lTarget)<=0
+            targetWithinReach = sign(oih.path.lAll(end)-[oih.info.lStart,oih.opt.lTarget,oih.info.lEnd]).*sign(lPredictor-[oih.info.lStart,oih.opt.lTarget,oih.info.lEnd])<=0;
+            if any(targetWithinReach) && oih.path.nAll>1
+				%% set target
+				if sum(targetWithinReach)==1
+					switch find(targetWithinReach)
+						case 1
+							lTargetTemp = oih.info.lStart;
+						case 2
+							lTargetTemp = oih.opt.lTarget;
+						case 3
+							lTargetTemp = oih.info.lEnd;
+					end
+				elseif targetWithinReach(2)
+					lTargetTemp = oih.opt.lTarget;
+				elseif targetWithinReach(3)
+					lTargetTemp = oih.info.lEnd;
+				else
+					lTargetTemp = oih.info.lStart;
+				end
                 %% try to converge to target
-                residualTarget = @(v) aux.residualFixedValue(func,v,oih.opt.lTarget,oih);
-                varPredictorCtt = (varPredictor - oih.path.varAll(:,end))*(abs(oih.opt.lTarget-oih.path.lAll(end))/abs(lPredictor-oih.path.lAll(end)))+oih.path.varAll(:,end);
+                residualTarget = @(v) aux.residualFixedValue(func,v,lTargetTemp,oih);
+                varPredictorCtt = (varPredictor - oih.path.varAll(:,end))*(abs(lTargetTemp-oih.path.lAll(end))/abs(lPredictor-oih.path.lAll(end)))+oih.path.varAll(:,end);
                 [varSolution,funSolution,oih.solver.exitflag,oih.solver.output,oih.solver.jacobian] = oih.solver.main(residualTarget,varPredictorCtt,dscale(1:end-1));
-                xSolution = [varSolution;oih.opt.lTarget];
+                xSolution = [varSolution;lTargetTemp];
                 oih.do.convergeToTarget = true;
                 aux.checkJacobian(residualTarget,funSolution,varSolution,oih);
                 if oih.solver.exitflag>0

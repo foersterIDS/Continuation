@@ -59,10 +59,10 @@ function [breakFunOut,ds] = exitLoop(oih, ds, funSolution, breakFunOut)
     %
     %% exit with l<lStart:
     %
-    if sign(oih.info.lEnd-oih.info.lStart)*(oih.path.lAll(end)-oih.info.lStart)<0
+    if sign(oih.info.lEnd-oih.info.lStart)*(oih.path.lAll(end)-oih.info.lStart)<=0
         oih.do.continuation = false;
         oih.info.exitflag = 0;
-        oih.info.exitMsg = '--> continuation stoped: l<lStart';
+        oih.info.exitMsg = '--> continuation stoped: l<=lStart';
     end
     %
     %% exit with success:
