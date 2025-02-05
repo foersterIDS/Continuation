@@ -102,10 +102,12 @@ function check(func,oih,resCorr)
                         optAddPointArgs{numel(optAddPointArgs)+1} = 'speedOfContinuation';
                         optAddPointArgs{numel(optAddPointArgs)+1} = 1;
                     end
+                    % get type of bifurcation by change of sign between
+                    % previous and following point of path
+                    bifType = (sign(oih.path.detJv('name','previous'))==sign(oih.path.detJv('name','last'))); % 1: fold bif.; 0: branch point bif; NaN: unknown
+                    %% add bifurcation point
                     oih.path.addPoint(xBif(1:end-1),xBif(end),bifSolverJacobian,oih,oih.path.nAll,optAddPointArgs{:});
                     % 
-                    % get type of bifurcation
-                    bifType = (sign(oih.path.detJv('name','previous'))==sign(oih.path.detJv('name','last'))); % 1: fold bif.; 0: branch point bif; NaN: unknown
                     %
                     % if bifType = 0 (branch point) calculate directions
                     % of paths by null() and save to oih.bifurcation.dirs cell array

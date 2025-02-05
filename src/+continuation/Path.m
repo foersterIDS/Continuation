@@ -269,21 +269,21 @@ classdef Path < handle
                 NameValueArgs.name (1,:) char {mustBeMember(NameValueArgs.name,{'last','previous','initial','plus'})} = 'last'
             end
             if isfield(NameValueArgs,'index')
-                Jv = obj.JAll{index}(1:obj.nVar,1:obj.nVar);
+                Jv = obj.JAll{index};
             else
                 switch NameValueArgs.name
                     case 'last'
-                        Jv = obj.JAll{end}(1:obj.nVar,1:obj.nVar);
+                        Jv = obj.JAll{end};
                     case 'previous'
                         if obj.nAll>1
-                            Jv = obj.JAll{end-1}(1:obj.nVar,1:obj.nVar);
+                            Jv = obj.JAll{end-1};
                         else
-                            Jv = obj.JAll{end}(1:obj.nVar,1:obj.nVar);
+                            Jv = obj.JAll{end};
                         end
                     case 'initial'
-                        Jv = obj.JAll{1}(1:obj.nVar,1:obj.nVar);
+                        Jv = obj.JAll{1};
                     case 'plus'
-                        Jv = obj.plusStruct.J(1:obj.nVar,1:obj.nVar);
+                        Jv = obj.plusStruct.J;
                 end
             end
             detJv = det(Jv);
