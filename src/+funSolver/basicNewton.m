@@ -21,7 +21,7 @@ function [x,fval,exitflag,output,jacobian] = basicNewton(fun,x0,dscale,outputFla
             [fi,Ji] = fun(xi);
         else
             fi = fun(xi);
-            Ji = aux.numericJacobian(fun,xi,'centralValue',fi,'diffquot',Opt.diffquot,'diffStep',oih.opt.diffStep);
+            Ji = aux.numericJacobian(fun,xi,'centralValue',fi,'diffquot',Opt.diffquot,'diffStep',Opt.diffStep);
         end
         JiSc = Ji*diag(dscale);
         nf = length(fi);
@@ -63,7 +63,7 @@ function [x,fval,exitflag,output,jacobian] = basicNewton(fun,x0,dscale,outputFla
                 'tolerance',absFi);
             if nargout>4
                 if ~Opt.jacobian
-                    Ji = aux.numericJacobian(fun,xi,'centralValue',fi,'diffquot',Opt.diffquot,'diffStep',oih.opt.diffStep);
+                    Ji = aux.numericJacobian(fun,xi,'centralValue',fi,'diffquot',Opt.diffquot,'diffStep',Opt.diffStep);
                 end
                 jacobian = Ji;
             end
