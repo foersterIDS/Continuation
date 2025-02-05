@@ -204,7 +204,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             optArgsAddPoint = [optArgsAddPoint,'bifTestValue',1];
         end
         if oih.optIsSet.pathInfoFunction
-            optArgsAddPoint = [optArgsAddPoint,'pathInfoValue',oih.opt.pathInfoFunction(func,oih.path,varInitial,oih.opt.l0)];
+            optArgsAddPoint = [optArgsAddPoint,'pathInfoValue',oih.opt.pathInfoFunction(func,jacobianInitial,varInitial,oih.opt.l0)];
         end
         if oih.stepsizeOptions.predictor
             optArgsAddPoint = [optArgsAddPoint,'predictor',[oih.info.var0;oih.info.lStart]];
