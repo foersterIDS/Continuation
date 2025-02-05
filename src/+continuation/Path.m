@@ -568,7 +568,7 @@ classdef Path < handle
                 %% toggle plus
                 if obj.stepBackStatus
                     %% add plus
-                    obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
+                    % obj.bifTestValue = [obj.bifTestValue,obj.plusStruct.bifTestValue];
                     if obj.oih.opt.jacobianOut.basic
                         obj.JAll{3} = obj.JAll{2};
                         obj.JAll{2} = obj.plusStruct.J;
@@ -578,7 +578,7 @@ classdef Path < handle
                         error('jacobianOut must be full or basic!');
                     end
                     obj.lAll = [obj.lAll,obj.plusStruct.l];
-                    obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
+                    % obj.pathInfoValue = [obj.pathInfoValue,obj.plusStruct.pathInfoValue];
                     obj.signDetJRedAll = [obj.signDetJRedAll,obj.plusStruct.signDetJRed];
                     obj.varAll = [obj.varAll,obj.plusStruct.var];
                     if obj.oih.optIsSet.bifAdditionalTestfunction
