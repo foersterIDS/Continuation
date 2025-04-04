@@ -64,7 +64,7 @@ function EI = calcError(oih,previous)
     if weights(3) ~= 0
         lengthArrays = length(oih.path.speedOfContinuation);
     elseif weights(4) ~= 0
-        lengthArrays = length(oih.path.rateOfConvergence);
+        lengthArrays = length(oih.path.rateOfContraction);
     elseif weights(5) ~= 0
         lengthArrays = length(oih.path.xPredictorAll(1,:));
     else
