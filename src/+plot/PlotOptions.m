@@ -67,6 +67,7 @@ classdef PlotOptions < handle
                 options.createAnimation (1,1) logical = false
                 options.customDPI (1,1) double {mustBeGreaterThanZeroOrNaN(options.customDPI)} = NaN
                 options.skipFrames (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(options.skipFrames,0)} = 0
+                options.fps (1,1) double {mustBeInteger, mustBeGreaterThan(options.fps,0)} = 30
             end
             %% argument validation
             changeInputOfPlotFunctionToDefault = false;
@@ -143,7 +144,7 @@ classdef PlotOptions < handle
                 end
                 obj.vidObject = VideoWriter(fName,"MPEG-4");
                 obj.vidObject.Quality = 100;
-                obj.vidObject.FrameRate = 30;
+                obj.vidObject.FrameRate = options.fps;
                 obj.vidObject.open();
             end
 

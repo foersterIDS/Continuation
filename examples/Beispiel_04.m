@@ -32,8 +32,12 @@ customDPI = 200;
 % Name des Videos
 %
 fName = 'Test';
+%
+% FPS
+%
+fps = 30;
 
 %% Pfadverfolgung aufrufen
 [varAll,lAll,exitflag,bifs,sAll,jacobianOut,breakFunOut] = ...
     continuation(fun,v0,lams,lame,ds0,'dsMax',dsMax,'plot','on','corrector','sphere',...
-    'plotOptions',plot.PlotOptions("figure",fHandle,'createAnimation',true,'skipFrames',skipFrames,'customDPI',customDPI,'animationFilename',fName));
+    'plotOptions',plot.PlotOptions("figure",fHandle,'createAnimation',true,'skipFrames',skipFrames,'customDPI',customDPI,'animationFilename',fName,'fps',fps));
