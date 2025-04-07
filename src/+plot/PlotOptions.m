@@ -17,6 +17,10 @@ classdef PlotOptions < handle
         colormap (1,:) char = 'default'
         grid (1,:) char = 'on'
         dpaYFunction (1,1) function_handle = @(v) v
+        animationFilename (1,:) char = ''
+        createAnimation (1,1) logical = false
+        customDPI (1,1) double {mustBeGreaterThanZeroOrNaN(customDPI)} = NaN
+        skipFrames (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(skipFrames,0)} = 0
     end
 
     properties (Hidden)
@@ -27,10 +31,12 @@ classdef PlotOptions < handle
         axisOptions
         plotFunction
         mode (1,:) char {mustBeMember(mode,{'default','3d','dpa','custom'})} = 'default'
+        vidObject = []
     end
 
     properties (Access=private)
         initial = true
+        skipFramesCounter = 0
     end
 
     methods
@@ -57,6 +63,10 @@ classdef PlotOptions < handle
                 options.index3D (1,2) double {mustBeInteger} = [1,2]
                 options.dpaYFunction (1,1) function_handle = @(v) v
                 options.usePath (1,1) logical = false
+                options.animationFilename (1,:) char = ''
+                options.createAnimation (1,1) logical = false
+                options.customDPI (1,1) double {mustBeGreaterThanZeroOrNaN(options.customDPI)} = NaN
+                options.skipFrames (1,1) double {mustBeInteger,mustBeGreaterThanOrEqual(options.skipFrames,0)} = 0
             end
             %% argument validation
             changeInputOfPlotFunctionToDefault = false;
@@ -123,6 +133,19 @@ classdef PlotOptions < handle
                     options.ZLabel = '';
                 end
             end
+            
+            %% create video file (if needed)
+            if options.createAnimation
+                if isempty(options.animationFilename)
+                    fName = ['Animation_',num2str(round(rand*(10^9-10^8-1)+10^8))];
+                else
+                    fName = options.animationFilename;
+                end
+                obj.vidObject = VideoWriter(fName,"MPEG-4");
+                obj.vidObject.Quality = 100;
+                obj.vidObject.FrameRate = 30;
+                obj.vidObject.open();
+            end
 
             %% fill object
             fields = fieldnames(options);
@@ -184,6 +207,34 @@ classdef PlotOptions < handle
             end
             obj.mode = 'dpa';
             obj.plotFunction = [];
+        end
+
+        %% Other Methods
+        function val = drawFrame(obj)
+            obj.skipFramesCounter = obj.skipFramesCounter + 1;
+            if mod(obj.skipFramesCounter,obj.skipFrames+1) == 1
+                val = true;
+            else
+                val = false;
+            end
+        end
+
+        function writeFrame(obj)
+            if ~isnan(obj.customDPI)
+                cdata = print(obj.figure,'-RGBImage',['-r',int2str(round(obj.customDPI))]);
+                % If one of the dimensions is not even, it has to be
+                % padded
+                if mod(size(cdata,1),2) ~= 0
+                    cdata(end+1,:,:) = 255;
+                end
+                if mod(size(cdata,2),2) ~= 0
+                    cdata(:,end+1,:) = 255;
+                end
+                img = cdata;
+            else
+                img = getframe(obj.figure).cdata;
+            end
+            obj.vidObject.writeVideo(img);
         end
     end
 end

@@ -209,6 +209,9 @@ function livePlot(oih,dpaPoints)
                 end
             end
             drawnow limitrate;
+            if oih.opt.plotOptions.createAnimation && oih.opt.plotOptions.drawFrame()
+                oih.opt.plotOptions.writeFrame();
+            end
         end
     elseif difference < 0
         % delete points

@@ -495,6 +495,12 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         end
         drawnow;
     end
+    if oih.opt.plotOptions.createAnimation
+        if oih.opt.plotOptions.createAnimation && ~oih.opt.plotOptions.drawFrame()
+            oih.opt.plotOptions.writeFrame();
+        end
+        oih.opt.plotOptions.vidObject.close();
+    end
     %
     %% bifurcation tracing
     %
