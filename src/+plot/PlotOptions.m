@@ -212,7 +212,7 @@ classdef PlotOptions < handle
         %% Other Methods
         function val = drawFrame(obj)
             obj.skipFramesCounter = obj.skipFramesCounter + 1;
-            if mod(obj.skipFramesCounter,obj.skipFrames+1) == 1
+            if (obj.skipFrames == 0) || (mod(obj.skipFramesCounter,obj.skipFrames+1) == 1)
                 val = true;
             else
                 val = false;
