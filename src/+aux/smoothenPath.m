@@ -84,9 +84,6 @@ function [varInterp,paraInterp,sInterp] = smoothenPath(varData, paraData, sData,
         %
         kIt = kIt + 1;
     end
-    % add Last point
-    xInterp = [xInterp,XLast];
-    sInterp = [sInterp,sInterp(end)+norm(diff(xInterp(:,end+(-1:0)),1,2))];
     %% Delete uneccessary points
     if NameValueArgs.deletePoints
         zInterp = [xInterp;sInterp];
