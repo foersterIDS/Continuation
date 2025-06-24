@@ -93,7 +93,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.nBifSearch (1,1) double {mustBeGreaterThan(NameValueArgs.nBifSearch,0)}
         NameValueArgs.nIterOpt (1,1) double {mustBeGreaterThan(NameValueArgs.nIterOpt,0)}
         NameValueArgs.nStepMax (1,1) double {mustBeInteger,mustBeGreaterThan(NameValueArgs.nStepMax,0)}
-        NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeSmallerThan(NameValueArgs.optimalContractionRate,1)}
+        NameValueArgs.optimalContractionRate (1,1) double {mustBeGreaterThan(NameValueArgs.optimalContractionRate,0),mustBeLessThan(NameValueArgs.optimalContractionRate,1)}
         NameValueArgs.pathInfoFunction (1,1) function_handle
         NameValueArgs.pauseOnError {validation.scalarLogical}
         NameValueArgs.plot {validation.scalarLogical}
@@ -120,7 +120,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
         NameValueArgs.stepSizeErrorMax (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeErrorMax,0)}
         NameValueArgs.stepSizeErrorPd (1,:) double {mustBeGreaterThanOrEqual(NameValueArgs.stepSizeErrorPd,0)}
         NameValueArgs.stepSizeEvent {validation.scalarLogical}
-        NameValueArgs.stepSizeIterationsBeta (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeIterationsBeta,0),mustBeSmallerThan(NameValueArgs.stepSizeIterationsBeta,2)}
+        NameValueArgs.stepSizeIterationsBeta (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeIterationsBeta,0),mustBeLessThan(NameValueArgs.stepSizeIterationsBeta,2)}
         NameValueArgs.stepSizeExponentialWeight (1,1) double {mustBeGreaterThan(NameValueArgs.stepSizeExponentialWeight,0)}
         NameValueArgs.stepSizePidParams (1,3) double {mustBeGreaterThan(NameValueArgs.stepSizePidParams,0)}
         NameValueArgs.stepSizePidTol (1,1) double {mustBePositive}
