@@ -388,7 +388,7 @@ function [varAll,lAll,exitflag,bifStruct,sAll,jacobianOut,breakFunOut,infoOutStr
             if size(solverStepsizes, 1) < 3
                 oih.solver.output.rateOfContraction = oih.opt.optimalContractionRate;
             else
-                oih.solver.output.rateOfContraction = solverStepsizes(3,2)/solverStepsizes(2,2);
+                oih.solver.output.rateOfContraction = solverStepsizes(2,2)/solverStepsizes(1,2);
             end
         end
         %

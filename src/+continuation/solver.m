@@ -77,7 +77,8 @@ function stop = outputFun(x,optimValues,state)
             solverStepsizes = [];
         case 'iter'
             iter = optimValues.iteration;               % Iteration
-            normd = optimValues.stepsize;               % Norm of step
+            % normd = optimValues.stepsize;               % Norm of step
+            normd = norm(optimValues.gradient);
             solverStepsizes = [solverStepsizes; iter normd];
     end
 end
