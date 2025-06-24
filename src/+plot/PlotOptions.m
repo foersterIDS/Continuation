@@ -222,7 +222,7 @@ classdef PlotOptions < handle
 
         function writeFrame(obj)
             if ~isnan(obj.customDPI)
-                cdata = print(obj.figure,'-RGBImage',['-r',int2str(round(obj.customDPI))]);
+                cdata = print(obj.figure,'-RGBImage',['-r',int2str(round(obj.customDPI))],'-noui');
                 % If one of the dimensions is not even, it has to be
                 % padded
                 if mod(size(cdata,1),2) ~= 0
